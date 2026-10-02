@@ -88,55 +88,200 @@ verification includes race checks; the shared GitHub Actions workflow runs the s
 | request | Scoped streaming test-peer lifetimes, cancellation-aware bounded accepts and deterministic lifecycle regressions |
 | verification | Pinned reusable GitHub Actions CI for every ecosystem repository, native prerequisites, preserved candidate checkouts, independent verification and race checks |
 
+## Ecosystem-wide improvement audit
+
+This batch reviews all 64 library repositories individually. The tables pair the
+observed gap with the bounded change selected for this round; the backlog below
+records further work rather than claiming parity with mature libraries. Each
+module link leads to its public API, limits and regression tests.
+
+All 64 libraries have implementation, documentation and regression changes with
+module-local tests and isolated downstream verification. Integrated verification
+and CI status remain pending the coordinated final run.
+
+### Numeric and graph libraries
+
+| Module | Finding and improvement |
+| --- | --- |
+| [bigint](https://github.com/gomlang/bigint/blob/main/README.md) | Modular inversion was missing; add bounded signed/unsigned inverses with canonical residues, non-coprime results and zero-modulus errors. |
+| [bigmath](https://github.com/gomlang/bigmath/blob/main/README.md) | Exact integer conversion rejected fractions; add rational rounding to arbitrary-size integers in six modes without a floating intermediate. |
+| [decimal](https://github.com/gomlang/decimal/blob/main/README.md) | Exact division rejected representable boundary scales; normalize or pad finite quotients before checking representation limits. |
+| [ndarray](https://github.com/gomlang/ndarray/blob/main/README.md) | Finite mean/variance inputs could overflow intermediate sums; retry in scaled coordinates while preserving ordinary and IEEE special-value paths. |
+| [graph](https://github.com/gomlang/graph/blob/main/README.md) | Hub deletion repeatedly scanned incident adjacency; batch removals and clear slots directly while preserving ordering and stable handles. |
+| [bitflags](https://github.com/gomlang/bitflags/blob/main/README.md) | Name iteration could not expose unnamed or partial-composite bits; add ascending, fused one-bit iteration preserving all in-width bits. |
+
+### Codecs and formats
+
+| Module | Finding and improvement |
+| --- | --- |
+| [archive](https://github.com/gomlang/archive/blob/main/README.md) | A ZIP descriptor CRC equal to the signature was misclassified; match classic/ZIP64 signed and unsigned layouts against indexed metadata. |
+| [compress](https://github.com/gomlang/compress/blob/main/README.md) | Exact-budget GZIP EOF was rejected; allow one documented EOF probe after complete members, preserving sticky limits and provider errors. |
+| [msgpack](https://github.com/gomlang/msgpack/blob/main/README.md) | Impossible declarations waited for payloads; reject announced byte/value budgets at headers, including extension framing and map child counts. |
+| [csv](https://github.com/gomlang/csv/blob/main/README.md) | Excess columns were rejected only after reading their fields; fail immediately at the delimiter, retaining precise positions and sticky errors. |
+| [asn1](https://github.com/gomlang/asn1/blob/main/README.md) | DER validation omitted restricted string repertoires and ENUMERATED encoding rules; validate them recursively while retaining raw TLV framing APIs. |
+| [xml](https://github.com/gomlang/xml/blob/main/README.md) | Short comments and document/end-tag whitespace were mishandled; recognize short comments and enforce literal XML whitespace and end-tag grammar. |
+
+### Protocols and certificates
+
+| Module | Finding and improvement |
+| --- | --- |
+| [request](https://github.com/gomlang/request/blob/main/README.md) | Chunk extensions were silently ignored without grammar checks; share strict bounded validation across buffered and streaming HTTP/1.1 responses. |
+| [http](https://github.com/gomlang/http/blob/main/README.md) | Add bounded Content-Length normalization for repeated/list values and transfer-encoding conflicts; limit Connection whitespace to HTTP SP/HTAB. |
+| [websocket](https://github.com/gomlang/websocket/blob/main/README.md) | Required tokens could hide malformed later members; validate every Upgrade/Connection member on client and server handshakes. |
+| [textproto](https://github.com/gomlang/textproto/blob/main/README.md) | Add bounded numeric multiline replies with repeated-code checks, exact consumption, byte/count limits and existing reader failure semantics. |
+| [mime](https://github.com/gomlang/mime/blob/main/README.md) | Encoded words accepted malformed payloads and unsafe phrase punctuation; validate RFC 2047 encoded text and emit phrase-safe Q encoding. |
+| [mail](https://github.com/gomlang/mail/blob/main/README.md) | Comments obscured trailing commas and group boundaries; track separators explicitly, validate group labels and retain valid empty groups. |
+| [x509](https://github.com/gomlang/x509/blob/main/README.md) | Add typed BasicConstraints DER encoding/decoding with canonical defaults, checked path lengths and extension integration. |
+
+### Storage and servers
+
+| Module | Finding and improvement |
+| --- | --- |
+| [sql](https://github.com/gomlang/sql/blob/main/README.md) | Cursor cleanup errors were lost; close exactly once on returns/unwinding and preserve primary errors alongside close failures. |
+| [sqlite](https://github.com/gomlang/sqlite/blob/main/README.md) | Mutable binary inputs/row values could alias retained storage; copy Blob/TextBytes parameters, row accessors and Bytes conversions. |
+| [redis](https://github.com/gomlang/redis/blob/main/README.md) | Panicking WATCH callbacks could leak established transactions; defer connection cleanup through WATCH/MULTI scopes and preserve panic propagation. |
+| [web](https://github.com/gomlang/web/blob/main/README.md) | Static responses lacked strong If-Match handling and applied ranges to HEAD; enforce precondition precedence and restrict ranges to GET. |
+
+### Parsing and persistent text
+
+| Module | Finding and improvement |
+| --- | --- |
+| [parser](https://github.com/gomlang/parser/blob/main/README.md) | Add budgeted many_until with termination-first probing, committed-error preservation, merged diagnostics and zero-progress rejection. |
+| [syntax](https://github.com/gomlang/syntax/blob/main/README.md) | Small text slices traversed preceding tokens; seek overlapping tokens by cached child offsets while preserving checked UTF-8/subtree bounds. |
+| [logos](https://github.com/gomlang/logos/blob/main/README.md) | Repeated position queries rescanned prefixes; cache scalar line/column traversal while preserving independent forks and shared morph state. |
+| [regexp](https://github.com/gomlang/regexp/blob/main/README.md) | All-match collection was eager; add lazy matches with one shared work/match budget, fused failure and explicit cursor/input ownership. |
+| [diff](https://github.com/gomlang/diff/blob/main/README.md) | Myers reconstruction expanded every unchanged element; reconstruct coalesced ranges directly, preserving tie policy and patch behavior. |
+| [rope](https://github.com/gomlang/rope/blob/main/README.md) | Backward scalar traversal was absent; add reverse scalar iterators and checked exclusive-boundary starts over persistent snapshots. |
+| [proptest](https://github.com/gomlang/proptest/blob/main/README.md) | Subnormal interpolation could escape finite bounds; clamp rounding and preserve singleton signed zero, including replay/shrink cases. |
+
+### Documents and language tooling
+
+| Module | Finding and improvement |
+| --- | --- |
+| [template](https://github.com/gomlang/template/blob/main/README.md) | Add stable forward/reverse sorting by a nested attribute path, with checked keys and charged operation budgets. |
+| [markdown](https://github.com/gomlang/markdown/blob/main/README.md) | Escaping could allocate beyond the output budget before rejection; preflight escape expansion and emit URL encoding through checked fragments. |
+| [html](https://github.com/gomlang/html/blob/main/README.md) | Decoding bounded output only after construction; add exact decoded-length preflight, bounded construction and efficient literal runs. |
+| [highlight](https://github.com/gomlang/highlight/blob/main/README.md) | Lone CR and ATX indentation were misclassified; preserve LF/CRLF/CR boundaries and recognize heading indentation using ASCII spaces only. |
+| [go_doc](https://github.com/gomlang/go_doc/blob/main/README.md) | Literal comments became Markdown syntax and code labels broke spans; escape punctuation/destinations and choose safe code-span delimiters. |
+| [lsp](https://github.com/gomlang/lsp/blob/main/README.md) | Content-Type splitting mishandled quoted semicolons/escapes; parse bounded parameters, validate charset values and preserve poison/reset behavior. |
+
+### State and filesystem libraries
+
+| Module | Finding and improvement |
+| --- | --- |
+| [cache](https://github.com/gomlang/cache/blob/main/README.md) | Related invalidations could interleave; add atomic multi-key invalidation with one expiration pass, load cancellation and callbacks after batch commit. |
+| [incremental](https://github.com/gomlang/incremental/blob/main/README.md) | Several public reads needed synthetic queries for one revision; add scoped coherent evaluations with expiring capabilities and cancellable admission. |
+| [pipeline](https://github.com/gomlang/pipeline/blob/main/README.md) | Per-run generators lacked a cleanup hook; add resource acquisition and exactly-once release across exhaustion, early stop, errors and cancellation. |
+| [config](https://github.com/gomlang/config/blob/main/README.md) | Cancellation stopped event waiting but not queued reload/publication; add cancellable reload admission and preserve the previous snapshot/error state for abandoned candidates. |
+| [tempfile](https://github.com/gomlang/tempfile/blob/main/README.md) | Seek-based random access disturbed shared cursors; add positioned I/O across anonymous, named and spooled files, preserving offsets through rollover. |
+| [ignore](https://github.com/gomlang/ignore/blob/main/README.md) | Exclusion callbacks could close/cancel a walker yet still yield entries; recheck lifecycle immediately after either predicate result. |
+| [notify](https://github.com/gomlang/notify/blob/main/README.md) | Cancellable reads could block on watcher locks; make admission cancellable, restore locks on unwind and drain final poll readiness before completion. |
+| [walkdir](https://github.com/gomlang/walkdir/blob/main/README.md) | Traversal had no cancellation-aware descriptor cleanup; add contexts, boundary/batch checks and one Interrupted error followed by permanent exhaustion. |
+
+### Terminal applications
+
+| Module | Finding and improvement |
+| --- | --- |
+| [ansi](https://github.com/gomlang/ansi/blob/main/README.md) | Tab wrapping discarded remaining line capacity; fill it before continuing expanded styled/link-bearing spaces across wrapped lines. |
+| [terminal](https://github.com/gomlang/terminal/blob/main/README.md) | SOS payloads leaked as keys; retain bounded opaque strings until ST or timeout/flush, with fragmented input and exact restoration tested through a real PTY. |
+| [tui](https://github.com/gomlang/tui/blob/main/README.md) | Vertical navigation lost its target column on short lines; retain the intended display column across short, wide and tabbed lines. |
+| [prompt](https://github.com/gomlang/prompt/blob/main/README.md) | Unhandled terminal notifications erased validation/completion state; preserve it when the editor reports no handled action. |
+| [progress](https://github.com/gomlang/progress/blob/main/README.md) | No-op job updates scheduled duplicate output; mark only changed state dirty while preserving already-pending changes and explicit resets. |
+| [tui_markdown](https://github.com/gomlang/tui_markdown/blob/main/README.md) | Reflow reset active search navigation; retain/clamp the match ordinal and keep it visible, preserving selected-link priority. |
+| [tabwriter](https://github.com/gomlang/tabwriter/blob/main/README.md) | Small chunks repeatedly copied/rescanned incomplete lines; buffer incrementally while preserving CRLF, limits and block alignment; clarify control-byte preservation. |
+
+### Text, diagnostics and observability
+
+| Module | Finding and improvement |
+| --- | --- |
+| [color](https://github.com/gomlang/color/blob/main/README.md) | Tiny premultiplied distances squared to zero; use scaled Euclidean norms while retaining deterministic first-entry ties. |
+| [unicode_text](https://github.com/gomlang/unicode_text/blob/main/README.md) | Trimmed spaces after oversized graphemes lost hard-break metadata; compute continuation before assigning the break flag. |
+| [diagnostics](https://github.com/gomlang/diagnostics/blob/main/README.md) | Editor UTF-16 coordinates lacked checked conversion; add strict byte/UTF-16 mapping with scalar/surrogate and line-boundary validation. |
+| [fuzzy](https://github.com/gomlang/fuzzy/blob/main/README.md) | Impossible subsequences allocated scoring matrices or hit their limits; reject them with a cancellation-aware linear feasibility scan first. |
+| [metrics](https://github.com/gomlang/metrics/blob/main/README.md) | Snapshots insertion-sorted under the registry gate; use stable O(n log n) ordering while preserving deterministic labels and detached snapshots. |
+| [tracing](https://github.com/gomlang/tracing/blob/main/README.md) | MemorySink retained records indefinitely; add checked bounded storage and atomic drain, with explicit overflow/failure semantics. |
+| [bench](https://github.com/gomlang/bench/blob/main/README.md) | Imported summaries could contradict raw observations; validate extrema, estimate ranges and total outlier counts with defined rounding tolerance. |
+
+### CLI and native tooling
+
+| Module | Finding and improvement |
+| --- | --- |
+| [cli](https://github.com/gomlang/cli/blob/main/README.md) | Boolean flags rejected defaults/environment values; support normalized true/false/1/0 values with explicit > environment > default precedence and documented provenance. |
+| [object](https://github.com/gomlang/object/blob/main/README.md) | ELF extended symbol-index companions accepted invalid links/layouts; validate uniqueness, correspondence, unused entries and escaped section indexes. |
+| [dwarf](https://github.com/gomlang/dwarf/blob/main/README.md) | Line rows discarded operation/transient state; add parse_sections_detailed with operation index, flags, ISA and discriminator while preserving the original public records and entry point. |
+| [image](https://github.com/gomlang/image/blob/main/README.md) | PNG encoding always used filter zero; select all five row filters with bounded residual scoring and deterministic tie breaking while preserving pixels. |
+| [datetime](https://github.com/gomlang/datetime/blob/main/README.md) | Full-range durations lacked checked scaling; add exact signed integer multiplication through bounded doubling/addition with recoverable overflow. |
+| [llvm](https://github.com/gomlang/llvm/blob/main/README.md) | Integer constants were limited to 64 input bits; add bounded checked text constants in bases 2/8/10/16 under existing context lifetime/locking guards. |
+
 ## Remaining work
 
-| Module | Remaining capabilities |
+| Module | Remaining capabilities and limits |
 | --- | --- |
-| redis | Cluster/Sentinel, typed Streams commands and sharded subscriptions; no automatic retry of ambiguous writes; active standard TLS I/O interruption requires reconnection |
-| lsp | Broader typed feature models (completion, code actions, workspace edits and semantic tokens); the application event loop drives deadline polling |
-| cli | Defaults/environment for flags and counters; dynamic completion providers |
-| diff | Multi-file and Git metadata support, three-way merge, offset/fuzzy application; the linear-space algorithm is explicitly selected and has O(NM) worst-case time |
-| parser | Token-stream and incremental text parsing, further binary/text combinator parity; grammar left recursion still requires rewriting |
-| template | Macros/imports/call blocks, keyword arguments, file-loader invalidation and incremental output writing |
-| markdown | GFM extensions and finer inline source spans; existing CommonMark behavior must remain covered |
-| sql / sqlite | Row derives, batch helpers, statement caching, custom functions, backup and incremental blob APIs; pool acquisition context does not interrupt an already-running SQL statement |
-| pipeline | Error recovery/retry, time-based operators, parallel flat-map and metrics |
-| ndarray | Masked selection/scatter, sorting/quantiles, NPY interchange, SVD/eigen and rank-deficient solve support |
-| msgpack | Incremental field processing, reduced materialization and richer typed extension support; standard I/O adapters buffer one bounded value at a time |
-| graph | Flow/matching algorithms, serialization and configurable cost types |
-| goml_stats | Manifest-based canonical identities, declaration counts and historical comparisons; hierarchical Git ignore rules are provided by the ignore dependency |
-| bitflags | Associated-constant or operator syntax depends on language support; Serde wrappers support explicit or format-sensitive representations; arbitrary declaration expressions and generic storage newtypes are not generated |
-| logos | Compile-time derive/DFA generation, streaming/byte input, named subpatterns and broader Unicode regex properties; current runtime NFA reports equal-priority ambiguity during matching |
-| tempfile | Platforms beyond Linux amd64, cancellation-aware file operations, crash-durable persistence helpers; cleanup assumes no hostile concurrent filesystem changes |
-| request | HTTP/2 streaming, streaming connection reuse, HTTP/3, a websocket adapter, custom DNS, application retries and middleware; current streaming callbacks use bounded HTTP/1.1 connections and buffered requests retain HTTP/2 pooling |
-| llvm | Dominance/loop analysis, MemorySSA, sealed-block SSA construction, specialized instruction/CFG mutation, JIT execution, debug metadata, globals/named structs, vectors/atomics, exception handling, linkage/attributes and explicit ABI-name selection; implemented SSA traversal/editing, parallel-edge PHIs, insertion points, safe erasure and local-variable promotion alongside LLVM 18 target machines and ABI layouts |
-| incremental | Parallel branch evaluation, immutable database snapshots, persistent caches, durability classes and cycle fixed-point recovery; current root operations serialize and callbacks use scoped Evaluation handles |
-| rope | Grapheme and reverse iterators, search, editing history, optional Unicode newline policies and memory-mapped backing; current storage is persistent UTF-8 with LF/CRLF/CR line semantics |
-| web | HTTP/2 and HTTP/3, streaming compression and streaming/upgraded reverse-proxy forwarding; TCP/TLS HTTP/1.1 listeners, WebSocket upgrades, multipart, static files, CORS and bounded buffered gzip are implemented |
-| bigint | Faster multiplication/division for very large operands, primality and modular inverses, roots and rational arithmetic; ordinary arithmetic allocates proportionally to results while input/shift/power operations have explicit budgets |
-| tracing | Distributed trace propagation, OpenTelemetry exporters, richer sampling, byte-budget admission and instrumentation syntax; contexts are explicit and arbitrary sink callbacks must cooperate with shutdown |
-| datetime | Arbitrary-pattern parsing, localization, recurrence scheduling and automatic timezone-data updates; dates cover Gregorian years 1–9999 and timestamps use POSIX seconds without leap records |
-| decimal | Roots and transcendental functions, locale formatting, binary-float conversion and special-value/trap models; current finite arithmetic has explicit 4,096-digit coefficient/precision and scale bounds |
-| cache | Frequency-based admission, sharding and indexed/background expiry; current exact LRU uses O(n) expiry scans when timed entries exist, and synchronous loaders cooperate with cancellation |
-| ignore | Combined multi-pattern automata, tracked-file/index-aware selection, configurable file-type groups and additional platforms; current matching is byte-oriented with explicit work budgets and traversal targets Linux amd64 |
-| syntax | Incremental parsing/reparse orchestration, syntax pointers stable across revisions, multi-edit transactions and weak-reference interning; current library provides immutable lossless trees and checked persistent edits |
-| color | CSS Color 4's full grammar, additional RGB profiles, chromatic adaptation, HDR and ICC; Lab currently uses D65 and the parser documents its subset |
-| unicode_text | Unicode version upgrades, locale/dictionary tailoring, normalization, bidi shaping and sentence segmentation; current tables are pinned to Unicode 16 |
-| ansi | Screen emulation, single-byte C1 mode, extended underline styles/colors and terminal-specific palette discovery |
-| terminal | Additional operating systems, portable signal subscriptions and suspend/resume, Kitty keyboard/modifyOtherKeys, broader terminfo negotiation; current resize detection uses bounded polling |
-| tui | Configurable font/terminal width policies, soft-wrapped persistent editing, system clipboard, widget mouse-hit routing and graphics protocols |
-| prompt | Ranked completion-menu integration with the separate fuzzy library, date/file pickers and batch-mode policies; current callbacks are synchronous and password values are ordinary GC strings |
-| progress | Byte-stream adapters, recursive job trees, pause/resume accounting and arbitrary format templates; applications explicitly drive ticks |
-| diagnostics | Bidi/font shaping, richer graphical label routing and persistent source revisions; edit application returns checked new text without writing files |
-| tui_markdown | Full GFM extensions and integration with the separate highlight library; terminal rendering and optional pipe tables do not change the CommonMark parser's scope |
-| fuzzy | Canonical normalization, accent/transliteration policies, richer query expressions and faster very-large Top-K; scores are library-specific and DP matrix limits are explicit |
-| config | Interpolation, additional format/secret providers, debounce/background scheduling and line/column provenance; file reload targets Linux and TOML inherits the standard parser's scope |
-| websocket | Compression extensions, HTTP/2 CONNECT, proxy/redirect integrations and Autobahn certification; the core currently implements RFC 6455 without extensions |
-| highlight | Semantic scopes, full Markdown inline/block semantics, interpolated-expression scopes and TextMate/Sublime grammar compatibility; source copying remains linear despite lexical suffix reuse |
-| archive | Additional compression/encryption, split archives, legacy filename encodings and GNU sparse extensions; ZIP64 read/write is implemented, while convenience decoding and ZIP entry writing retain documented buffering bounds |
-| metrics | OpenMetrics/native histograms, distributed exporters, automatic runtime instrumentation and sharded update paths; registry operations currently serialize for consistent snapshots |
-| csv | Asynchronous I/O, indexing/seeking, additional escape dialects and nested Serde structures; typed flat rows use an explicit scalar schema and stream operations are synchronous |
-| bench | Allocation/CPU counters, plotting dashboards, process isolation and automated baseline selection; timings include Go runtime effects, cancellation is cooperative and input barriers support scalar values |
+| [bigint](https://github.com/gomlang/bigint/blob/main/README.md) | Faster large-operand multiplication/division and radix conversion, Montgomery reduction, higher roots and prime generation; modular inverses now exist, but arithmetic remains variable-time and has no operation cancellation or constant-time guarantee. |
+| [bigmath](https://github.com/gomlang/bigmath/blob/main/README.md) | Decimal Float parsing/formatting, nonfinite/subnormal values and transcendental functions; rational cross-cancellation could reduce large intermediate products within existing representation limits. |
+| [decimal](https://github.com/gomlang/decimal/blob/main/README.md) | Context precision padding can still exceed stored-scale limits; exact factor removal remains bounded. Roots, transcendental functions, binary-float conversion and special-value/trap models are absent. |
+| [ndarray](https://github.com/gomlang/ndarray/blob/main/README.md) | Masked selection/scatter, sorting/quantiles, NPY interchange, batched factorizations, SVD/eigen and rank-deficient solves; approximate statistics still permit cancellation/underflow, and stddev derives from variance. |
+| [graph](https://github.com/gomlang/graph/blob/main/README.md) | Flow/matching, serialization, configurable weights and dynamic shortest paths; individual edge deletion scans adjacency, deleted slots remain retained for handle identity, and mutable storage is unsynchronized. |
+| [bitflags](https://github.com/gomlang/bitflags/blob/main/README.md) | Associated constants/operators, arbitrary declaration expressions and generic storage derives; one-bit iteration is available, but iterator aliases share a serial cursor. |
+| [archive](https://github.com/gomlang/archive/blob/main/README.md) | Strict PAX fractional timestamps and faster global metadata merging; split/encrypted ZIP, other compression methods, sparse TAR, devices/FIFOs and legacy filename encodings. Documented ZIP buffering bounds still apply. |
+| [compress](https://github.com/gomlang/compress/blob/main/README.md) | Expose optional GZIP header metadata and consider additional formats; codecs retain sequential-owner semantics, and exact-budget GZIP EOF detection may consume one rejected excess source byte. |
+| [msgpack](https://github.com/gomlang/msgpack/blob/main/README.md) | Incremental field processing and richer typed extensions; readers still buffer complete bounded frames. Legal nonminimal encodings and arbitrary ordered map keys remain accepted without canonical map ordering. |
+| [csv](https://github.com/gomlang/csv/blob/main/README.md) | Reduce duplicated raw/decoded bytes used for precise error positions; asynchronous I/O, seeking, dialect inference, comments, nested schemas, transcoding and formula sanitization remain outside the explicit API. |
+| [asn1](https://github.com/gomlang/asn1/blob/main/README.md) | Schema-aware SET versus SET OF ordering, time/REAL/other string validation, relative OIDs and high-tag-number form; generic DER validation is not complete schema validation, and typed schemas omit the newly checked opaque primitives. |
+| [xml](https://github.com/gomlang/xml/blob/main/README.md) | Validate declaration pseudo-attributes/placement and restrict hexadecimal references to lowercase x; DTD/XSD, external/custom entities, nested object mapping and non-UTF-8 encodings remain unsupported. |
+| [request](https://github.com/gomlang/request/blob/main/README.md) | HTTP/2 streaming and streaming reuse, HTTP/3, custom DNS, persistent cookies and general retries; streaming callbacks still use bounded HTTP/1.1 connections, and trailer validation remains duplicated. |
+| [http](https://github.com/gomlang/http/blob/main/README.md) | Live-stream parsing, method/status body semantics and transfer-coding validation; Content-Length checks do not reconcile actual body bytes, and dump helpers are diagnostic rather than byte-exact round trips. |
+| [websocket](https://github.com/gomlang/websocket/blob/main/README.md) | Compression/extensions, HTTP/2 CONNECT, proxy/redirect integration and Autobahn certification; origin/authentication/routes remain application policy, and adapters control interruption of blocked I/O. |
+| [textproto](https://github.com/gomlang/textproto/blob/main/README.md) | SMTP enhanced-status interpretation and FTP unprefixed intermediate replies; reply text remains byte-oriented and callers choose charset/success policy. |
+| [mime](https://github.com/gomlang/mime/blob/main/README.md) | More charsets, structured-field recognition and folding policy; multipart extraction/form policy remains separate from the strict byte-oriented codecs. |
+| [mail](https://github.com/gomlang/mail/blob/main/README.md) | Obsolete route syntax, internationalized addr-specs and broader phrase/CFWS/domain-literal grammar; SMTP delivery, DNS and body decoding are outside this package. |
+| [x509](https://github.com/gomlang/x509/blob/main/README.md) | Complete certificates, signature/chain validation and trust roots; extension criticality, key usage and path enforcement need certificate context. Typed path lengths are bounded to i64. |
+| [sql](https://github.com/gomlang/sql/blob/main/README.md) | Additional backend adapters, generic prepared statements, row derives and batch helpers; pool contexts bound acquisition rather than execution, and collection caps rows rather than retained bytes. |
+| [sqlite](https://github.com/gomlang/sqlite/blob/main/README.md) | Backup, incremental BLOBs, custom SQL functions and byte-bounded collection; one serialized connection is owned by Database, with pooling supplied by the separate sql adapter. |
+| [redis](https://github.com/gomlang/redis/blob/main/README.md) | Cluster/Sentinel and sharded subscriptions; no ambiguous-write replay or forced preemption of uncooperative callbacks/connectors. Panic cleanup covers established WATCH/MULTI scopes rather than arbitrary connector panics. |
+| [web](https://github.com/gomlang/web/blob/main/README.md) | Date validators, multipart ranges, HTTP/2/3 and streaming compression/proxying; static responses remain bounded but fully buffered, and unknown range units currently return 416. |
+| [parser](https://github.com/gomlang/parser/blob/main/README.md) | Token streams, resumable text parsing and further binary/text parity; recovery needs configured delimiters/quotes, left recursion needs rewriting, and callbacks are cooperatively bounded. |
+| [syntax](https://github.com/gomlang/syntax/blob/main/README.md) | Incremental parsing, revision-stable syntax pointers, range-limited public token iterators and multi-edit transactions; covering_element still scans children to preserve leftmost/zero-width selection. |
+| [logos](https://github.com/gomlang/logos/blob/main/README.md) | Compile-time derives/DFA generation, streaming/byte input, captures, named patterns and broader Unicode properties; fallback may revisit input, so matching has no whole-input linear-time guarantee. |
+| [regexp](https://github.com/gomlang/regexp/blob/main/README.md) | Lazy replacement/splitting, named captures, inline flags, lookarounds and backreferences; the iterator retains complete UTF-8 input and is not transport streaming. |
+| [diff](https://github.com/gomlang/diff/blob/main/README.md) | Multi-file/Git metadata, binary patches, three-way merge and fuzzy application; Myers retains bounded quadratic trace space in edit distance, while explicit Hirschberg has O(NM) worst-case time. |
+| [rope](https://github.com/gomlang/rope/blob/main/README.md) | Grapheme, reverse byte/chunk/line and double-ended iteration, search, editing history and memory-mapped backing; reverse scalar iteration is now available over immutable snapshots. |
+| [proptest](https://github.com/gomlang/proptest/blob/main/README.md) | Unbiased generator choices and value-based persistent replay; stores currently retain seeds/sizes, generator changes can alter replay, and custom callbacks cannot be preempted. |
+| [template](https://github.com/gomlang/template/blob/main/README.md) | Macros/imports/call blocks, keyword arguments, recursive loops, file-loader invalidation and incremental output; attribute sorting supports one dot-separated numeric/string key, without multi-key or case-fold syntax. |
+| [markdown](https://github.com/gomlang/markdown/blob/main/README.md) | GFM, footnotes, math, highlighting and finer inline spans; unsuccessful searches can remain quadratic under work budgets, and output bounds do not cover every caller-owned AST or parser allocation. |
+| [html](https://github.com/gomlang/html/blob/main/README.md) | Streaming decoding and tokenizer state; these whole-string utilities do not provide sanitization, URL policy or template-context analysis. |
+| [highlight](https://github.com/gomlang/highlight/blob/main/README.md) | Semantic scopes, full Markdown, interpolation and TextMate/Sublime compatibility; incremental edits still reconstruct/split full source even when lexical suffixes are reused. |
+| [go_doc](https://github.com/gomlang/go_doc/blob/main/README.md) | Go source/symbol extraction, import resolution, automatic URLs, directives, legacy headings and nested list blocks; code-span newlines retain CommonMark normalization. |
+| [lsp](https://github.com/gomlang/lsp/blob/main/README.md) | Broader feature schemas and workspace-edit execution, worker/timer scheduling and concurrent server/session mutation; media-type names remain unrestricted, and applications own language semantics/deadline polling. |
+| [cache](https://github.com/gomlang/cache/blob/main/README.md) | Frequency-based admission, sharding, indexed/background expiry and refresh-ahead; expiry still scans, loader dependency cycles are caller-managed, and batch sizes/callback work remain caller-controlled. |
+| [incremental](https://github.com/gomlang/incremental/blob/main/README.md) | Parallel branch evaluation, persistent snapshots/caches, durability classes and cycle fixed points; roots serialize, callbacks cannot reenter blocking database methods, and failed reads do not roll back valid memoization. |
+| [pipeline](https://github.com/gomlang/pipeline/blob/main/README.md) | Error recovery/retry, time operators, parallel flat-map, durable replay/checkpoints and cleanup-error reporting; resource callbacks are cooperative, release must return normally and external aliases remain caller-owned. |
+| [config](https://github.com/gomlang/config/blob/main/README.md) | Interpolation, more formats/secret providers, debounce/background scheduling and source-line provenance; reads/validators are synchronous and cancelled consumed event batches need an explicit resynchronizing reload. |
+| [tempfile](https://github.com/gomlang/tempfile/blob/main/README.md) | Positioned read_exact/write_all helpers, non-Linux backends and crash-durable persistence; native transfers may be partial, overlapping buffers/writes need synchronization, and cleanup retains depth/concurrent-filesystem limits. |
+| [ignore](https://github.com/gomlang/ignore/blob/main/README.md) | Multipattern automata, tracked-file selection, file-type groups and other platforms; walking remains path-based, bind-mount loops rely on depth/work limits and one walker requires one consumer. |
+| [notify](https://github.com/gomlang/notify/blob/main/README.md) | Other backends, bind-mount aliases and non-UTF-8 event policies; cancellation observes kernel polling within 50 ms but cannot preempt running callbacks, and discarded racing batches may require rescanning. |
+| [walkdir](https://github.com/gomlang/walkdir/blob/main/README.md) | Other platforms and interruptible filesystem operations; active ancestors retain descriptors, early abandonment still needs close, and traversal provides neither a filesystem snapshot nor confinement. |
+| [ansi](https://github.com/gomlang/ansi/blob/main/README.md) | Screen emulation, single-byte C1 mode, extended underline/color models and palette discovery; wrapping remains grapheme-based, with word-aware layout delegated to unicode_text. |
+| [terminal](https://github.com/gomlang/terminal/blob/main/README.md) | Other operating systems, suspend/resume, signal subscriptions, Kitty/modifyOtherKeys, X10 mouse and terminfo negotiation; applications retain exclusive session ownership and cleanup does not install global exit/signal handlers. |
+| [tui](https://github.com/gomlang/tui/blob/main/README.md) | Configurable width policies, soft-wrapped persistent editing, clipboard, mouse-hit routing and graphics protocols; editing remains a single-event-loop model without bidi shaping or IME composition. |
+| [prompt](https://github.com/gomlang/prompt/blob/main/README.md) | Ranked completion menus, date/file pickers, batch policies and persistent/background providers; validation/completion callbacks are synchronous and password values remain ordinary GC strings. |
+| [progress](https://github.com/gomlang/progress/blob/main/README.md) | Byte-stream adapters, recursive jobs, pause/resume and templates; applications drive ticks, and convenience updates may wait behind output unless callers use context-aware operations. |
+| [tui_markdown](https://github.com/gomlang/tui_markdown/blob/main/README.md) | Full GFM and syntax highlighting; searches are literal, case-sensitive and confined to displayed lines. Reflow retains match ordinal rather than source identity, and selected links take visibility priority. |
+| [tabwriter](https://github.com/gomlang/tabwriter/blob/main/README.md) | Alignment still buffers an entire tabbed block until a boundary or flush; widths do not parse ANSI, and caller control/escape bytes are preserved rather than sanitized. |
+| [color](https://github.com/gomlang/color/blob/main/README.md) | CSS Color 4, RGB/ICC profiles, chromatic adaptation and HDR; palette lookup remains linear and scaled norms cannot recover coordinates already lost to floating rounding. |
+| [unicode_text](https://github.com/gomlang/unicode_text/blob/main/README.md) | Unicode upgrades, locale/dictionary tailoring, normalization, bidi and sentence segmentation; deterministic terminal policies do not perform font shaping. |
+| [diagnostics](https://github.com/gomlang/diagnostics/blob/main/README.md) | Indexed UTF-16 mapping, bidi/font shaping, graphical label routing and persistent source revisions; mapping scans a line prefix, cache mutation is application-synchronized and edits return text without writing files. |
+| [fuzzy](https://github.com/gomlang/fuzzy/blob/main/README.md) | Normalization/transliteration, richer queries and larger-corpus Top-K; feasible candidates still need DP budgets and prepared vectors, with no streaming source or aggregate corpus byte limit. |
+| [metrics](https://github.com/gomlang/metrics/blob/main/README.md) | OpenMetrics/native histograms, exporters, runtime instrumentation and sharding; snapshot copying/sorting remains under the registry gate and registration/collector lookups retain linear scans. |
+| [tracing](https://github.com/gomlang/tracing/blob/main/README.md) | Distributed propagation, exporters, richer sampling and byte-budget admission; bounded MemorySink limits records only, the original constructor stays unbounded, and draining cannot reset a latched tracer failure. |
+| [bench](https://github.com/gomlang/bench/blob/main/README.md) | Allocation/CPU counters, process isolation, dashboards and baseline selection; report validation checks necessary consistency without recomputing every statistic, and workloads remain cooperatively cancellable. |
+| [cli](https://github.com/gomlang/cli/blob/main/README.md) | Counter defaults/environment values, automatic negated flags and dynamic/filesystem/constraint-aware completion; boolean flag defaults/environment are now supported, with false environment values counting as provided. |
+| [object](https://github.com/gomlang/object/blob/main/README.md) | Relocations, compressed sections, notes and dynamic-linker interpretation; metadata text limits remain per name/count rather than a cumulative decoded-text budget. |
+| [dwarf](https://github.com/gomlang/dwarf/blob/main/README.md) | DWARF64, indexed/supplementary/split/type units and v5 define_file; line-file/row limits are per table, with a separate cumulative decoded-text budget. |
+| [image](https://github.com/gomlang/image/blob/main/README.md) | Palette/grayscale encoder optimization, interlacing and filter-policy selection; output remains noninterlaced 8-bit RGBA, without color-management metadata, animation, JPEG or other formats. |
+| [datetime](https://github.com/gomlang/datetime/blob/main/README.md) | Duration division/rounding, recurrence, arbitrary-pattern/localized parsing and automatic timezone updates; arithmetic uses elapsed POSIX time without leap-second/TAI or calendar-month scaling. |
+| [llvm](https://github.com/gomlang/llvm/blob/main/README.md) | Dominance/loop/MemorySSA analysis, sealed-block SSA, JIT/ORC, globals, recursive structs, vectors/atomics, debug metadata and broader ABI/linkage controls; LLVM 18 remains required and native processing is not hostile-IR isolation. |
+| [goml_stats](https://github.com/gomlang/goml_stats/blob/main/README.md) | Manifest-based canonical identities, declaration counts and historical comparisons; hierarchical Git ignore rules are provided by the ignore dependency |
 
 Further work should preserve resource bounds, recoverable errors, normal
 versioned dependency consumption and the independent reference checks already
