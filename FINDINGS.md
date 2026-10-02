@@ -295,6 +295,11 @@ the transport workaround and uses standard I/O directly in its FFI package.
 - `Debug` is not universally implemented for standard generic containers. Tests
   compare container values through `PartialEq`, while scalar assertions retain
   detailed diagnostics.
+- GoML 0.1.57 failed ANF validation while linking a lexer context containing
+  `Ref[(isize, Position)]`, where `Position` derives `Debug` and `PartialEq`.
+  The synthesized tuple `Hash` implementation referenced the out-of-scope
+  `Position` hash function. The position cache uses three private scalar
+  references; this compiler defect remains open.
 - Strings and slices do not expose `is_empty`; use `byte_len() == 0` or
   `len() == 0`. String byte slices must end on UTF-8 boundaries. Binary parsing
   uses byte slices, and text diagnostics clamp to scalar boundaries.

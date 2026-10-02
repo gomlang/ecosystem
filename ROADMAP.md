@@ -161,7 +161,7 @@ for the applicable race, I/O, PTY and native checks.
 | --- | --- |
 | [template](https://github.com/gomlang/template/blob/main/README.md) | Add stable forward/reverse sorting by a nested attribute path, with checked keys and charged operation budgets. |
 | [markdown](https://github.com/gomlang/markdown/blob/main/README.md) | Escaping could allocate beyond the output budget before rejection; preflight escape expansion and emit URL encoding through checked fragments. |
-| [html](https://github.com/gomlang/html/blob/main/README.md) | Decoding bounded output only after construction; add exact decoded-length preflight, bounded construction and efficient literal runs. |
+| [html](https://github.com/gomlang/html/blob/main/README.md) | Decoding lacked exact size planning and copied literal bytes individually; add decoded-length preflight before construction and efficient literal runs. |
 | [highlight](https://github.com/gomlang/highlight/blob/main/README.md) | Lone CR and ATX indentation were misclassified; preserve LF/CRLF/CR boundaries and recognize heading indentation using ASCII spaces only. |
 | [go_doc](https://github.com/gomlang/go_doc/blob/main/README.md) | Literal comments became Markdown syntax and code labels broke spans; escape punctuation/destinations and choose safe code-span delimiters. |
 | [lsp](https://github.com/gomlang/lsp/blob/main/README.md) | Content-Type splitting mishandled quoted semicolons/escapes; parse bounded parameters, validate charset values and preserve poison/reset behavior. |
