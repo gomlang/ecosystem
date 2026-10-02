@@ -5,7 +5,8 @@ Each library repository contains its public API, documentation, tests and exampl
 Ordinary examples share the library's root `goml.toml`; `[dev-dependencies]`
 contains their test helpers. The verifier, Explorer application and statistics
 tool retain separate repositories. The ecosystem requires
-[GoML 0.1.55](https://github.com/gomlang/goml/releases/tag/v0.1.55) or newer.
+[GoML 0.1.56](https://github.com/gomlang/goml/releases/tag/v0.1.56) or newer.
+Source files and generated GoML bindings use `.goml`.
 Libraries with native integration document their Go adapters and system prerequisites.
 The [split manifest](split-manifest.tsv) records the source commit and the
 history and tree IDs used to create each library repository.
