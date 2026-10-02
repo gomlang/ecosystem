@@ -17,8 +17,8 @@ of feature parity with every mature library in that category.
 
 Each addition has library and independently resolved consumer coverage. The
 verification entry point is `just ecosystem-test` in the sibling `verification`
-repository, implemented in GoML; CI integration
-is intentionally deferred.
+repository, implemented in GoML. Each repository now runs these checks through
+the shared GitHub Actions configuration in `verification`.
 
 ## Adoption of GoML 0.1.50
 
@@ -60,7 +60,7 @@ is intentionally deferred.
 
 The Explorer example composes the libraries with `walkdir` and `notify`.
 Verification uses independent registry consumers, official/reference data,
-pseudo-terminals and race checks where relevant. CI integration remains deferred.
+pseudo-terminals and race checks where relevant. These checks also run in GitHub Actions.
 
 ## Application libraries batch
 
@@ -76,7 +76,17 @@ pseudo-terminals and race checks where relevant. CI integration remains deferred
 | bench | Adaptive warmup/sampling, setup exclusion, checked monotonic clocks, bootstrap intervals, outlier statistics, baseline comparisons, throughput and standalone JSON/HTML reports |
 
 The batch uses native GoML tests and independent versioned consumers. Local
-verification includes race checks; no CI workflow was added.
+verification includes race checks; the shared GitHub Actions workflow runs the same checks.
+
+## Reliability and developer workflow batch
+
+| Module | Added |
+| --- | --- |
+| sql | Concurrent bounded SQLite pools, cancellable deadline-aware acquisition, close wakeups and synchronized lease invalidation for connections, cursors and transactions |
+| parser | Explicit recovery reports, synchronization markers, nested/quoted recovery scanning and composable partial results with shared work/depth budgets |
+| cli | Static Bash, Zsh and Fish completion generated from command schemas, including nested commands, aliases, inherited options and value choices |
+| request | Scoped streaming test-peer lifetimes, cancellation-aware bounded accepts and deterministic lifecycle regressions |
+| verification | Pinned reusable GitHub Actions CI for every ecosystem repository, native prerequisites, preserved candidate checkouts, independent verification and race checks |
 
 ## Remaining work
 
@@ -84,12 +94,12 @@ verification includes race checks; no CI workflow was added.
 | --- | --- |
 | redis | Cluster/Sentinel, typed Streams commands and sharded subscriptions; no automatic retry of ambiguous writes; active standard TLS I/O interruption requires reconnection |
 | lsp | Broader typed feature models (completion, code actions, workspace edits and semantic tokens); the application event loop drives deadline polling |
-| cli | Shell completion and defaults/environment for flags and counters |
+| cli | Defaults/environment for flags and counters; dynamic completion providers |
 | diff | Multi-file and Git metadata support, three-way merge, offset/fuzzy application; the linear-space algorithm is explicitly selected and has O(NM) worst-case time |
-| parser | Recovery with multiple diagnostics, token-stream and incremental text parsing, further binary/text combinator parity; grammar left recursion still requires rewriting |
+| parser | Token-stream and incremental text parsing, further binary/text combinator parity; grammar left recursion still requires rewriting |
 | template | Macros/imports/call blocks, keyword arguments, file-loader invalidation and incremental output writing |
 | markdown | GFM extensions and finer inline source spans; existing CommonMark behavior must remain covered |
-| sqlite | Row derives, batch helpers, connection/statement caching, custom functions, backup and incremental blob APIs |
+| sql / sqlite | Row derives, batch helpers, statement caching, custom functions, backup and incremental blob APIs; pool acquisition context does not interrupt an already-running SQL statement |
 | pipeline | Error recovery/retry, time-based operators, parallel flat-map and metrics |
 | ndarray | Masked selection/scatter, sorting/quantiles, NPY interchange, SVD/eigen and rank-deficient solve support |
 | msgpack | Incremental field processing, reduced materialization and richer typed extension support; standard I/O adapters buffer one bounded value at a time |
@@ -98,11 +108,11 @@ verification includes race checks; no CI workflow was added.
 | bitflags | Associated-constant or operator syntax depends on language support; Serde wrappers support explicit or format-sensitive representations; arbitrary declaration expressions and generic storage newtypes are not generated |
 | logos | Compile-time derive/DFA generation, streaming/byte input, named subpatterns and broader Unicode regex properties; current runtime NFA reports equal-priority ambiguity during matching |
 | tempfile | Platforms beyond Linux amd64, cancellation-aware file operations, crash-durable persistence helpers; cleanup assumes no hostile concurrent filesystem changes |
-| request | Streaming requests/responses, HTTP/3, an adapter to the separate websocket library, full domain-cookie policy, custom DNS, application retries and middleware; HTTP/2 connections are pooled and multiplexed, while the synchronous API buffers each response within explicit limits |
+| request | HTTP/2 streaming, streaming connection reuse, HTTP/3, a websocket adapter, custom DNS, application retries and middleware; current streaming callbacks use bounded HTTP/1.1 connections and buffered requests retain HTTP/2 pooling |
 | llvm | Dominance/loop analysis, MemorySSA, sealed-block SSA construction, specialized instruction/CFG mutation, JIT execution, debug metadata, globals/named structs, vectors/atomics, exception handling, linkage/attributes and explicit ABI-name selection; implemented SSA traversal/editing, parallel-edge PHIs, insertion points, safe erasure and local-variable promotion alongside LLVM 18 target machines and ABI layouts |
 | incremental | Parallel branch evaluation, immutable database snapshots, persistent caches, durability classes and cycle fixed-point recovery; current root operations serialize and callbacks use scoped Evaluation handles |
 | rope | Grapheme and reverse iterators, search, editing history, optional Unicode newline policies and memory-mapped backing; current storage is persistent UTF-8 with LF/CRLF/CR line semantics |
-| web | TLS listeners, HTTP/2 and HTTP/3, an upgrade adapter to the separate websocket library, multipart extraction, static files, compression and bundled CORS middleware; current GoML transport serves HTTP/1.1 with streaming and SSE |
+| web | HTTP/2 and HTTP/3, streaming compression and streaming/upgraded reverse-proxy forwarding; TCP/TLS HTTP/1.1 listeners, WebSocket upgrades, multipart, static files, CORS and bounded buffered gzip are implemented |
 | bigint | Faster multiplication/division for very large operands, primality and modular inverses, roots and rational arithmetic; ordinary arithmetic allocates proportionally to results while input/shift/power operations have explicit budgets |
 | tracing | Distributed trace propagation, OpenTelemetry exporters, richer sampling, byte-budget admission and instrumentation syntax; contexts are explicit and arbitrary sink callbacks must cooperate with shutdown |
 | datetime | Arbitrary-pattern parsing, localization, recurrence scheduling and automatic timezone-data updates; dates cover Gregorian years 1–9999 and timestamps use POSIX seconds without leap records |
@@ -123,7 +133,7 @@ verification includes race checks; no CI workflow was added.
 | config | Interpolation, additional format/secret providers, debounce/background scheduling and line/column provenance; file reload targets Linux and TOML inherits the standard parser's scope |
 | websocket | Compression extensions, HTTP/2 CONNECT, proxy/redirect integrations and Autobahn certification; the core currently implements RFC 6455 without extensions |
 | highlight | Semantic scopes, full Markdown inline/block semantics, interpolated-expression scopes and TextMate/Sublime grammar compatibility; source copying remains linear despite lexical suffix reuse |
-| archive | ZIP64, additional compression/encryption, GNU sparse/base-256/longname extensions and fully streaming decompression; ZIP indexing and GZIP convenience APIs are bounded in-memory operations |
+| archive | Additional compression/encryption, split archives, legacy filename encodings and GNU sparse extensions; ZIP64 read/write is implemented, while convenience decoding and ZIP entry writing retain documented buffering bounds |
 | metrics | OpenMetrics/native histograms, distributed exporters, automatic runtime instrumentation and sharded update paths; registry operations currently serialize for consistent snapshots |
 | csv | Asynchronous I/O, indexing/seeking, additional escape dialects and nested Serde structures; typed flat rows use an explicit scalar schema and stream operations are synchronous |
 | bench | Allocation/CPU counters, plotting dashboards, process isolation and automated baseline selection; timings include Go runtime effects, cancellation is cooperative and input barriers support scalar values |

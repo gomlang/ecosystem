@@ -31,9 +31,9 @@ capabilities remain separate migration work; this is not completion of E1.
 
 | Module | Functional target | Status |
 | --- | --- | --- |
-| [parser](../parser/README.md) | Text/binary combinators, recursive grammars, shared work/depth budgets, spans, contextual errors and operator precedence | Implemented; module and downstream check tests pass |
+| [parser](../parser/README.md) | Text/binary combinators, recursive grammars, shared work/depth budgets, explicit multi-error recovery, spans, contextual errors and operator precedence | Implemented; module and downstream check tests pass |
 | [proptest](../proptest/README.md) | Composable generators, lazy budgeted shrinking, failure campaigns, distributions, persistent replay, model/system execution and IEEE edge cases | Implemented; 32 library tests and 3 independent downstream check tests pass |
-| [cli](../cli/README.md) | Command schemas, aliases, inherited globals, groups, nested/flattened Args and typed subcommand derives | Implemented; module and downstream check tests pass |
+| [cli](../cli/README.md) | Command schemas, aliases, inherited globals, groups, nested/flattened Args, typed subcommand derives and Bash/Zsh/Fish completion | Implemented; module and downstream check tests pass |
 | [msgpack](../msgpack/README.md) | MessagePack wire types, direct Serde and standard stream integration, typed/dynamic frames, malformed-input limits and interoperability | Implemented; 20 library tests, downstream check checks and 2,490 reference interoperability cases pass |
 | [graph](../graph/README.md) | Mutable directed/undirected graphs, stable IDs, traversal, components, topological order, shortest paths and spanning trees | Implemented; independent algorithm checks and downstream check tests pass |
 | [template](../template/README.md) | Expressions, lexical scopes, conditions, loops, filters, includes, inheritance, escaping and contextual diagnostics | Implemented; 11 library tests, 2 downstream check tests and 1,367 Jinja shared-syntax comparisons pass |
@@ -77,7 +77,7 @@ capabilities remain separate migration work; this is not completion of E1.
 | [csv](../csv/README.md) | Streaming standard I/O, quoted multiline fields, configurable dialects, byte/UTF-8 records, headers, precise positions, limits and typed Serde schemas | Implemented; 22 library tests, 1,500 generated roundtrips, versioned file downstream check and race checks pass |
 | [websocket](../websocket/README.md) | RFC 6455 handshakes, frames, masking, fragmented UTF-8 messages, control/close state machines, bounded queues and cancellable duplex TCP/TLS/standard I/O | Implemented; 23 library tests, live TCP downstream check, fixed protocol vectors and race checks pass |
 | [highlight](../highlight/README.md) | Extensible logos grammars, GoML/JSON/TOML/Markdown scopes, nested and cross-line regions, embedded fences, persistent incremental documents and ANSI/HTML output | Implemented; 17 library tests, 200 incremental/full rebuild comparisons, rope downstream check and race checks pass |
-| [archive](../archive/README.md) | GoML USTAR/PAX and classic ZIP codecs, CRC32, bounded TAR streaming and ZIP indexing, DEFLATE/GZIP codecs, metadata and rooted extraction with an openat fallback for older kernels | 17 library tests, GNU gzip/tar/Info-ZIP interoperability, downstream check and race checks pass |
+| [archive](../archive/README.md) | GoML USTAR/PAX and ZIP/ZIP64 codecs, CRC32, bounded TAR streaming and ZIP indexing, DEFLATE/GZIP codecs, metadata and rooted extraction with an openat fallback for older kernels | 17 library tests, GNU gzip/tar/Info-ZIP interoperability, downstream check and race checks pass |
 | [metrics](../metrics/README.md) | Concurrent counters/gauges/histograms, descriptor and label validation, cardinality limits, consistent snapshots, atomic gauge collection, timers and Prometheus exposition | Implemented; 16 library tests, live HTTP scrape downstream check and race checks pass |
 | [bench](../bench/README.md) | Adaptive sampling, parameterized workloads, setup exclusion, bootstrap statistics, baseline comparisons, throughput, cancellation and JSON/HTML reports | Implemented; 14 library tests, deterministic clocks, real sorting downstream check and race checks pass |
 
@@ -215,3 +215,13 @@ the LLVM command-line tools in that installation to check emitted IR and bitcode
 Compiler limitations found during implementation remain documented in
 [FINDINGS.md](FINDINGS.md). The four compiler regression cases live in the
 compiler's pipeline and module fixtures.
+
+## GitHub Actions
+
+Every library, application, catalog and verification repository has a `CI`
+workflow for pushes, pull requests and manual runs. Workflows reuse the
+[verification infrastructure](https://github.com/gomlang/verification/tree/main/ci)
+at a full commit SHA and test the triggering candidate against pinned sibling
+revisions with the released GoML toolchain. Checks include formatting, tests,
+independent dependency verification, smoke/cached builds and the applicable
+race, PTY, SIMD and native interoperability suites. Failure logs are uploaded.
