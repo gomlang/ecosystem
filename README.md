@@ -38,11 +38,11 @@ Unicode terminal behavior and costly collection operations. The
 [per-library audit and remaining work](https://github.com/gomlang/ecosystem/blob/main/ROADMAP.md#ecosystem-wide-improvement-audit)
 keeps each change and its limits explicit, alongside earlier batches.
 
-All 64 libraries have passed their module-local tests and isolated downstream
-verification. Applicable checks include races, real I/O, PTYs and native
-interoperability. The coordinated integration/CI result is
-still pending; the capability table below describes established coverage and
-fixed reference datasets rather than a total for this round.
+All 64 libraries passed their module-local tests and isolated downstream
+verification for this batch. Applicable checks include races, real I/O, PTYs and
+native interoperability. See the [catalog Actions](https://github.com/gomlang/ecosystem/actions)
+and each library's Actions page for current revision results. The capability
+table records established coverage and fixed reference datasets.
 
 | Module | Functional target | Status |
 | --- | --- | --- |

@@ -96,8 +96,9 @@ records further work rather than claiming parity with mature libraries. Each
 module link leads to its public API, limits and regression tests.
 
 All 64 libraries have implementation, documentation and regression changes with
-module-local tests and isolated downstream verification. Integrated verification
-and CI status remain pending the coordinated final run.
+module-local tests and isolated downstream verification. Repository CI uses the
+[shared verification workflow](https://github.com/gomlang/verification/tree/main/ci)
+for the applicable race, I/O, PTY and native checks.
 
 ### Numeric and graph libraries
 
