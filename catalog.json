@@ -8,12 +8,12 @@
     },
     {
       "name": "archive",
-      "scope": "GoML USTAR/PAX and ZIP/ZIP64 codecs, CRC32, bounded TAR streaming and ZIP indexing, DEFLATE/GZIP codecs, metadata and rooted extraction with an openat fallback for older kernels",
+      "scope": "GoML USTAR/PAX and ZIP/ZIP64 codecs, CRC32, bounded TAR streaming and ZIP indexing, explicit DOS timestamp offsets, DEFLATE/GZIP codecs, metadata and rooted extraction with an openat fallback for older kernels",
       "coverage": "Module tests, GNU gzip/tar/Info-ZIP interoperability, downstream check and race checks"
     },
     {
       "name": "asn1",
-      "scope": "Bounded canonical DER values, explicit positional schemas, OIDs, checked BIT STRING codecs and TLV time validation",
+      "scope": "Bounded canonical DER values, explicit positional schemas, OIDs, checked BIT STRING and arbitrary-width INTEGER byte codecs, and TLV time validation",
       "coverage": "Library and independent example tests for canonical encodings, limits and malformed input"
     },
     {
@@ -38,7 +38,7 @@
     },
     {
       "name": "cache",
-      "scope": "Generic concurrent weighted LRU, TTL/TTI, ordered batch reads, injectable clocks, bounded singleflight loading, invalidation generations, copy policy and removal callbacks",
+      "scope": "Generic concurrent weighted LRU, TTL/TTI, ordered batch reads/writes, injectable clocks, bounded singleflight loading, invalidation generations, copy policy and removal callbacks",
       "coverage": "Module tests and race checks, versioned downstream check and 42,240 Python reference operations"
     },
     {
@@ -93,7 +93,7 @@
     },
     {
       "name": "fuzzy",
-      "scope": "Unicode ranked subsequences, full case folding, grapheme-safe highlights, anchored modes, stable Top-K, persistent incremental queries and cancellable parallel search",
+      "scope": "Unicode ranked subsequences, full case folding, grapheme-safe highlights, anchored modes across collection/parallel/session search, stable Top-K and persistent incremental queries",
       "coverage": "Module tests, 1,270 exhaustive reference cases, versioned downstream check and race checks"
     },
     {
@@ -103,8 +103,8 @@
     },
     {
       "name": "graph",
-      "scope": "Mutable directed/undirected graphs, stable IDs, traversal, components, topological order, directed/undirected cycle witnesses, shortest paths and spanning trees",
-      "coverage": "Independent algorithm checks and downstream check tests"
+      "scope": "Mutable directed/undirected graphs, stable IDs, traversal, components, topological order and dependency generations, directed/undirected cycle witnesses, shortest paths and spanning trees",
+      "coverage": "Independent algorithm checks, 512 directed-graph generation references and downstream check tests"
     },
     {
       "name": "highlight",
@@ -168,7 +168,7 @@
     },
     {
       "name": "metrics",
-      "scope": "Concurrent counters/gauges/histograms, descriptor and label validation, cardinality limits, consistent snapshots, atomic gauge collection, timers and Prometheus exposition",
+      "scope": "Concurrent counters/gauges/histograms, descriptor and label validation, cardinality limits, consistent snapshots, atomic gauge collection, timers and bounded streaming Prometheus exposition",
       "coverage": "Module tests, live HTTP scrape downstream check and race checks"
     },
     {
@@ -193,8 +193,8 @@
     },
     {
       "name": "object",
-      "scope": "Bounded ELF32/ELF64 metadata, sections, program headers, symbols and extended numbering in either byte order",
-      "coverage": "Library and downstream tests for binary layouts, extended indexes, range validation and ownership"
+      "scope": "Bounded ELF32/ELF64 metadata, sections, program headers, symbols, typed note records and extended numbering in either byte order",
+      "coverage": "Library and downstream tests for binary layouts, note alignment/endianness, extended indexes, range validation and ownership"
     },
     {
       "name": "parser",
@@ -213,7 +213,7 @@
     },
     {
       "name": "prompt",
-      "scope": "Typed text/password/integer input, validation, history/completion, searchable single/multiple choices and confirmation",
+      "scope": "Typed text/password/integer input, validation, history/completion, searchable single/multiple choices with custom ranking and confirmation",
       "coverage": "Module tests, independent downstream check and real PTY sessions"
     },
     {
@@ -228,7 +228,7 @@
     },
     {
       "name": "regexp",
-      "scope": "Bounded regular-expression syntax and Thompson NFA matching with captures, lazy match/split iteration and template/literal replacement",
+      "scope": "Bounded regular-expression syntax and Thompson NFA matching with captures, lazy match/split iteration and template/literal/callback replacement",
       "coverage": "Library and downstream tests for UTF-8 boundaries, capture behavior, syntax diagnostics and shared work limits"
     },
     {
@@ -283,7 +283,7 @@
     },
     {
       "name": "textproto",
-      "scope": "Bounded CRLF lines, folded-header framing, numeric reply reading/writing and dot-encoded text streams over standard I/O",
+      "scope": "Bounded CRLF lines, folded-header framing, checked header mutation, numeric reply reading/writing and dot-encoded text streams over standard I/O",
       "coverage": "Library and downstream tests for fragmented frames, clean EOF and malformed protocol input"
     },
     {
@@ -308,8 +308,8 @@
     },
     {
       "name": "uuid",
-      "scope": "UUID values, strict text/network-byte/GUID-byte conversions, secure v4/v7, ordering/Hash and Serde",
-      "coverage": "RFC 9562 vectors, concurrent generation and independent consumer checks"
+      "scope": "UUID values, strict text/network-byte/GUID-byte conversions, secure v4/v7, synchronized monotonic v7, ordering/Hash and Serde",
+      "coverage": "RFC 9562 vectors, concurrent generation, monotonic carry/rollback/exhaustion and independent consumer checks"
     },
     {
       "name": "walkdir",
@@ -333,8 +333,8 @@
     },
     {
       "name": "xml",
-      "scope": "Bounded incremental UTF-8 XML 1.0 token reading/writing with namespaces, checked character references and required/optional scalar Serde mappings",
-      "coverage": "Library and downstream tests for chunk boundaries, namespaces, XML declarations, optional fields and malformed documents"
+      "scope": "Bounded incremental UTF-8 XML 1.0 token reading/writing with namespaces, checked character references and required/optional/repeated scalar Serde mappings",
+      "coverage": "Library and downstream tests for chunk boundaries, namespaces, XML declarations, optional/repeated fields and malformed documents"
     },
     {
       "name": "yaml",

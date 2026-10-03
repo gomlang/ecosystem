@@ -398,6 +398,33 @@ The previous report, historical split manifests and verifier inventory retain
 their existing historical role. The new report records the next gaps in the
 libraries changed during the prior round as well.
 
+## Capability round 4: 2026-10-04
+
+The [round 4 review](CAPABILITY_REVIEW_ROUND4.md) rechecks all 68 libraries and
+adds twelve compatible capabilities:
+
+| Module | Added |
+| --- | --- |
+| archive | Explicit UTC-offset interpretation of ZIP DOS modification timestamps |
+| asn1 | Arbitrary-width canonical two's-complement INTEGER byte codecs |
+| cache | Ordered batch writes with prevalidation, copied input and one critical section |
+| fuzzy | Anchored match modes for collection, parallel and persistent-session search |
+| graph | Deterministic dependency generations for topological scheduling |
+| metrics | Bounded string and streaming Prometheus export |
+| object | Bounded typed ELF notes with explicit alignment and byte order |
+| prompt | Caller-supplied choice filtering/ranking with stable ties |
+| regexp | Match/capture callbacks for replacement, including typed callback failures |
+| textproto | Checked header replacement and removal with preserved field ordering |
+| uuid | A synchronized monotonic v7 generator with rollback and exhaustion policies |
+| xml | Repeated scalar child mappings and incremental bounded encoding |
+
+A separate CSV documentation correction removes an obsolete claim that comment
+records are unsupported. Local module tests and independent consumer checks
+cover the twelve functional changes; the review links the final successful CI
+runs for all thirteen changed library repositories. Cross-review found and
+fixed a cache input-alias issue before final delivery. Earlier reports and
+historical split manifests remain preserved.
+
 ## Catalog maintenance
 
 The catalog now records every library's scope and verification coverage in
@@ -421,7 +448,7 @@ verification. See [Maintaining this catalog](README.md#maintaining-this-catalog)
 
 | Module | Remaining capabilities and limits |
 | --- | --- |
-| [uuid](https://github.com/gomlang/uuid/blob/main/README.md) | Generates v4/v7 only. V7 random tails do not guarantee monotonic order within a millisecond or during clock rollback. Serde uses canonical strings; raw storage uses explicit byte conversion. |
+| [uuid](https://github.com/gomlang/uuid/blob/main/README.md) | Generates v4/v7 only. The default v7 random generator has no monotonic guarantee; MonotonicGenerator supplies a shared local sequence with explicit rollback/exhaustion behavior, without persistence or coordination across generators. Serde uses canonical strings; raw storage uses explicit byte conversion. |
 | [yaml](https://github.com/gomlang/yaml/blob/main/README.md) | The documented YAML core-schema subset excludes arbitrary custom tags, complex mapping keys and cyclic aliases. Typed Serde/JSON bridges require string mapping keys and finite representable values. Native parse allocations precede some tree checks; normalization retries and input/work budgets remain explicit. |
 | [jwt](https://github.com/gomlang/jwt/blob/main/README.md) | Compact JWS only; no JWE, OAuth, remote key fetching or JWK/JWKS import. Applications configure trusted issuers/audiences and provision/rotate keys. Supported algorithms and NumericDate limits are explicit. |
 | [s3](https://github.com/gomlang/s3/blob/main/README.md) | Object and multipart APIs have explicit per-request budgets. Bucket administration, automatic region discovery, automatic retries and built-in cloud credential-provider discovery remain separate work. Protocol checks use AWS vectors and local independent peers, not a live cloud account. |
@@ -484,7 +511,7 @@ verification. See [Maintaining this catalog](README.md#maintaining-this-catalog)
 | [tracing](https://github.com/gomlang/tracing/blob/main/README.md) | Per-record logical bounds are not an aggregate bound on all caller-retained spans/sink-retained records. Existing constructor remains unbounded; arbitrary blocking sink callbacks remain non-preemptible. Logical byte accounting excludes JSON expansion, allocator overhead and backing storage pinned by slices. |
 | [bench](https://github.com/gomlang/bench/blob/main/README.md) | Strict arithmetic reproducibility does not establish raw timing, workload or environment authenticity. Ordinary import remains inexpensive structural validation; callers choose strict replay explicitly. Sorting cannot be preempted mid-sort, and the documented tolerance permits tiny statistical perturbations. |
 | [cli](https://github.com/gomlang/cli/blob/main/README.md) | Automatic negated flags and dynamic completion remain unsupported. Completion remains static and does not suppress constraints or used scalar options. |
-| [object](https://github.com/gomlang/object/blob/main/README.md) | Relocations, section decompression, notes and dynamic-linker views remain outside the metadata reader scope. Existing entry points now apply an aggregate name budget; larger expanded metadata requires an explicit allowance. |
+| [object](https://github.com/gomlang/object/blob/main/README.md) | Relocations, section decompression and dynamic-linker views remain outside the metadata reader scope. Raw note records are available with explicit 4/8-byte alignment; vendor-specific descriptors still require interpretation. Existing entry points now apply an aggregate name budget; larger expanded metadata requires an explicit allowance. |
 | [dwarf](https://github.com/gomlang/dwarf/blob/main/README.md) | DWARF64, indexed/supplementary/split/type units and v5 define_file remain unsupported. Legacy parse results temporarily materialize detailed rows before projection, as in the previous round. Line row/file/directory budgets are aggregate across tables; implicit sentinels consume no real-item allowance. |
 | [image](https://github.com/gomlang/image/blob/main/README.md) | JPEG and still WebP are supported, including lossless WebP encoding. Animated WebP, lossy WebP encoding, metadata/color-profile preservation and additional codecs remain unsupported. Existing PNG output still lacks palette/lower-bit-depth/16-bit/interlaced encoding. Image dimensions and pixel counts retain explicit bounds. |
 | [datetime](https://github.com/gomlang/datetime/blob/main/README.md) | Other rounding modes, recurrence scheduling, localized rendering, leap-second/TAI arithmetic and automatic timezone-data updates remain outside scope. Elapsed-time division discards sub-nanosecond remainders toward zero and retains endpoint asymmetry. |
