@@ -3,7 +3,7 @@
   "libraries": [
     {
       "name": "ansi",
-      "scope": "Structured styles, 16/256/truecolor profiles, streaming UTF-8/escape parsing, hyperlinks, styled graphemes and partial-write adapters",
+      "scope": "Structured styles, 16/256/truecolor profiles, streaming UTF-8/escape parsing, hyperlinks, configurable-width styled text layout and partial-write adapters",
       "coverage": "Module tests, downstream tests and 2,800 independent protocol/rendering cases"
     },
     {
@@ -13,7 +13,7 @@
     },
     {
       "name": "asn1",
-      "scope": "Bounded canonical DER values, explicit positional schemas, OIDs and TLV time validation",
+      "scope": "Bounded canonical DER values, explicit positional schemas, OIDs, checked BIT STRING codecs and TLV time validation",
       "coverage": "Library and independent example tests for canonical encodings, limits and malformed input"
     },
     {
@@ -38,7 +38,7 @@
     },
     {
       "name": "cache",
-      "scope": "Generic concurrent weighted LRU, TTL/TTI, injectable clocks, bounded singleflight loading, invalidation generations, copy policy and removal callbacks",
+      "scope": "Generic concurrent weighted LRU, TTL/TTI, ordered batch reads, injectable clocks, bounded singleflight loading, invalidation generations, copy policy and removal callbacks",
       "coverage": "Module tests and race checks, versioned downstream check and 42,240 Python reference operations"
     },
     {
@@ -103,7 +103,7 @@
     },
     {
       "name": "graph",
-      "scope": "Mutable directed/undirected graphs, stable IDs, traversal, components, topological order, cycle witnesses, shortest paths and spanning trees",
+      "scope": "Mutable directed/undirected graphs, stable IDs, traversal, components, topological order, directed/undirected cycle witnesses, shortest paths and spanning trees",
       "coverage": "Independent algorithm checks and downstream check tests"
     },
     {
@@ -118,7 +118,7 @@
     },
     {
       "name": "http",
-      "scope": "Transport-independent HTTP header validation, hop-by-hop filtering and HTTP/1.1 response framing",
+      "scope": "Transport-independent HTTP header validation, hop-by-hop filtering and HTTP/1.1 request/response framing",
       "coverage": "Library and downstream tests for framing ambiguity, syntax errors and output limits"
     },
     {
@@ -128,7 +128,7 @@
     },
     {
       "name": "image",
-      "scope": "PNG/JPEG/WebP codecs, premultiplied images, drawing, strict crop and nearest/bilinear resize",
+      "scope": "PNG/JPEG/WebP codecs, premultiplied images, drawing, strict crop, nearest/bilinear resize and lossless rotations/mirrors",
       "coverage": "Native JPEG/WebP backends, independent image fixtures and consumer checks"
     },
     {
@@ -203,7 +203,7 @@
     },
     {
       "name": "pipeline",
-      "scope": "Lazy streams, bounded parallel transforms, filtering, ordering, batching/windows, merge/zip, backpressure and cancellation",
+      "scope": "Lazy streams, bounded parallel transforms, filtering, ordering, batching/windows, merge/zip, early-stopping folds, backpressure and cancellation",
       "coverage": "Module tests and race checks, versioned downstream check and 1,253 Python oracle cases"
     },
     {
@@ -228,7 +228,7 @@
     },
     {
       "name": "regexp",
-      "scope": "Bounded regular-expression syntax and Thompson NFA matching with captures, lazy match/split iteration and replacement",
+      "scope": "Bounded regular-expression syntax and Thompson NFA matching with captures, lazy match/split iteration and template/literal replacement",
       "coverage": "Library and downstream tests for UTF-8 boundaries, capture behavior, syntax diagnostics and shared work limits"
     },
     {
@@ -238,7 +238,7 @@
     },
     {
       "name": "rope",
-      "scope": "Persistent balanced UTF-8 text, shared snapshots, checked edits/slices, UTF-16 and line indexing, forward/reverse cursors and streaming I/O",
+      "scope": "Persistent balanced UTF-8 text, shared snapshots, checked edits/slices, UTF-16 and line indexing, forward/reverse element and line cursors, and streaming I/O",
       "coverage": "Module tests and race checks, versioned downstream check and 3,266 Python reference edits"
     },
     {
@@ -283,7 +283,7 @@
     },
     {
       "name": "textproto",
-      "scope": "Bounded CRLF lines, folded-header framing and dot-encoded text streams over standard I/O",
+      "scope": "Bounded CRLF lines, folded-header framing, numeric reply reading/writing and dot-encoded text streams over standard I/O",
       "coverage": "Library and downstream tests for fragmented frames, clean EOF and malformed protocol input"
     },
     {
@@ -308,12 +308,12 @@
     },
     {
       "name": "uuid",
-      "scope": "UUID values, strict text/byte conversions, secure v4/v7, ordering/Hash and Serde",
+      "scope": "UUID values, strict text/network-byte/GUID-byte conversions, secure v4/v7, ordering/Hash and Serde",
       "coverage": "RFC 9562 vectors, concurrent generation and independent consumer checks"
     },
     {
       "name": "walkdir",
-      "scope": "Lazy directory traversal, depth bounds, pruning, symlink policies, metadata snapshots and contextual errors",
+      "scope": "Lazy directory traversal, configurable sibling ordering, depth bounds, pruning, symlink policies, metadata snapshots and contextual errors",
       "coverage": "Module tests, the complete migrated traversal/syscall downstream check suite and race checks"
     },
     {

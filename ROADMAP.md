@@ -355,6 +355,22 @@ a documented consumer requirement, with affected ecosystem manifests migrated.
 | [image](https://github.com/gomlang/image/blob/main/README.md) | JPEG encode/decode, still WebP decode/lossless encode, strict crop and nearest/bilinear resize over existing premultiplied pixels. |
 | [markdown](https://github.com/gomlang/markdown/blob/main/README.md) | Opt-in GFM tables/alignment and task lists, independent extension AST, existing CommonMark behavior retained. |
 
+## Capability review: 2026-10-04
+
+The [per-library capability review](CAPABILITY_REVIEW.md) covers all 68 current
+libraries, with source references and a disposition for every finding. Twelve
+compatible additions were delivered: configurable ANSI width layout, ASN.1 BIT
+STRING codecs, batch cache reads, undirected cycle witnesses, HTTP request
+framing, lossless image orientation, early-stopping pipeline folds, literal
+regular-expression replacement, reverse rope lines, numeric reply writing, GUID
+byte interchange and custom directory ordering.
+
+The report records 44 deferred candidates and 12 explicit scope boundaries.
+Local module tests and isolated consumer verification cover the changed
+libraries; each delivered commit has a linked GitHub Actions run. This round
+does not replace the historical migration manifests or expand the verifier
+inventory.
+
 ## Catalog maintenance
 
 The catalog now records every library's scope and verification coverage in
