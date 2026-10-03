@@ -481,3 +481,18 @@ Two existing compiler boundaries surfaced during this batch:
 
 These implementations do not change the compiler or stage0 contract. Container
 snapshots, recoverable errors, real I/O and race tests exercise the working APIs.
+
+## Application expansion: native module propagation
+
+A module declaring `[native]` currently requires every consuming project to
+supply a module-root `go.mod`, even when the imported package uses only the
+module's pure GoML helpers. Adding the HTML document adapter therefore affects
+entity-only consumers too. The template, markdown, go_doc, tui_markdown and
+explorer repositories now carry minimal Go 1.26 manifests. An independent
+entity-only project reproduced the missing-manifest diagnostic and built after
+adding the minimal manifest. The image codec additions have the same setup rule.
+
+The expansion uses the existing released toolchain. UUID uses standard secure
+entropy; S3 composes existing HTTP, XML and date APIs; native adapters contain
+YAML/HTML format backends, standard JWT cryptography and JPEG/WebP codecs. The
+public wrappers expose recoverable errors and explicit supported scopes.

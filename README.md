@@ -5,7 +5,7 @@ Each library repository contains its public API, documentation, tests and exampl
 Ordinary examples share the library's root `goml.toml`; `[dev-dependencies]`
 contains their test helpers. The verifier, Explorer application and statistics
 tool retain separate repositories. The ecosystem requires
-[GoML 0.1.56](https://github.com/gomlang/goml/releases/tag/v0.1.56) or newer.
+[GoML 0.1.57](https://github.com/gomlang/goml/releases/tag/v0.1.57) or newer.
 Source files and generated GoML bindings use `.goml`.
 Libraries with native integration document their Go adapters and system prerequisites.
 The [split manifest](https://github.com/gomlang/ecosystem/blob/main/split-manifest.tsv) records the source commit and the
@@ -31,6 +31,15 @@ capabilities remain separate migration work; this is not completion of E1.
 
 ## Current improvement audit
 
+The application-library expansion brings the catalog to 68 libraries. It adds
+`uuid`, `yaml`, `jwt` and `s3`, plus SQLite migrations, Web sessions/CSRF/rate
+limiting, HTML DOM/selectors/sanitization, JPEG/WebP codecs and image transforms,
+and opt-in Markdown tables/task lists. The
+[expansion audit](https://github.com/gomlang/ecosystem/blob/main/ROADMAP.md#application-library-expansion)
+records the scope and remaining boundaries.
+
+### Previous per-library audits
+
 The second ecosystem-wide audit adds another bounded improvement to each of the
 64 libraries. Changes include numeric stability, indexed lookups, incremental
 text APIs, stricter protocol parsing and resource cleanup, plus explicit limits
@@ -48,20 +57,26 @@ records established coverage and fixed reference datasets.
 
 | Module | Functional target | Status |
 | --- | --- | --- |
+| [uuid](https://github.com/gomlang/uuid/blob/main/README.md) | UUID values, strict text/byte conversions, secure v4/v7, ordering/Hash and Serde | RFC 9562 vectors, concurrent generation and independent consumer checks |
+| [yaml](https://github.com/gomlang/yaml/blob/main/README.md) | Bounded YAML block/flow parsing and emission, multi-document streams, aliases, dynamic values and Serde | Managed YAML backend, explicit core-schema policy and configuration consumer |
+| [jwt](https://github.com/gomlang/jwt/blob/main/README.md) | Compact JWS signing/verification with HS256, RS256, ES256 and EdDSA, key selection and claims policies | Standard Go crypto backend, strict parsing and independent signature vectors |
+| [s3](https://github.com/gomlang/s3/blob/main/README.md) | S3-compatible SigV4 client, object operations, listing, presigning and multipart lifecycle | AWS signing vectors and local independent wire-protocol checks |
+| [sql](https://github.com/gomlang/sql/blob/main/README.md) | Typed database contracts and pools, SQLite adaptation, transactional migrations and checksum history | Real SQLite upgrade, drift, rollback and concurrent migration checks |
+| [image](https://github.com/gomlang/image/blob/main/README.md) | PNG/JPEG/WebP codecs, premultiplied images, drawing, strict crop and nearest/bilinear resize | Native JPEG/WebP backends, independent image fixtures and consumer checks |
 | [parser](https://github.com/gomlang/parser/blob/main/README.md) | Text/binary combinators, recursive grammars, shared work/depth budgets, explicit multi-error recovery, linear literal scans, spans, contextual errors and operator precedence | Implemented; module and downstream check tests pass |
 | [proptest](https://github.com/gomlang/proptest/blob/main/README.md) | Composable generators, lazy budgeted shrinking, failure campaigns, distributions, persistent replay, opt-in rejection sampling, model/system execution and IEEE edge cases | Implemented; module tests and independent downstream tests pass |
 | [cli](https://github.com/gomlang/cli/blob/main/README.md) | Command schemas, aliases, inherited globals, groups, nested/flattened Args, typed subcommand derives and Bash/Zsh/Fish completion | Implemented; module and downstream check tests pass |
 | [msgpack](https://github.com/gomlang/msgpack/blob/main/README.md) | MessagePack wire types, direct Serde and standard stream integration, typed/dynamic frames, malformed-input limits and interoperability | Implemented; module tests, downstream checks and 2,490 reference interoperability cases pass |
 | [graph](https://github.com/gomlang/graph/blob/main/README.md) | Mutable directed/undirected graphs, stable IDs, traversal, components, topological order, cycle witnesses, shortest paths and spanning trees | Implemented; independent algorithm checks and downstream check tests pass |
 | [template](https://github.com/gomlang/template/blob/main/README.md) | Expressions, lexical scopes, conditions, loops, filters, includes, inheritance, escaping and contextual diagnostics | Implemented; module tests, downstream tests and 1,367 Jinja shared-syntax comparisons pass |
-| [html](https://github.com/gomlang/html/blob/main/README.md) | Shared bounded escaping and whole-string/incremental text/attribute character-reference decoding | Shared entity data, explicit quote policies, bounded incremental decoding and template/markdown-compatible wrappers |
+| [html](https://github.com/gomlang/html/blob/main/README.md) | Entity utilities, immutable HTML5 DOM, CSS selectors and conservative HTML sanitization | Existing pure GoML entity code plus managed document backend, independent recovery and hostile-input fixtures |
 | [compress](https://github.com/gomlang/compress/blob/main/README.md) | Incremental bounded DEFLATE, GZIP, ZLIB and LZW codecs with dictionary, checksum and bit-order contracts | Implemented; module tests, Go codec interoperability, independent downstream check and race checks pass |
 | [redis](https://github.com/gomlang/redis/blob/main/README.md) | RESP2/3 codec, typed commands, pipelining, transactions, Pub/Sub, bounded pools, DNS/TLS, injectable transport, context cancellation and total deadlines | Implemented; module tests and race checks, versioned downstream fixtures, 2,391 protocol cases, Redis 7.2.5 RESP2/3 interoperability and DNS/TLS cases in normal/race builds pass |
 | [pipeline](https://github.com/gomlang/pipeline/blob/main/README.md) | Lazy streams, bounded parallel transforms, filtering, ordering, batching/windows, merge/zip, backpressure and cancellation | Implemented; module tests and race checks, versioned downstream check and 1,253 Python oracle cases pass |
 | [ndarray](https://github.com/gomlang/ndarray/blob/main/README.md) | Generic shared views, slicing, broadcasting, checked arithmetic, reductions, batched multiplication, LU/Cholesky/QR solves and SIMD | Implemented; module tests, versioned downstream check, 2,929 NumPy cases and native/SSE2/scalar builds pass |
 | [sqlite](https://github.com/gomlang/sqlite/blob/main/README.md) | Typed binding/rows, prepared statements, streaming queries, nested savepoints, rollback, cancellation and explicit resource management | Implemented; module tests, native tests, versioned downstream check, 2,754 SQLite comparisons and race checks pass |
 | [lsp](https://github.com/gomlang/lsp/blob/main/README.md) | JSON-RPC framing, persistent document snapshots, UTF-8/16/32 negotiation, synchronous/deferred dispatch and bidirectional request deadlines | Implemented; module tests, downstream tests and independent position/edit/protocol checks pass |
-| [markdown](https://github.com/gomlang/markdown/blob/main/README.md) | Block and inline parsing, AST, HTML rendering, escaping, links, code, lists and reference conformance | Implemented; 652/652 CommonMark examples, entity, module and downstream checks pass |
+| [markdown](https://github.com/gomlang/markdown/blob/main/README.md) | CommonMark AST/rendering plus opt-in GFM tables and task lists with a separate extension AST | Existing 652 CommonMark examples retained; official GFM fixtures and consumer checks |
 | [diff](https://github.com/gomlang/diff/blob/main/README.md) | Myers and linear-space Hirschberg differences, unified patches, checked application, context and newline preservation | Implemented; tests and GNU interoperability pass |
 | [bitflags](https://github.com/gomlang/bitflags/blob/main/README.md) | Typed integer flag sets, trait and inherent derives, unknown-bit policies, set algebra, name iteration, text and numeric Serde | Implemented; module tests, downstream check, derive diagnostics and 4,601 Rust reference comparisons pass |
 | [logos](https://github.com/gomlang/logos/blob/main/README.md) | Typed UTF-8 lexers, regex/literal rules, longest match, priorities, callbacks/extras, mode switching, checked source ranges and bounded Thompson NFA matching | Implemented; module tests, downstream check, race checks and 3,155 Python reference cases pass |
@@ -72,7 +87,7 @@ records established coverage and fixed reference datasets.
 | [llvm](https://github.com/gomlang/llvm/blob/main/README.md) | LLVM 18 typed handles, SSA construction/editing, mutable-local promotion, IR traversal, target machines, ABI layouts, optimization and cross-target output | Implemented; module tests, native tests, downstream tests, race checks, four target formats and 12,420 linked-function comparisons pass |
 | [rope](https://github.com/gomlang/rope/blob/main/README.md) | Persistent balanced UTF-8 text, shared snapshots, checked edits/slices, UTF-16 and line indexing, forward/reverse cursors and streaming I/O | Implemented; module tests and race checks, versioned downstream check and 3,266 Python reference edits pass |
 | [tracing](https://github.com/gomlang/tracing/blob/main/README.md) | Structured events, nested spans, explicit task contexts, filtering/sampling, composed sinks, bounded asynchronous output and coordinated cleanup | Implemented; module tests and race checks, downstream tests and 1,307 Python reference records pass |
-| [web](https://github.com/gomlang/web/blob/main/README.md) | GoML HTTP/1.1 server routing, typed request extraction, middleware, streaming I/O/SSE, panic isolation, cancellation, bounds and graceful shutdown | Implemented; module tests, downstream tests, live HTTP interoperability and race checks pass |
+| [web](https://github.com/gomlang/web/blob/main/README.md) | HTTP/1.1 routing, streaming/SSE, bounded sessions, CSRF and per-peer/custom-key rate limiting | Module, independent live HTTP consumer and concurrent-state race checks |
 | [bigint](https://github.com/gomlang/bigint/blob/main/README.md) | Immutable signed/unsigned arbitrary-precision integers, arithmetic/division, bitwise operations, radix/byte conversions, number theory and exact Serde | Implemented; module tests, downstream tests, race checks and 1,938 Python reference cases pass |
 | [decimal](https://github.com/gomlang/decimal/blob/main/README.md) | Exact base-10 arithmetic over bigint, precision contexts, seven rounding modes, quantization, checked conversions and representation-preserving Serde | Implemented; module tests, versioned downstream check, race checks and 3,072 Python Decimal value/error/status comparisons pass |
 | [incremental](https://github.com/gomlang/incremental/blob/main/README.md) | Typed heterogeneous inputs/queries, dynamic dependencies, revision validation, unchanged-result cutoff, atomic updates, cancellation and bounded memoization | Implemented; module tests and race checks, versioned downstream check and 15,847 from-scratch oracle queries pass |
@@ -101,9 +116,9 @@ records established coverage and fixed reference datasets.
 Other independent library repositories are [asn1](https://github.com/gomlang/asn1/blob/main/README.md),
 [bigmath](https://github.com/gomlang/bigmath/blob/main/README.md), [dwarf](https://github.com/gomlang/dwarf/blob/main/README.md),
 [go_doc](https://github.com/gomlang/go_doc/blob/main/README.md), [http](https://github.com/gomlang/http/blob/main/README.md),
-[image](https://github.com/gomlang/image/blob/main/README.md), [mail](https://github.com/gomlang/mail/blob/main/README.md),
+[mail](https://github.com/gomlang/mail/blob/main/README.md),
 [mime](https://github.com/gomlang/mime/blob/main/README.md), [object](https://github.com/gomlang/object/blob/main/README.md),
-[regexp](https://github.com/gomlang/regexp/blob/main/README.md), [sql](https://github.com/gomlang/sql/blob/main/README.md),
+[regexp](https://github.com/gomlang/regexp/blob/main/README.md),
 [tabwriter](https://github.com/gomlang/tabwriter/blob/main/README.md), [textproto](https://github.com/gomlang/textproto/blob/main/README.md),
 [x509](https://github.com/gomlang/x509/blob/main/README.md), and [xml](https://github.com/gomlang/xml/blob/main/README.md).
 
@@ -137,7 +152,7 @@ Most libraries use a named example with no extra manifest. Most use `examples/ba
 them against an isolated registry snapshot. Cross-module API, generic and derive
 coverage is preserved without maintaining a manifest for every sample.
 
-The bench, llvm, redis, sql, sqlite and web repositories retain explicit native
+The bench, llvm, redis, sql, sqlite, web and yaml repositories retain explicit native
 fixtures under `testdata/downstream/native/`. Their Go module settings and test
 servers are part of those scenarios. `goml verify` builds and tests these fixtures
 automatically. Fixture-only helpers are declared in root `[dev-dependencies]`;
@@ -242,3 +257,19 @@ at a full commit SHA and test the triggering candidate against pinned sibling
 revisions with the released GoML toolchain. Checks include formatting, tests,
 independent dependency verification, smoke/cached builds and the applicable
 race, PTY, SIMD and native interoperability suites. Failure logs are uploaded.
+
+## Native adapters in the application expansion
+
+`yaml`, `jwt`, `html` and `image` declare managed Go adapters. Their consumers
+need a module-root `go.mod` using Go 1.26+, including callers of existing HTML
+entity and image APIs. The affected `template`, `markdown`, `go_doc`,
+`tui_markdown` and `explorer` repositories include minimal manifests. Native
+module requirements, checksums and local replacements are managed by GoML; CI
+prepares the pinned backend dependencies before readonly builds. JPEG/WebP
+codecs in this expansion require no additional C library.
+
+UUID uses standard cryptographic entropy without a native adapter. JWT uses Go
+standard cryptography; YAML, HTML and image documents identify their pinned
+third-party backends. S3 tests use published signing vectors and local peers,
+without cloud account credentials. Library source publication and CI do not
+constitute an immutable public-registry version release.
