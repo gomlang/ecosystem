@@ -1,0 +1,355 @@
+{
+  "schema_version": 1,
+  "libraries": [
+    {
+      "name": "ansi",
+      "scope": "Structured styles, 16/256/truecolor profiles, streaming UTF-8/escape parsing, hyperlinks, styled graphemes and partial-write adapters",
+      "coverage": "Module tests, downstream tests and 2,800 independent protocol/rendering cases"
+    },
+    {
+      "name": "archive",
+      "scope": "GoML USTAR/PAX and ZIP/ZIP64 codecs, CRC32, bounded TAR streaming and ZIP indexing, DEFLATE/GZIP codecs, metadata and rooted extraction with an openat fallback for older kernels",
+      "coverage": "Module tests, GNU gzip/tar/Info-ZIP interoperability, downstream check and race checks"
+    },
+    {
+      "name": "asn1",
+      "scope": "Bounded canonical DER values, explicit positional schemas, OIDs and TLV time validation",
+      "coverage": "Library and independent example tests for canonical encodings, limits and malformed input"
+    },
+    {
+      "name": "bench",
+      "scope": "Adaptive sampling, parameterized workloads, setup exclusion, bootstrap statistics, baseline comparisons, throughput, cancellation and JSON/HTML reports",
+      "coverage": "Module tests, deterministic clocks, real sorting downstream check and race checks"
+    },
+    {
+      "name": "bigint",
+      "scope": "Immutable signed/unsigned arbitrary-precision integers, arithmetic/division, bitwise operations, radix/byte conversions, number theory and exact Serde",
+      "coverage": "Module tests, downstream tests, race checks and 1,938 Python reference cases"
+    },
+    {
+      "name": "bigmath",
+      "scope": "Immutable bounded arbitrary-precision rationals and binary floating-point values with explicit rounding",
+      "coverage": "Library and downstream tests with frozen Go math/big reference vectors"
+    },
+    {
+      "name": "bitflags",
+      "scope": "Typed integer flag sets, trait and inherent derives, unknown-bit policies, set algebra, name iteration, text and numeric Serde",
+      "coverage": "Module tests, downstream check, derive diagnostics and 4,601 Rust reference comparisons"
+    },
+    {
+      "name": "cache",
+      "scope": "Generic concurrent weighted LRU, TTL/TTI, injectable clocks, bounded singleflight loading, invalidation generations, copy policy and removal callbacks",
+      "coverage": "Module tests and race checks, versioned downstream check and 42,240 Python reference operations"
+    },
+    {
+      "name": "cli",
+      "scope": "Command schemas, aliases, inherited globals, groups, nested/flattened Args, typed subcommand derives and Bash/Zsh/Fish completion",
+      "coverage": "Module and downstream check tests"
+    },
+    {
+      "name": "color",
+      "scope": "Checked sRGB/linear/HSL/HSV/XYZ/Lab/Oklab conversions, CSS colors, alpha compositing, gamut mapping, contrast, Delta E and gradients",
+      "coverage": "Pure GoML over standard math; module tests, downstream check tests and 4,659 numerical reference cases"
+    },
+    {
+      "name": "compress",
+      "scope": "Incremental bounded DEFLATE, GZIP, ZLIB and LZW codecs with dictionary, checksum and bit-order contracts",
+      "coverage": "Module tests, Go codec interoperability, independent downstream check and race checks"
+    },
+    {
+      "name": "config",
+      "scope": "Layered typed JSON/TOML, environment and CLI sources, merge policies, JSON Pointer edits, provenance, validation, immutable snapshots and filesystem hot reload",
+      "coverage": "Module tests, real inotify reloads, versioned downstream check and race checks"
+    },
+    {
+      "name": "csv",
+      "scope": "Streaming standard I/O, quoted multiline fields, configurable dialects, byte/UTF-8 records, headers, precise positions, limits and typed Serde schemas",
+      "coverage": "Module tests, 1,500 generated roundtrips, versioned file downstream check and race checks"
+    },
+    {
+      "name": "datetime",
+      "scope": "Checked calendars and nanosecond instants, explicit arithmetic policies, RFC3339, TZif/POSIX timezones, DST ambiguity resolution and Serde",
+      "coverage": "Module tests and race checks, versioned downstream check and 8,140 calendar/timezone reference cases"
+    },
+    {
+      "name": "decimal",
+      "scope": "Exact base-10 arithmetic over bigint, precision contexts, seven rounding modes, quantization, checked conversions and representation-preserving Serde",
+      "coverage": "Module tests, versioned downstream check, race checks and 3,072 Python Decimal value/error/status comparisons"
+    },
+    {
+      "name": "diagnostics",
+      "scope": "Checked source caches/spans, Unicode multi-file labels, themes, clipping, suggestions and conflict-checked edits",
+      "coverage": "Module tests, downstream tests and 6,236 independent source/edit/rendering cases"
+    },
+    {
+      "name": "diff",
+      "scope": "Myers and linear-space Hirschberg differences, unified patches, checked application, context and newline preservation",
+      "coverage": "Tests and GNU interoperability"
+    },
+    {
+      "name": "dwarf",
+      "scope": "Bounded DWARF32 v2–5 units, DIEs, forms and line tables over standard random-access input",
+      "coverage": "Library and downstream tests with checked-in compiler-produced binary fixtures and reference line tables"
+    },
+    {
+      "name": "fuzzy",
+      "scope": "Unicode ranked subsequences, full case folding, grapheme-safe highlights, anchored modes, stable Top-K, persistent incremental queries and cancellable parallel search",
+      "coverage": "Module tests, 1,270 exhaustive reference cases, versioned downstream check and race checks"
+    },
+    {
+      "name": "go_doc",
+      "scope": "Go documentation-comment AST and bounded comment, plain-text, Markdown and HTML rendering",
+      "coverage": "Library and downstream examples covering indentation, links and output limits"
+    },
+    {
+      "name": "graph",
+      "scope": "Mutable directed/undirected graphs, stable IDs, traversal, components, topological order, cycle witnesses, shortest paths and spanning trees",
+      "coverage": "Independent algorithm checks and downstream check tests"
+    },
+    {
+      "name": "highlight",
+      "scope": "Extensible logos grammars, GoML/JSON/TOML/Markdown scopes, nested and cross-line regions, embedded fences, persistent incremental documents and ANSI/HTML output",
+      "coverage": "Module tests, 200 incremental/full rebuild comparisons, rope downstream check and race checks"
+    },
+    {
+      "name": "html",
+      "scope": "Entity utilities, immutable HTML5 DOM, CSS selectors and conservative HTML sanitization",
+      "coverage": "Existing pure GoML entity code plus managed document backend, independent recovery and hostile-input fixtures"
+    },
+    {
+      "name": "http",
+      "scope": "Transport-independent HTTP header validation, hop-by-hop filtering and HTTP/1.1 response framing",
+      "coverage": "Library and downstream tests for framing ambiguity, syntax errors and output limits"
+    },
+    {
+      "name": "ignore",
+      "scope": "Glob sets, hierarchical Git ignore rules, match explanations, worktree metadata, bounded traversal, cancellation and parallel callbacks",
+      "coverage": "Module tests and race checks, versioned downstream check and 9,400 real Git reference queries"
+    },
+    {
+      "name": "image",
+      "scope": "PNG/JPEG/WebP codecs, premultiplied images, drawing, strict crop and nearest/bilinear resize",
+      "coverage": "Native JPEG/WebP backends, independent image fixtures and consumer checks"
+    },
+    {
+      "name": "incremental",
+      "scope": "Typed heterogeneous inputs/queries, dynamic dependencies, revision validation, unchanged-result cutoff, atomic updates, cancellation and bounded memoization",
+      "coverage": "Module tests and race checks, versioned downstream check and 15,847 from-scratch oracle queries"
+    },
+    {
+      "name": "jwt",
+      "scope": "Compact JWS signing/verification with HS256, RS256, ES256 and EdDSA, key selection and claims policies",
+      "coverage": "Standard Go crypto backend, strict parsing and independent signature vectors"
+    },
+    {
+      "name": "llvm",
+      "scope": "LLVM 18 typed handles, SSA construction/editing, mutable-local promotion, IR traversal, target machines, ABI layouts, optimization and cross-target output",
+      "coverage": "Module tests, native tests, downstream tests, race checks, four target formats and 12,420 linked-function comparisons"
+    },
+    {
+      "name": "logos",
+      "scope": "Typed UTF-8 lexers, regex/literal rules, longest match, priorities, callbacks/extras, mode switching, checked source ranges and bounded Thompson NFA matching",
+      "coverage": "Module tests, downstream check, race checks and 3,155 Python reference cases"
+    },
+    {
+      "name": "lsp",
+      "scope": "JSON-RPC framing, persistent document snapshots, UTF-8/16/32 negotiation, synchronous/deferred dispatch and bidirectional request deadlines",
+      "coverage": "Module tests, downstream tests and independent position/edit/protocol checks"
+    },
+    {
+      "name": "mail",
+      "scope": "Bounded mailbox/address lists and header blocks with MIME encoded-word integration",
+      "coverage": "Library and downstream tests for address grammar, folding, encoded words and resource limits"
+    },
+    {
+      "name": "markdown",
+      "scope": "CommonMark AST/rendering plus opt-in GFM tables and task lists with a separate extension AST",
+      "coverage": "Existing 652 CommonMark examples retained; official GFM fixtures and consumer checks"
+    },
+    {
+      "name": "metrics",
+      "scope": "Concurrent counters/gauges/histograms, descriptor and label validation, cardinality limits, consistent snapshots, atomic gauge collection, timers and Prometheus exposition",
+      "coverage": "Module tests, live HTTP scrape downstream check and race checks"
+    },
+    {
+      "name": "mime",
+      "scope": "MIME media types, RFC 2231 parameters, RFC 2047 encoded words and streaming multipart bodies",
+      "coverage": "Library and downstream tests for malformed parameters, encoding boundaries and bounded multipart streams"
+    },
+    {
+      "name": "msgpack",
+      "scope": "MessagePack wire types, direct Serde and standard stream integration, typed/dynamic frames, malformed-input limits and interoperability",
+      "coverage": "Module tests, downstream checks and 2,490 reference interoperability cases"
+    },
+    {
+      "name": "ndarray",
+      "scope": "Generic shared views, slicing, broadcasting, checked arithmetic, reductions, batched multiplication, LU/Cholesky/QR solves and SIMD",
+      "coverage": "Module tests, versioned downstream check, 2,929 NumPy cases and native/SSE2/scalar builds"
+    },
+    {
+      "name": "notify",
+      "scope": "Linux inotify watchers, recursive maintenance, event filters, ignored subtrees, multi-path registrations, cancellable reads and bounded subscriptions",
+      "coverage": "Module tests, the complete migrated downstream check suite and race checks"
+    },
+    {
+      "name": "object",
+      "scope": "Bounded ELF32/ELF64 metadata, sections, program headers, symbols and extended numbering in either byte order",
+      "coverage": "Library and downstream tests for binary layouts, extended indexes, range validation and ownership"
+    },
+    {
+      "name": "parser",
+      "scope": "Text/binary combinators, recursive grammars, shared work/depth budgets, explicit multi-error recovery, linear literal scans, spans, contextual errors and operator precedence",
+      "coverage": "Module and downstream check tests"
+    },
+    {
+      "name": "pipeline",
+      "scope": "Lazy streams, bounded parallel transforms, filtering, ordering, batching/windows, merge/zip, backpressure and cancellation",
+      "coverage": "Module tests and race checks, versioned downstream check and 1,253 Python oracle cases"
+    },
+    {
+      "name": "progress",
+      "scope": "Concurrent bars/spinners, snapshots, rate/ETA, throttling, coordinated logging, redirected output and cancellable shutdown",
+      "coverage": "Module tests, independent downstream check, 400 numerical cases, race detector and real PTY checks"
+    },
+    {
+      "name": "prompt",
+      "scope": "Typed text/password/integer input, validation, history/completion, searchable single/multiple choices and confirmation",
+      "coverage": "Module tests, independent downstream check and real PTY sessions"
+    },
+    {
+      "name": "proptest",
+      "scope": "Composable generators, lazy budgeted shrinking, failure campaigns, distributions, persistent replay, opt-in rejection sampling, model/system execution and IEEE edge cases",
+      "coverage": "Module tests and independent downstream tests"
+    },
+    {
+      "name": "redis",
+      "scope": "RESP2/3 codec, typed commands, pipelining, transactions, Pub/Sub, bounded pools, DNS/TLS, injectable transport, context cancellation and total deadlines",
+      "coverage": "Module tests and race checks, versioned downstream fixtures, 2,391 protocol cases, Redis 7.2.5 RESP2/3 interoperability and DNS/TLS cases in normal/race builds"
+    },
+    {
+      "name": "regexp",
+      "scope": "Bounded regular-expression syntax and Thompson NFA matching with captures, lazy match/split iteration and replacement",
+      "coverage": "Library and downstream tests for UTF-8 boundaries, capture behavior, syntax diagnostics and shared work limits"
+    },
+    {
+      "name": "request",
+      "scope": "GoML HTTP(S)/HTTP2 clients with pooled multiplexed connections, request builders, JSON/form/multipart, redirects, per-stream cancellation, TLS policy and bounded responses",
+      "coverage": "Module tests, race checks, downstream checks and HTTP/TLS/proxy interoperability with native reference servers"
+    },
+    {
+      "name": "rope",
+      "scope": "Persistent balanced UTF-8 text, shared snapshots, checked edits/slices, UTF-16 and line indexing, forward/reverse cursors and streaming I/O",
+      "coverage": "Module tests and race checks, versioned downstream check and 3,266 Python reference edits"
+    },
+    {
+      "name": "s3",
+      "scope": "S3-compatible SigV4 client, object operations, listing, presigning and multipart lifecycle",
+      "coverage": "AWS signing vectors and local independent wire-protocol checks"
+    },
+    {
+      "name": "sql",
+      "scope": "Typed database contracts and pools, SQLite adaptation, transactional migrations and checksum history",
+      "coverage": "Real SQLite upgrade, drift, rollback and concurrent migration checks"
+    },
+    {
+      "name": "sqlite",
+      "scope": "Typed binding/rows, prepared statements, streaming queries, nested savepoints, rollback, cancellation and explicit resource management",
+      "coverage": "Module tests, native tests, versioned downstream check, 2,754 SQLite comparisons and race checks"
+    },
+    {
+      "name": "syntax",
+      "scope": "Immutable lossless green trees, red navigation, typed AST views, bounded interning/builders, checked ranges, range token iteration and persistent subtree edits",
+      "coverage": "Module tests and race checks, versioned downstream check, 3,840 model-checked edits and 240 lossless rewrites"
+    },
+    {
+      "name": "tabwriter",
+      "scope": "Bounded streaming tab alignment with byte or terminal-column measurement",
+      "coverage": "Library and downstream tests for fragmented input, CRLF handling and buffer/output limits"
+    },
+    {
+      "name": "tempfile",
+      "scope": "Secure temporary files/directories, anonymous files, atomic persistence, ownership transfer, scoped cleanup and memory-to-disk spooling",
+      "coverage": "Module tests and race checks, downstream check and 160 concurrent filesystem comparisons"
+    },
+    {
+      "name": "template",
+      "scope": "Expressions, lexical scopes, conditions, loops, filters, includes, inheritance, escaping and contextual diagnostics",
+      "coverage": "Module tests, downstream tests and 1,367 Jinja shared-syntax comparisons"
+    },
+    {
+      "name": "terminal",
+      "scope": "Linux raw sessions, typed keyboard/mouse/paste/focus/resize events, capability detection, cancellable I/O and explicit restoration",
+      "coverage": "Module tests, independent downstream check, race detector and real PTY checks"
+    },
+    {
+      "name": "textproto",
+      "scope": "Bounded CRLF lines, folded-header framing and dot-encoded text streams over standard I/O",
+      "coverage": "Library and downstream tests for fragmented frames, clean EOF and malformed protocol input"
+    },
+    {
+      "name": "tracing",
+      "scope": "Structured events, nested spans, explicit task contexts, filtering/sampling, composed sinks, bounded asynchronous output and coordinated cleanup",
+      "coverage": "Module tests and race checks, downstream tests and 1,307 Python reference records"
+    },
+    {
+      "name": "tui",
+      "scope": "Unicode cell buffers, incremental rendering, constrained layout, tables/trees/charts, focus and grapheme-aware editing",
+      "coverage": "Module tests, downstream tests, 2,505 model-checked ANSI frames and real PTY checks"
+    },
+    {
+      "name": "tui_markdown",
+      "scope": "CommonMark terminal layout, themed blocks/inlines, tables, links, scrolling and searchable previews",
+      "coverage": "Module tests, downstream tests, 1,118 independent cases and real PTY checks"
+    },
+    {
+      "name": "unicode_text",
+      "scope": "Unicode 16 grapheme/word/line segmentation, terminal width policies, truncation, padding, tab expansion and bounded wrapping",
+      "coverage": "Module tests, downstream tests and all 19,591 official Unicode segmentation cases"
+    },
+    {
+      "name": "uuid",
+      "scope": "UUID values, strict text/byte conversions, secure v4/v7, ordering/Hash and Serde",
+      "coverage": "RFC 9562 vectors, concurrent generation and independent consumer checks"
+    },
+    {
+      "name": "walkdir",
+      "scope": "Lazy directory traversal, depth bounds, pruning, symlink policies, metadata snapshots and contextual errors",
+      "coverage": "Module tests, the complete migrated traversal/syscall downstream check suite and race checks"
+    },
+    {
+      "name": "web",
+      "scope": "HTTP/1.1 routing, streaming/SSE, bounded sessions, CSRF and per-peer/custom-key rate limiting",
+      "coverage": "Module, independent live HTTP consumer and concurrent-state race checks"
+    },
+    {
+      "name": "websocket",
+      "scope": "RFC 6455 handshakes, frames, masking, fragmented UTF-8 messages, control/close state machines, bounded queues and cancellable duplex TCP/TLS/standard I/O",
+      "coverage": "Module tests, live TCP downstream check, fixed protocol vectors and race checks"
+    },
+    {
+      "name": "x509",
+      "scope": "PKIX distinguished names, extensions, algorithm identifiers and typed BasicConstraints DER structures",
+      "coverage": "Library and downstream DER roundtrips, canonical ordering and malformed-structure checks; certificate verification is outside scope"
+    },
+    {
+      "name": "xml",
+      "scope": "Bounded incremental UTF-8 XML 1.0 token reading/writing with namespaces and checked character references",
+      "coverage": "Library and downstream tests for chunk boundaries, namespaces, XML declarations and malformed documents"
+    },
+    {
+      "name": "yaml",
+      "scope": "Bounded YAML block/flow parsing and emission, multi-document streams, aliases, dynamic values and Serde",
+      "coverage": "Managed YAML backend, explicit core-schema policy and configuration consumer"
+    }
+  ],
+  "applications": [
+    {
+      "name": "explorer",
+      "scope": "Interactive terminal file explorer and deterministic snapshot mode"
+    },
+    {
+      "name": "goml_stats",
+      "scope": "GoML project statistics with Git ignore rules and text/JSON reports"
+    }
+  ]
+}

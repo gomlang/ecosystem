@@ -355,6 +355,25 @@ a documented consumer requirement, with affected ecosystem manifests migrated.
 | [image](https://github.com/gomlang/image/blob/main/README.md) | JPEG encode/decode, still WebP decode/lossless encode, strict crop and nearest/bilinear resize over existing premultiplied pixels. |
 | [markdown](https://github.com/gomlang/markdown/blob/main/README.md) | Opt-in GFM tables/alignment and task lists, independent extension AST, existing CommonMark behavior retained. |
 
+## Catalog maintenance
+
+The catalog now records every library's scope and verification coverage in
+[catalog.json](catalog.json), including the 13 libraries previously listed only
+as links. Generated README tables keep the library count, alphabetical ordering
+and application classification consistent. Historical split manifests continue
+to describe the original 64-library extraction.
+
+The standalone Python checker validates metadata, generated content, historical
+manifest structure/membership and catalog document links. Its regression suite
+covers malformed metadata, drift, duplicate entries, broken references and
+module-coordinate mismatches. CI compares the catalog with the pinned verifier
+inventory before running the existing infrastructure checks. Library tests and
+current per-library CI results remain separate evidence.
+
+Development examples select an installed GoML release explicitly, document the
+private registry setup, and distinguish catalog validation from full ecosystem
+verification. See [Maintaining this catalog](README.md#maintaining-this-catalog).
+
 ## Remaining work
 
 | Module | Remaining capabilities and limits |
