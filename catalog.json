@@ -23,7 +23,7 @@
     },
     {
       "name": "bigint",
-      "scope": "Immutable signed/unsigned arbitrary-precision integers, arithmetic/division, bitwise operations, radix/byte conversions, number theory and exact Serde",
+      "scope": "Immutable signed/unsigned arbitrary-precision integers, arithmetic/division, signed and unsigned nth roots, bitwise operations, radix/byte conversions, number theory and exact Serde",
       "coverage": "Module tests, downstream tests, race checks and 1,938 Python reference cases"
     },
     {
@@ -63,7 +63,7 @@
     },
     {
       "name": "csv",
-      "scope": "Streaming standard I/O, quoted multiline fields, configurable dialects, byte/UTF-8 records, headers, precise positions, limits and typed Serde schemas",
+      "scope": "Streaming standard I/O, quoted multiline fields, configurable dialects, opt-in comments, byte/UTF-8 records, headers, precise positions, limits and typed Serde schemas",
       "coverage": "Module tests, 1,500 generated roundtrips, versioned file downstream check and race checks"
     },
     {
@@ -73,8 +73,8 @@
     },
     {
       "name": "decimal",
-      "scope": "Exact base-10 arithmetic over bigint, precision contexts, seven rounding modes, quantization, checked conversions and representation-preserving Serde",
-      "coverage": "Module tests, versioned downstream check, race checks and 3,072 Python Decimal value/error/status comparisons"
+      "scope": "Exact base-10 arithmetic over bigint, integral quotient/remainder, precision contexts, seven rounding modes, quantization, checked conversions and representation-preserving Serde",
+      "coverage": "Module tests, versioned downstream check, race checks and 3,072 Python Decimal value/error/status comparisons plus 192 independent integer quotient/remainder vectors"
     },
     {
       "name": "diagnostics",
@@ -88,7 +88,7 @@
     },
     {
       "name": "dwarf",
-      "scope": "Bounded DWARF32 v2–5 units, DIEs, forms and line tables over standard random-access input",
+      "scope": "Bounded DWARF32 v2\u20135 units, DIEs, forms and line tables over standard random-access input",
       "coverage": "Library and downstream tests with checked-in compiler-produced binary fixtures and reference line tables"
     },
     {
@@ -98,7 +98,7 @@
     },
     {
       "name": "go_doc",
-      "scope": "Go documentation-comment AST and bounded comment, plain-text, Markdown and HTML rendering",
+      "scope": "Go documentation-comment AST and bounded comment, plain-text, Markdown and HTML rendering with automatic HTTP(S) links",
       "coverage": "Library and downstream examples covering indentation, links and output limits"
     },
     {
@@ -153,13 +153,13 @@
     },
     {
       "name": "lsp",
-      "scope": "JSON-RPC framing, persistent document snapshots, UTF-8/16/32 negotiation, synchronous/deferred dispatch and bidirectional request deadlines",
+      "scope": "JSON-RPC framing, persistent document snapshots, UTF-8/16/32 negotiation, checked completion output, synchronous/deferred dispatch and bidirectional request deadlines",
       "coverage": "Module tests, downstream tests and independent position/edit/protocol checks"
     },
     {
       "name": "mail",
-      "scope": "Bounded mailbox/address lists and header blocks with MIME encoded-word integration",
-      "coverage": "Library and downstream tests for address grammar, folding, encoded words and resource limits"
+      "scope": "Bounded mailboxes, flat and group-preserving address lists and header blocks with MIME encoded-word integration",
+      "coverage": "Library and downstream tests for address/group grammar, empty groups, folding, encoded words and resource limits"
     },
     {
       "name": "markdown",
@@ -173,7 +173,7 @@
     },
     {
       "name": "mime",
-      "scope": "MIME media types, RFC 2231 parameters, RFC 2047 encoded words and streaming multipart bodies",
+      "scope": "MIME media types, RFC 2231 parameters, RFC 2047 encoded words and streaming multipart bodies with bounded discard",
       "coverage": "Library and downstream tests for malformed parameters, encoding boundaries and bounded multipart streams"
     },
     {
@@ -198,7 +198,7 @@
     },
     {
       "name": "parser",
-      "scope": "Text/binary combinators, recursive grammars, shared work/depth budgets, explicit multi-error recovery, linear literal scans, spans, contextual errors and operator precedence",
+      "scope": "Text/binary combinators including sentinel-terminated collections, recursive grammars, shared work/depth budgets, explicit multi-error recovery, linear literal scans, spans, contextual errors and operator precedence",
       "coverage": "Module and downstream check tests"
     },
     {
@@ -218,7 +218,7 @@
     },
     {
       "name": "proptest",
-      "scope": "Composable generators, lazy budgeted shrinking, failure campaigns, distributions, persistent replay, opt-in rejection sampling, model/system execution and IEEE edge cases",
+      "scope": "Composable generators, lazy budgeted shrinking, failure campaigns, distributions, persistent replay, opt-in rejection sampling, model/system execution with panic cleanup and IEEE edge cases",
       "coverage": "Module tests and independent downstream tests"
     },
     {
@@ -263,8 +263,8 @@
     },
     {
       "name": "tabwriter",
-      "scope": "Bounded streaming tab alignment with byte or terminal-column measurement",
-      "coverage": "Library and downstream tests for fragmented input, CRLF handling and buffer/output limits"
+      "scope": "Bounded streaming tab alignment, explicit left/right column alignment and byte or terminal-column measurement",
+      "coverage": "Library and downstream tests for alignment, ragged rows, width policies, fragmented input, CRLF and buffer/output limits"
     },
     {
       "name": "tempfile",
@@ -328,13 +328,13 @@
     },
     {
       "name": "x509",
-      "scope": "PKIX distinguished names, extensions, algorithm identifiers and typed BasicConstraints DER structures",
+      "scope": "PKIX distinguished names, extensions, algorithm identifiers and typed BasicConstraints, KeyUsage and ExtendedKeyUsage DER structures",
       "coverage": "Library and downstream DER roundtrips, canonical ordering and malformed-structure checks; certificate verification is outside scope"
     },
     {
       "name": "xml",
-      "scope": "Bounded incremental UTF-8 XML 1.0 token reading/writing with namespaces and checked character references",
-      "coverage": "Library and downstream tests for chunk boundaries, namespaces, XML declarations and malformed documents"
+      "scope": "Bounded incremental UTF-8 XML 1.0 token reading/writing with namespaces, checked character references and required/optional scalar Serde mappings",
+      "coverage": "Library and downstream tests for chunk boundaries, namespaces, XML declarations, optional fields and malformed documents"
     },
     {
       "name": "yaml",

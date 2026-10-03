@@ -371,6 +371,33 @@ libraries; each delivered commit has a linked GitHub Actions run. This round
 does not replace the historical migration manifests or expand the verifier
 inventory.
 
+## Capability follow-up round: 2026-10-04
+
+The [follow-up review](CAPABILITY_REVIEW_ROUND3.md) rechecks all 68 libraries and
+implements twelve candidates from the preceding audit:
+
+| Module | Added |
+| --- | --- |
+| bigint | Signed nth roots with truncation toward zero, signed remainders and explicit limits |
+| decimal | Exact integral quotient/remainder and remainder-only operations |
+| csv | Opt-in record-start comments with existing byte and record accounting |
+| go_doc | Automatic HTTP(S) links in HTML prose, with bounded output and linear bracket handling |
+| mail | Structured address lists retaining group names, empty groups and order |
+| lsp | Checked completion items/lists with optional request-position validation |
+| mime | Bounded discard of the current multipart body |
+| parser | Binary sentinel-terminated collections with incomplete-input and shared-budget behavior |
+| proptest | State-machine cleanup after execution panics while preserving the original panic |
+| tabwriter | Explicit left/right alignment by column, including final numeric columns |
+| x509 | Bounded Extended Key Usage DER codec and standard purpose OID helpers |
+| xml | Optional scalar attribute/child mappings distinguishing missing and empty values |
+
+Each changed library passed local module tests, independent consumer verification
+and CI for its linked delivered revision. Cross-review corrected an automatic-URL
+rescan issue; a decimal formatting gate was fixed before final CI success.
+The previous report, historical split manifests and verifier inventory retain
+their existing historical role. The new report records the next gaps in the
+libraries changed during the prior round as well.
+
 ## Catalog maintenance
 
 The catalog now records every library's scope and verification coverage in
@@ -398,7 +425,7 @@ verification. See [Maintaining this catalog](README.md#maintaining-this-catalog)
 | [yaml](https://github.com/gomlang/yaml/blob/main/README.md) | The documented YAML core-schema subset excludes arbitrary custom tags, complex mapping keys and cyclic aliases. Typed Serde/JSON bridges require string mapping keys and finite representable values. Native parse allocations precede some tree checks; normalization retries and input/work budgets remain explicit. |
 | [jwt](https://github.com/gomlang/jwt/blob/main/README.md) | Compact JWS only; no JWE, OAuth, remote key fetching or JWK/JWKS import. Applications configure trusted issuers/audiences and provision/rotate keys. Supported algorithms and NumericDate limits are explicit. |
 | [s3](https://github.com/gomlang/s3/blob/main/README.md) | Object and multipart APIs have explicit per-request budgets. Bucket administration, automatic region discovery, automatic retries and built-in cloud credential-provider discovery remain separate work. Protocol checks use AWS vectors and local independent peers, not a live cloud account. |
-| [bigint](https://github.com/gomlang/bigint/blob/main/README.md) | Signed roots, random-prime generation, Karatsuba/FFT multiplication and Montgomery reduction are still absent. Root work has no cancellation or cryptographic constant-time guarantee; limits bound input magnitude rather than elapsed work. Root scratch products can reach twice the input bit length; exponent limits do not bound degree. |
+| [bigint](https://github.com/gomlang/bigint/blob/main/README.md) | Random-prime generation, Karatsuba/FFT multiplication and Montgomery reduction are still absent. Signed odd-degree roots truncate toward zero and return same-sign remainders. Root work has no cancellation or cryptographic constant-time guarantee; limits bound input magnitude rather than elapsed work. Root scratch products can reach twice the input bit length; exponent limits do not bound degree. |
 | [bigmath](https://github.com/gomlang/bigmath/blob/main/README.md) | Addition and comparison still construct full cross products. Binary Float still lacks decimal parsing/formatting, subnormals, special values and transcendental functions. Cross-cancellation keeps the existing representation limits and adds workload-dependent GCD cost. |
 | [decimal](https://github.com/gomlang/decimal/blob/main/README.md) | Results requiring nonzero digits outside the scale range still fail; the API does not silently reduce requested precision or underflow to zero. Lower-scale context limits, exact factor-removal limits, missing square root/transcendentals and absence of binary floating conversion remain. |
 | [ndarray](https://github.com/gomlang/ndarray/blob/main/README.md) | Statistics remain floating-point approximations; extreme dynamic-range contributions and cancellation can still lose precision. No batched factorization, SVD, eigenvalue solver or rank-deficient least-squares support. |
@@ -407,7 +434,7 @@ verification. See [Maintaining this catalog](README.md#maintaining-this-catalog)
 | [archive](https://github.com/gomlang/archive/blob/main/README.md) | Negative PAX timestamps remain unsupported; accepted fractions are reduced to whole seconds. Global PAX key merging remains a candidate for indexed lookup and explicit work bounds. Archive writer bodies/ZIP metadata remain bounded but partly materialized as documented. |
 | [compress](https://github.com/gomlang/compress/blob/main/README.md) | GZIP writer still emits fixed headers and has no custom metadata API. Only the latest accepted header is exposed; empty concatenated members can be traversed in one read and are not separately enumerated. FEXTRA remains opaque bytes; application subfield semantics and Latin-1-to-Unicode conversion are caller concerns. Per-member metadata capture can retain previous and current headers; publication does not establish payload validity. |
 | [msgpack](https://github.com/gomlang/msgpack/blob/main/README.md) | No calendar/timezone conversion API or automatic interpretation of opaque Extension values. Timestamp dynamic errors use InvalidTimestamp while generic typed paths surface Serde errors according to existing protocol. |
-| [csv](https://github.com/gomlang/csv/blob/main/README.md) | Quoted fields still keep decoded and wire buffers for precise UTF-8 error mapping. Trimming still allocates a separate decoded field; further memory reduction would require a different position-tracking representation. Dialect inference, transcoding and comments remain intentionally unsupported. |
+| [csv](https://github.com/gomlang/csv/blob/main/README.md) | Quoted fields still keep decoded and wire buffers for precise UTF-8 error mapping. Trimming still allocates a separate decoded field; further memory reduction would require a different position-tracking representation. Dialect inference and transcoding remain unsupported. Comments are opt-in at the start of a logical record and retain byte limits. |
 | [asn1](https://github.com/gomlang/asn1/blob/main/README.md) | Time values remain TLV content; no Value/Schema time variants or native timestamp conversion. GeneralizedTime permits possible month-end 23:59:60 syntax but does not consult historical/future leap-second announcements. UTCTime leaves century selection to applications; year 00 may denote a leap century. Generic SET/SET OF distinctions, unknown primitive semantics, high tag numbers, and certificate policy remain outside the supported subset. |
 | [xml](https://github.com/gomlang/xml/blob/main/README.md) | DTD/external entities, non-UTF-8 encodings and general schema validation remain intentionally unsupported. Incomplete-token scanning still rescans pending data across feeds; a cursor/work-budget redesign could bound adversarial one-byte feeding more tightly. Ordinary PI payload whitespace behavior is unchanged. |
 | [request](https://github.com/gomlang/request/blob/main/README.md) | Trailer policy rejects the known framing/routing trio; it is not an exhaustive application-specific field allowlist. Unknown extension trailers remain accepted. Buffered responses still discard trailer values after validation; only streaming responses expose them. HTTP/2 streaming, HTTP/3 and async/await remain outside current support. |
@@ -432,8 +459,8 @@ verification. See [Maintaining this catalog](README.md#maintaining-this-catalog)
 | [markdown](https://github.com/gomlang/markdown/blob/main/README.md) | GFM tables and task lists are implemented through opt-in APIs; other GFM extensions, footnotes, math, highlighting and finer inline spans remain separate work. Existing parser work budgets and walker auxiliary-storage bounds do not bound caller-owned AST allocations. |
 | [html](https://github.com/gomlang/html/blob/main/README.md) | DOM nodes are immutable; incremental DOM mutation, browser execution/layout and automatic template-context analysis remain separate work. Selectors use a documented subset and conservative structural-work admission, which can reject expensive queries before matching. Sanitizers have explicit conservative policies and output-context limits. Native parsing allocates its tree before validating node/depth limits; input bytes are bounded. The existing entity decoder remains a serial UTF-8 string stream. |
 | [highlight](https://github.com/gomlang/highlight/blob/main/README.md) | Full Markdown parsing, interpolation, semantic symbol scopes and TextMate/Sublime compatibility are still unsupported. Incremental edits still reconstruct and split full source even when lexical suffixes are reused. |
-| [go_doc](https://github.com/gomlang/go_doc/blob/main/README.md) | Go source/symbol extraction, import resolution, automatic URLs, directives, legacy headings and nested list blocks remain unsupported. The parser still implements a bounded comment subset, not every Go doc heuristic. |
-| [lsp](https://github.com/gomlang/lsp/blob/main/README.md) | Broader feature schemas and workspace-edit execution remain application work. Worker/timer scheduling and concurrent server/session mutation are still outside the library; applications own language semantics and deadline polling. Output limits exclude caller-owned replacements and edit-span storage; coordinate/overlap errors retain precedence. |
+| [go_doc](https://github.com/gomlang/go_doc/blob/main/README.md) | Go source/symbol extraction, import resolution, directives, legacy headings and nested list blocks remain unsupported. Automatic HTTP(S) links apply to HTML prose rendering; other render formats and the AST remain unchanged. The parser still implements a bounded comment subset, not every Go doc heuristic. |
+| [lsp](https://github.com/gomlang/lsp/blob/main/README.md) | Completion output helpers cover the documented common fields; broader feature schemas and workspace-edit execution remain application work. Worker/timer scheduling and concurrent server/session mutation are still outside the library; applications own language semantics and deadline polling. Output limits exclude caller-owned replacements and edit-span storage; coordinate/overlap errors retain precedence. |
 | [cache](https://github.com/gomlang/cache/blob/main/README.md) | Single global cache gate; sharding and proactive background expiry remain absent. Generic key hashing/equality and user copy/removal policies still have their documented panic and aliasing contracts. Weight measures caller-supplied units, not retained bytes. TTI updates and removals cost O(log n); backing storage can retain its high-water capacity. |
 | [incremental](https://github.com/gomlang/incremental/blob/main/README.md) | Evaluation is serialized; no parallel independent query branches or persistent revision snapshots. User policies must honor purity/copy rules and cannot be preempted while running. Cancellation in the later caller-result copy can occur after a valid memo has already been published. |
 | [pipeline](https://github.com/gomlang/pipeline/blob/main/README.md) | Expansion remains sequential; no bounded parallel flatten operator was added. Arbitrary callbacks and external blocking operations require cooperative cancellation; no typed panic recovery. |
