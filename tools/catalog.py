@@ -1,9 +1,12 @@
 """Render and validate the ecosystem catalog using only the Python standard library."""
 
 import argparse
+import html
+from html.entities import html5
 import json
 from pathlib import Path
 import re
+import string
 import sys
 import tomllib
 from urllib.parse import unquote, urlsplit
@@ -204,12 +207,139 @@ def anchors(text):
     return result
 
 
+def escaped(text, index):
+    return (text[index] == "\\" and index + 1 < len(text)
+            and text[index + 1] in string.punctuation)
+
+
+def link_space(text, index):
+    start = index
+    while index < len(text) and text[index] in " \t\n":
+        index += 1
+    return index if text[start:index].count("\n") <= 1 else None
+
+
+def link_title_end(text, index):
+    if index >= len(text) or text[index] not in "\"'(":
+        return None
+    closing = ")" if text[index] == "(" else text[index]
+    start = index + 1
+    index = start
+    while index < len(text):
+        if escaped(text, index):
+            index += 2
+            continue
+        if text[index] == closing:
+            if re.search(r"\n[ \t]*\n", text[start:index]):
+                return None
+            return index + 1
+        if closing == ")" and text[index] == "(":
+            return None
+        index += 1
+    return None
+
+
+def link_destination(text, index):
+    """Parse the destination/title after ](, returning None for literal text."""
+    start = link_space(text, index)
+    if start is None or start == len(text):
+        return None
+    index = start
+    depth = 0
+    if text[index] == "<":
+        index += 1
+        while index < len(text) and text[index] != ">":
+            if text[index] in "<\n":
+                return None
+            index += 2 if escaped(text, index) else 1
+        if index == len(text):
+            return None
+        target = text[start + 1:index]
+        index += 1
+    else:
+        while index < len(text):
+            char = text[index]
+            if escaped(text, index):
+                index += 2
+                continue
+            if char == ")":
+                if depth == 0:
+                    break
+                depth -= 1
+            elif char == "(":
+                depth += 1
+            elif ord(char) <= 32 or ord(char) == 127:
+                break
+            index += 1
+        target = text[start:index]
+
+    end = link_space(text, index) if not depth else None
+    if end is not None and end < len(text) and text[end] == ")":
+        return target, end + 1
+    # A title must be separated from a destination. If the destination parse
+    # failed, an omitted destination followed by a title is also valid.
+    title = link_title_end(text, end) if end is not None and end > index else None
+    if title is None:
+        target = ""
+        title = link_title_end(text, start)
+    if title is not None:
+        end = link_space(text, title)
+        if end is not None and end < len(text) and text[end] == ")":
+            return target, end + 1
+    return None
+
+
+def decode_destination(target):
+    def decode(match):
+        value = match[0]
+        if value.startswith("\\"):
+            return value[1:]
+        if value.startswith("&#") or value[1:] in html5:
+            return html.unescape(value)
+        return value
+
+    # Decode together so an escaped ampersand does not start an entity.
+    return re.sub(r"\\[" + re.escape(string.punctuation)
+                  + r"]|&(?:#[0-9]{1,7}|#[xX][0-9a-fA-F]{1,6}|[A-Za-z][A-Za-z0-9]*);",
+                  decode, target)
+
+
+def inline_targets(text):
+    # Inline links allow angle destinations, balanced parentheses and optional
+    # titles: https://spec.commonmark.org/0.31.2/#links
+    brackets = []
+    index = 0
+    while index < len(text):
+        if escaped(text, index):
+            index += 2
+            continue
+        if text.startswith("![", index):
+            brackets.append([True, True])
+            index += 2
+            continue
+        if text[index] == "[":
+            brackets.append([False, True])
+        elif text[index] == "]" and brackets:
+            image, active = brackets.pop()
+            if active and text.startswith("(", index + 1):
+                link = link_destination(text, index + 2)
+                if link is not None:
+                    target, index = link
+                    yield decode_destination(target)
+                    if not image:
+                        for bracket in brackets:
+                            if not bracket[0]:
+                                bracket[1] = False
+                    continue
+        index += 1
+
+
 def check_links(root, readme):
     documents = {"README.md": readme}
     for name in ("ROADMAP.md", "FINDINGS.md"):
         documents[name] = (root / name).read_text(encoding="utf-8")
     for name, text in documents.items():
-        for target in re.findall(r"\]\(([^\s)]+)\)", prose(text)):
+        for target in inline_targets(prose(text)):
             url = urlsplit(target)
             if url.scheme or url.netloc:
                 prefix = "/gomlang/ecosystem/blob/main/"

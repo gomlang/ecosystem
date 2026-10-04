@@ -141,6 +141,70 @@ class CatalogTests(unittest.TestCase):
                 self.assertEqual(status, 1)
                 self.assertIn(target, error)
 
+    def test_optional_link_titles_do_not_hide_missing_files_or_fragments(self):
+        for target in ["absent.md", "ROADMAP.md#absent", "<absent file.md>"]:
+            for title in ['"description"', "'description'", '(description)', '"escaped \\"quote\\""']:
+                with self.subTest(target=target, title=title):
+                    self.write("FINDINGS.md", f"[Broken]({target} {title})")
+                    status, error, _ = self.run_check()
+                    self.assertEqual(status, 1)
+                    self.assertIn("absent", error)
+
+    def test_link_destinations_allow_angles_balanced_parentheses_and_escapes(self):
+        self.write("Guide (v1).md", "# Guide\n## Details\n")
+        self.write("Guide(v1).md", "# Guide\n")
+        self.write("Guide(v1(nested(third))).md", "# Guide\n")
+        self.write("A&B.md", "# Guide\n")
+        targets = ["<ROADMAP.md#remaining-work>", "<Guide (v1).md#details>",
+                   "Guide(v1).md", r"Guide\(v1\).md", "Guide(v1(nested(third))).md",
+                   "A&amp;B.md", "<A&amp;B.md>"]
+        for target in targets:
+            for title in ["", ' "optional title"', " 'optional title'", " (optional title)"]:
+                for before, after in [("", ""), (" \n", " ")]:
+                    with self.subTest(target=target, title=title, padding=before):
+                        self.write("FINDINGS.md", f"[Valid]({before}{target}{title}{after})")
+                        status, error, _ = self.run_check()
+                        self.assertEqual((status, error), (0, ""))
+
+    def test_literal_brackets_and_malformed_destinations_are_not_links(self):
+        for text in [r"\[literal](absent.md)", "](absent.md)",
+                     "[literal](<absent.md>junk)", "[literal](<absent.md)",
+                     '[literal](absent.md "unterminated)', "[literal](absent(unbalanced.md)"]:
+            with self.subTest(text=text):
+                self.write("FINDINGS.md", text)
+                self.assertEqual(self.run_check()[0], 0)
+
+    def test_empty_destinations_and_multiline_titles(self):
+        cases = ["[Local]()", "[Local](<>)", '[Local]("a title")',
+                 "[Local]('a title')", "[Local]((a title))",
+                 '[Local](ROADMAP.md "a title\non two lines")']
+        for text in cases:
+            with self.subTest(text=text):
+                self.write("FINDINGS.md", text)
+                self.assertEqual(self.run_check()[0], 0)
+        self.write("FINDINGS.md", '[Broken](absent.md\n "a title\non two lines")')
+        self.assertIn("absent.md", self.run_check()[1])
+
+    def test_entities_and_escapes_are_decoded_once_in_destinations(self):
+        self.write("A&amp;B.md", "# Literal amp entity\n")
+        self.write("A&B.md", "# Ampersand\n")
+        targets = [r"A\&amp;B.md", "A&amp;amp;B.md", "A&#38;B.md", "A&#x26;B.md"]
+        for target in targets:
+            with self.subTest(target=target):
+                self.write("FINDINGS.md", f"[Valid]({target})")
+                self.assertEqual(self.run_check()[0], 0)
+        self.write("FINDINGS.md", '[Broken](A&invalid;B.md "title")')
+        self.assertIn("A&invalid;B.md", self.run_check()[1])
+        self.assertEqual(catalog.decode_destination("A&amp;#38;B.md"), "A&#38;B.md")
+
+    def test_nested_and_escaped_label_brackets_preserve_link_boundaries(self):
+        for label in ["[nested] label", r"escaped \] label", r"escaped \[ label"]:
+            with self.subTest(label=label):
+                self.write("FINDINGS.md", f'[{label}](absent.md "title")')
+                self.assertIn("absent.md", self.run_check()[1])
+        self.write("FINDINGS.md", "[outer [inner](ROADMAP.md)](absent.md)")
+        self.assertEqual(self.run_check()[0], 0)
+
     def test_markdown_examples_are_not_treated_as_links_or_headings(self):
         self.write("FINDINGS.md", "`[literal](absent.md)`\n```goml\n[literal](missing.md)\n```\n")
         self.assertEqual(self.run_check()[0], 0)
