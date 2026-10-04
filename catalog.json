@@ -318,8 +318,8 @@
     },
     {
       "name": "wasm",
-      "scope": "GoML WebAssembly interpreter with Core 2 scalar instructions, multi-value blocks, reference types, bulk memory/table operations, typed host imports, Wasm backtraces, fuel and allocation limits",
-      "coverage": "Module and independent example tests for binary formats, validation, numeric semantics, host linking, traps and resource limits, plus pinned official specification fixtures"
+      "scope": "GoML WebAssembly interpreter with Core 2 scalar instructions, multi-value blocks, reference types, bulk memory/table operations, typed host imports, Wasm backtraces, fuel/allocation limits and WASI Preview 1 with explicit bounded in-memory resources",
+      "coverage": "Module and independent consumer tests, pinned official specification fixtures, independent reference outcomes, real wasi-sdk C programs and all 46 WASI import signatures"
     },
     {
       "name": "web",

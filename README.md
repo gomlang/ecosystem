@@ -39,9 +39,12 @@ capabilities remain separate migration work; this is not completion of E1.
 providing a GoML WebAssembly binary decoder, validator and interpreter.
 It supports Core 2 scalar instructions, multi-value blocks, reference types,
 multiple tables and bulk memory/table operations, with typed host imports,
-Wasm backtraces, execution fuel and allocation limits. Independent examples run
-pinned Core 1 and Core 2 specification fixtures with explicit migration checks.
-SIMD, WASI, threads and components remain follow-up work.
+Wasm backtraces, execution fuel and allocation limits. WASI Preview 1 provides
+explicit arguments/environment, buffered standard I/O, a bounded in-memory
+filesystem and opt-in clocks/randomness. Independent examples run pinned Core 1
+and Core 2 specification fixtures and real wasi-sdk C programs, and check all 46
+WASI import signatures. Host filesystem mounts, symbolic links, sockets, SIMD,
+threads and components remain follow-up work.
 
 ## Current improvement audit
 
@@ -145,7 +148,7 @@ The catalog contains **69 libraries**.
 | [unicode_text](https://github.com/gomlang/unicode_text/blob/main/README.md) | Unicode 16 grapheme/word/line segmentation, terminal width policies, truncation, padding, tab expansion and bounded wrapping | Module tests, downstream tests and all 19,591 official Unicode segmentation cases |
 | [uuid](https://github.com/gomlang/uuid/blob/main/README.md) | UUID values, strict text/network-byte/GUID-byte conversions, secure v4/v7, synchronized monotonic v7, ordering/Hash and Serde | RFC 9562 vectors, concurrent generation, monotonic carry/rollback/exhaustion and independent consumer checks |
 | [walkdir](https://github.com/gomlang/walkdir/blob/main/README.md) | Lazy directory traversal, configurable sibling ordering, depth bounds, pruning, symlink policies, metadata snapshots and contextual errors | Module tests, the complete migrated traversal/syscall downstream check suite and race checks |
-| [wasm](https://github.com/gomlang/wasm/blob/main/README.md) | GoML WebAssembly interpreter with Core 2 scalar instructions, multi-value blocks, reference types, bulk memory/table operations, typed host imports, Wasm backtraces, fuel and allocation limits | Module and independent example tests for binary formats, validation, numeric semantics, host linking, traps and resource limits, plus pinned official specification fixtures |
+| [wasm](https://github.com/gomlang/wasm/blob/main/README.md) | GoML WebAssembly interpreter with Core 2 scalar instructions, multi-value blocks, reference types, bulk memory/table operations, typed host imports, Wasm backtraces, fuel/allocation limits and WASI Preview 1 with explicit bounded in-memory resources | Module and independent consumer tests, pinned official specification fixtures, independent reference outcomes, real wasi-sdk C programs and all 46 WASI import signatures |
 | [web](https://github.com/gomlang/web/blob/main/README.md) | HTTP/1.1 routing, streaming/SSE, bounded sessions, CSRF and per-peer/custom-key rate limiting | Module, independent live HTTP consumer and concurrent-state race checks |
 | [websocket](https://github.com/gomlang/websocket/blob/main/README.md) | RFC 6455 handshakes, frames, masking, fragmented UTF-8 messages, control/close state machines, bounded queues and cancellable duplex TCP/TLS/standard I/O | Module tests, live TCP downstream check, fixed protocol vectors and race checks |
 | [x509](https://github.com/gomlang/x509/blob/main/README.md) | PKIX distinguished names, extensions, algorithm identifiers and typed BasicConstraints, KeyUsage and ExtendedKeyUsage DER structures | Library and downstream DER roundtrips, canonical ordering and malformed-structure checks; certificate verification is outside scope |

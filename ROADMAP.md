@@ -436,13 +436,18 @@ repository adds the 69th ecosystem library, `ecosystem::wasm`.
 | Validation | Function and block typing, index checks, initializer rules, imports/exports and memory/table limits |
 | Execution | Scalar integer/float instructions including sign extension and saturating conversions, multi-value blocks, references, multiple tables, bulk operations and Wasm backtraces |
 | Embedding | Typed multi-result host functions, external references and objects, named linking, reusable validated modules and isolated store ownership |
+| WASI Preview 1 | All 46 import signatures, explicit arguments/environment, buffered standard I/O, capability-relative in-memory files/directories, explicit clocks/randomness and process exit codes |
 | Resource limits | Module/structural limits, local and operand/control storage, call depth, memory/table allocation and execution fuel |
-| Verification | Module tests, independent example tests and pinned official specification fixtures |
+| Verification | Module tests, independent example tests, pinned official specification fixtures, real wasi-sdk C commands/reactors and independent WASI ABI checks |
 
-WASI, WAT parsing, SIMD, threads, components, memory64, multiple memories, tail
-calls, exceptions, GC and JIT compilation remain separate work. Host callbacks
+WASI host filesystem mounts, symbolic links, sockets and process signals remain
+unsupported; symbolic-link calls return `NOTSUP`, sockets/signals return `NOSYS`.
+WAT parsing, SIMD, threads, components, memory64, multiple memories, tail calls,
+exceptions, GC and JIT compilation remain separate work. Host callbacks
 are synchronous trusted application code; instruction fuel does not preempt their
-work. Stores require serial use, and the documented limits count logical resources
+work. WASI charges fuel for variable byte/metadata work and bounds I/O, file
+storage, descriptors and polling; its default configuration inherits no process
+resources. Stores require serial use, and the documented limits count logical resources
 rather than every byte of allocator overhead.
 
 ## Catalog maintenance
@@ -535,7 +540,7 @@ verification. See [Maintaining this catalog](README.md#maintaining-this-catalog)
 | [dwarf](https://github.com/gomlang/dwarf/blob/main/README.md) | DWARF64, indexed/supplementary/split/type units and v5 define_file remain unsupported. Legacy parse results temporarily materialize detailed rows before projection, as in the previous round. Line row/file/directory budgets are aggregate across tables; implicit sentinels consume no real-item allowance. |
 | [image](https://github.com/gomlang/image/blob/main/README.md) | JPEG and still WebP are supported, including lossless WebP encoding. Animated WebP, lossy WebP encoding, metadata/color-profile preservation and additional codecs remain unsupported. Existing PNG output still lacks palette/lower-bit-depth/16-bit/interlaced encoding. Image dimensions and pixel counts retain explicit bounds. |
 | [datetime](https://github.com/gomlang/datetime/blob/main/README.md) | Other rounding modes, recurrence scheduling, localized rendering, leap-second/TAI arithmetic and automatic timezone-data updates remain outside scope. Elapsed-time division discards sub-nanosecond remainders toward zero and retains endpoint asymmetry. |
-| [wasm](https://github.com/gomlang/wasm/blob/main/README.md) | WASI, text-format parsing, SIMD, threads, components and Core 3 features remain unsupported. Execution fuel bounds interpreter work; host callbacks require their own work/deadline limits. Stores require serial use. |
+| [wasm](https://github.com/gomlang/wasm/blob/main/README.md) | WASI Preview 1 has an explicit bounded in-memory filesystem; host mounts, symbolic links, sockets and signals remain unsupported. Text-format parsing, SIMD, threads, components and Core 3 features remain separate work. Host callbacks require their own work/deadline limits. Stores require serial use. |
 | [llvm](https://github.com/gomlang/llvm/blob/main/README.md) | JIT/ORC, global construction, named recursive structs, vector operations, atomics, debug metadata and general ABI/linkage controls remain outside scope. Native LLVM parsing and code generation are not a process isolation boundary for hostile IR or LLVM internal failures. LLVM 18 is required; aggregate access uses one immediate member index per call, and callers still own SSA/ABI correctness. |
 | [goml_stats](https://github.com/gomlang/goml_stats/blob/main/README.md) | Manifest-based canonical identities, declaration counts and historical comparisons; hierarchical Git ignore rules are provided by the ignore dependency |
 
