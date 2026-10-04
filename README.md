@@ -33,6 +33,17 @@ DEFLATE, GZIP, ZLIB and LZW encoding and decoding are exercised by the
 isolated compress example. Archive compatibility adapters and the other E1
 capabilities remain separate migration work; this is not completion of E1.
 
+## WebAssembly interpreter
+
+[`wasm`](https://github.com/gomlang/wasm/blob/main/README.md) is the 69th library,
+providing a GoML WebAssembly Core 1.0 binary decoder, validator and interpreter.
+It supports typed host imports, module exports, memory, tables and globals, with
+explicit call frames, execution fuel and allocation limits. Library tests and
+independent example tests cover malformed binaries, validation, execution and
+resource boundaries. The conformance example replays frozen fixtures from a
+pinned official specification revision. WASI and post-MVP proposals remain
+follow-up work.
+
 ## Current improvement audit
 
 The [latest capability review](CAPABILITY_REVIEW_ROUND4.md) rechecks all
@@ -68,7 +79,7 @@ CI status of every library. Its contents are generated from [catalog.json](catal
 
 <!-- catalog:start -->
 
-The catalog contains **68 libraries**.
+The catalog contains **69 libraries**.
 
 | Module | Implemented scope | Verification coverage |
 | --- | --- | --- |
@@ -135,6 +146,7 @@ The catalog contains **68 libraries**.
 | [unicode_text](https://github.com/gomlang/unicode_text/blob/main/README.md) | Unicode 16 grapheme/word/line segmentation, terminal width policies, truncation, padding, tab expansion and bounded wrapping | Module tests, downstream tests and all 19,591 official Unicode segmentation cases |
 | [uuid](https://github.com/gomlang/uuid/blob/main/README.md) | UUID values, strict text/network-byte/GUID-byte conversions, secure v4/v7, synchronized monotonic v7, ordering/Hash and Serde | RFC 9562 vectors, concurrent generation, monotonic carry/rollback/exhaustion and independent consumer checks |
 | [walkdir](https://github.com/gomlang/walkdir/blob/main/README.md) | Lazy directory traversal, configurable sibling ordering, depth bounds, pruning, symlink policies, metadata snapshots and contextual errors | Module tests, the complete migrated traversal/syscall downstream check suite and race checks |
+| [wasm](https://github.com/gomlang/wasm/blob/main/README.md) | GoML WebAssembly Core 1.0 binary decoder, validator and interpreter with typed imports/exports, explicit call frames, linear memory, tables, globals, fuel and allocation limits | Module and independent example tests for binary formats, validation, numeric semantics, host linking, traps and resource limits, plus pinned official specification fixtures |
 | [web](https://github.com/gomlang/web/blob/main/README.md) | HTTP/1.1 routing, streaming/SSE, bounded sessions, CSRF and per-peer/custom-key rate limiting | Module, independent live HTTP consumer and concurrent-state race checks |
 | [websocket](https://github.com/gomlang/websocket/blob/main/README.md) | RFC 6455 handshakes, frames, masking, fragmented UTF-8 messages, control/close state machines, bounded queues and cancellable duplex TCP/TLS/standard I/O | Module tests, live TCP downstream check, fixed protocol vectors and race checks |
 | [x509](https://github.com/gomlang/x509/blob/main/README.md) | PKIX distinguished names, extensions, algorithm identifiers and typed BasicConstraints, KeyUsage and ExtendedKeyUsage DER structures | Library and downstream DER roundtrips, canonical ordering and malformed-structure checks; certificate verification is outside scope |

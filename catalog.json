@@ -317,6 +317,11 @@
       "coverage": "Module tests, the complete migrated traversal/syscall downstream check suite and race checks"
     },
     {
+      "name": "wasm",
+      "scope": "GoML WebAssembly Core 1.0 binary decoder, validator and interpreter with typed imports/exports, explicit call frames, linear memory, tables, globals, fuel and allocation limits",
+      "coverage": "Module and independent example tests for binary formats, validation, numeric semantics, host linking, traps and resource limits, plus pinned official specification fixtures"
+    },
+    {
       "name": "web",
       "scope": "HTTP/1.1 routing, streaming/SSE, bounded sessions, CSRF and per-peer/custom-key rate limiting",
       "coverage": "Module, independent live HTTP consumer and concurrent-state race checks"
