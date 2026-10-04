@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: gomlang/verification
-          ref: 857b1b5e7051d15999f66afd37cc0b0ad944f42e
+          ref: 23ad70d702978884dcd64321910f3999731b06c1
           path: _verification
           persist-credentials: false
       - name: Test catalog validation
@@ -37,7 +37,7 @@ jobs:
 
   verify:
     needs: catalog
-    uses: gomlang/verification/.github/workflows/ecosystem-ci.yml@857b1b5e7051d15999f66afd37cc0b0ad944f42e
+    uses: gomlang/verification/.github/workflows/ecosystem-ci.yml@23ad70d702978884dcd64321910f3999731b06c1
     with:
       module: ecosystem
-      verification-ref: 857b1b5e7051d15999f66afd37cc0b0ad944f42e
+      verification-ref: 23ad70d702978884dcd64321910f3999731b06c1
