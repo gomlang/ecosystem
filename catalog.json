@@ -88,7 +88,7 @@
     },
     {
       "name": "dwarf",
-      "scope": "Bounded DWARF32 v2\u20135 units, DIEs, forms and line tables over standard random-access input",
+      "scope": "Bounded DWARF32 v2–5 units, DIEs, forms and line tables over standard random-access input",
       "coverage": "Library and downstream tests with checked-in compiler-produced binary fixtures and reference line tables"
     },
     {
@@ -100,6 +100,11 @@
       "name": "go_doc",
       "scope": "Go documentation-comment AST and bounded comment, plain-text, Markdown and HTML rendering with automatic HTTP(S) links",
       "coverage": "Library and downstream examples covering indentation, links and output limits"
+    },
+    {
+      "name": "goir",
+      "scope": "Typed SSA, bounded interpretation, machine IR, liveness, linear-scan allocation and Linux amd64 Go ABI0 leaf-function assembly with a reference stack backend",
+      "coverage": "Module and independent consumer tests, multi-backend native differential checks, exhaustive parallel copies, forced spills, ABI layout, stack growth and optional execution benchmarks"
     },
     {
       "name": "graph",
