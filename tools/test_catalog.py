@@ -147,6 +147,44 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(catalog.anchors("## API `v1`\n## API `v1`\n```\n## Hidden\n```\n"),
                          {"api-v1", "api-v1-1"})
 
+    def test_fence_character_length_and_indentation_control_code_boundaries(self):
+        cases = [
+            ("~~~text", "# Hidden\n[literal](absent.md)\n", "~~~"),
+            ("   ```text", "# Hidden\n[literal](absent.md)\n", "  ```"),
+            ("````text", "```\n# Hidden\n[literal](absent.md)\n```\n", "`````"),
+            ("~~~text", "```\n# Hidden\n[literal](absent.md)\n", "~~~~"),
+            ("```text", "``` trailing text\n# Hidden\n[literal](absent.md)\n", "```"),
+        ]
+        for opening, content, closing in cases:
+            with self.subTest(opening=opening, content=content, closing=closing):
+                text = f"# Before\n{opening}\n{content}{closing}\n# After\n"
+                self.assertEqual(catalog.anchors(text), {"before", "after"})
+                self.write("FINDINGS.md", text + "[valid](ROADMAP.md#remaining-work)\n")
+                self.assertEqual(self.run_check()[0], 0)
+                self.write("FINDINGS.md", text + "[broken](missing.md)\n")
+                self.assertIn("missing.md", self.run_check()[1])
+
+    def test_unclosed_fence_hides_examples_through_end_of_document(self):
+        for opening in ["```", "~~~", "`````"]:
+            with self.subTest(opening=opening):
+                text = f"# Before\n{opening}\n# Hidden\n[literal](absent.md)\n"
+                self.assertEqual(catalog.anchors(text), {"before"})
+                self.write("FINDINGS.md", text)
+                self.assertEqual(self.run_check()[0], 0)
+
+    def test_backtick_in_fence_info_does_not_start_a_code_block(self):
+        text = "```info`invalid\n# Visible\n"
+        self.assertEqual(catalog.without_fences(text), text)
+        self.assertEqual(catalog.anchors(text), {"visible"})
+
+    def test_heading_suffixes_never_collide_with_existing_anchors(self):
+        headings = "# Entry\n# Entry-1\n# Entry\n# Entry-1\n# Entry\n   ## Indented\n"
+        expected = {"entry", "entry-1", "entry-2", "entry-1-1", "entry-3", "indented"}
+        self.assertEqual(catalog.anchors(headings), expected)
+        self.write("ROADMAP.md", headings)
+        self.write("FINDINGS.md", "\n".join(f"[heading](ROADMAP.md#{slug})" for slug in expected))
+        self.assertEqual(self.run_check()[0], 0)
+
     def inventory(self):
         return {"parser": {"kind": "library"}, "explorer": {"kind": "application"},
                 "ecosystem": {"kind": "catalog"}}

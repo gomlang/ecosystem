@@ -163,11 +163,27 @@ def replace_catalog(readme, data):
 
 
 def without_fences(text):
-    return re.sub(r"(?ms)^```[^\n]*\n.*?^```[ \t]*$", "", text)
+    # CommonMark fences use matching characters, with a closing run at least as
+    # long as the opening run: https://spec.commonmark.org/0.31.2/#fenced-code-blocks
+    output, fence = [], None
+    for line in text.splitlines(keepends=True):
+        marker = re.fullmatch(r" {0,3}(`{3,}|~{3,})(.*)", line.rstrip("\r\n"))
+        if fence is not None:
+            if (marker and marker[1][0] == fence[0] and len(marker[1]) >= len(fence)
+                    and not marker[2].strip(" \t")):
+                fence = None
+        elif marker and (marker[1][0] == "~" or "`" not in marker[2]):
+            fence = marker[1]
+        else:
+            output.append(line)
+            continue
+        # Preserve block boundaries so prose on opposite sides cannot combine.
+        output.append("\n")
+    return "".join(output)
 
 
 def prose(text):
-    # Catalog documents use backtick fences and inline code. Examples inside them
+    # Catalog documents use fenced blocks and inline code. Examples inside them
     # can contain literal Markdown links that are not documentation references.
     return re.sub(r"`+[^`]*`+", "", without_fences(text))
 
@@ -175,11 +191,15 @@ def prose(text):
 def anchors(text):
     counts = {}
     result = set()
-    for heading in re.findall(r"(?m)^#{1,6}[ \t]+(.+?)[ \t]*#*[ \t]*$", without_fences(text)):
+    for heading in re.findall(r"(?m)^ {0,3}#{1,6}[ \t]+(.+?)[ \t]*#*[ \t]*$", without_fences(text)):
         heading = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", heading)
         base = re.sub(r"[^\w\- ]", "", heading.lower()).replace(" ", "-")
         count = counts.get(base, 0)
-        result.add(f"{base}-{count}" if count else base)
+        candidate = f"{base}-{count}" if count else base
+        while candidate in result:
+            count += 1
+            candidate = f"{base}-{count}"
+        result.add(candidate)
         counts[base] = count + 1
     return result
 
