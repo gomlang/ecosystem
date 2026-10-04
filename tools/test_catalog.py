@@ -141,6 +141,34 @@ class CatalogTests(unittest.TestCase):
                 self.assertEqual(status, 1)
                 self.assertIn(target, error)
 
+    def test_code_spans_require_matching_backtick_runs_without_joining_prose(self):
+        for text in ["Use ``a ` [example](absent.md)`` after.",
+                     "Use `a `` [example](absent.md)` after.",
+                     "[label]`code`(absent.md)"]:
+            with self.subTest(text=text):
+                self.write("FINDINGS.md", text)
+                status, error, _ = self.run_check()
+                self.assertEqual((status, error), (0, ""))
+
+    def test_escaped_or_unmatched_backticks_do_not_hide_real_links(self):
+        for text in [r"\`[real](absent.md)`", "``before [real](absent.md)` after",
+                     "before `literal\n\n[real](absent.md)`"]:
+            with self.subTest(text=text):
+                self.write("FINDINGS.md", text)
+                status, error, _ = self.run_check()
+                self.assertEqual(status, 1)
+                self.assertIn("absent.md", error)
+
+    def test_link_destinations_keep_literal_backticks(self):
+        self.write("a`b`c.md", "# Backtick name\n")
+        self.write("FINDINGS.md", "[real](a`b`c.md)")
+        status, error, _ = self.run_check()
+        self.assertEqual((status, error), (0, ""))
+        self.write("FINDINGS.md", "[real](absent`file`.md)")
+        status, error, _ = self.run_check()
+        self.assertEqual(status, 1)
+        self.assertIn("absent`file`.md", error)
+
     def test_optional_link_titles_do_not_hide_missing_files_or_fragments(self):
         for target in ["absent.md", "ROADMAP.md#absent", "<absent file.md>"]:
             for title in ['"description"', "'description'", '(description)', '"escaped \\"quote\\""']:

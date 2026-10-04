@@ -1,6 +1,7 @@
 """Render and validate the ecosystem catalog using only the Python standard library."""
 
 import argparse
+from bisect import bisect_right
 import html
 from html.entities import html5
 import json
@@ -186,9 +187,9 @@ def without_fences(text):
 
 
 def prose(text):
-    # Catalog documents use fenced blocks and inline code. Examples inside them
-    # can contain literal Markdown links that are not documentation references.
-    return re.sub(r"`+[^`]*`+", "", without_fences(text))
+    # Inline code is skipped by the link scanner, which must retain backticks
+    # inside destinations and must not join text on either side of a code span.
+    return without_fences(text)
 
 
 def anchors(text):
@@ -307,11 +308,29 @@ def decode_destination(target):
 def inline_targets(text):
     # Inline links allow angle destinations, balanced parentheses and optional
     # titles: https://spec.commonmark.org/0.31.2/#links
+    backticks = {}
+    for run in re.finditer(r"`+", text):
+        backticks.setdefault(run.end() - run.start(), []).append(run.start())
+    paragraphs = [match.start() for match in re.finditer(r"\n[ \t]*\n", text)]
+    paragraphs.append(len(text))
     brackets = []
     index = 0
     while index < len(text):
         if escaped(text, index):
             index += 2
+            continue
+        if text[index] == "`":
+            end = index + 1
+            while end < len(text) and text[end] == "`":
+                end += 1
+            width = end - index
+            positions = backticks.get(width, [])
+            following = bisect_right(positions, index)
+            boundary = paragraphs[bisect_right(paragraphs, index)]
+            if following < len(positions) and positions[following] < boundary:
+                index = positions[following] + width
+            else:
+                index = end
             continue
         if text.startswith("![", index):
             brackets.append([True, True])
