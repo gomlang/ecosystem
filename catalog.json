@@ -103,8 +103,8 @@
     },
     {
       "name": "goir",
-      "scope": "Typed SSA, bounded simplification and interpretation, machine IR, liveness, linear-scan allocation and Linux amd64 Go ABI0 leaf-function assembly",
-      "coverage": "Original/optimized IR and six native configurations, fixed-seed generated programs, exhaustive parallel copies, forced spills, ABI and stack-growth checks, code metrics and optional execution benchmarks"
+      "scope": "Typed SSA modules, SCCP/GVN, bounded call interpreter, constrained machine IR, segmented allocation with splitting and a symbolic checker, Linux amd64 Go ABI0 calls",
+      "coverage": "Six native configurations, generated loops/calls, GC and stack-growth helpers, stage filetests, reduced failure reproducers, exhaustive parallel copies, encoded sizes and repeated compile timings"
     },
     {
       "name": "graph",
