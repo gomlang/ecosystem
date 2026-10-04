@@ -103,8 +103,8 @@
     },
     {
       "name": "goir",
-      "scope": "Typed SSA, bounded interpretation, machine IR, liveness, linear-scan allocation and Linux amd64 Go ABI0 leaf-function assembly with a reference stack backend",
-      "coverage": "Module and independent consumer tests, multi-backend native differential checks, exhaustive parallel copies, forced spills, ABI layout, stack growth and optional execution benchmarks"
+      "scope": "Typed SSA, bounded simplification and interpretation, machine IR, liveness, linear-scan allocation and Linux amd64 Go ABI0 leaf-function assembly",
+      "coverage": "Original/optimized IR and six native configurations, fixed-seed generated programs, exhaustive parallel copies, forced spills, ABI and stack-growth checks, code metrics and optional execution benchmarks"
     },
     {
       "name": "graph",
