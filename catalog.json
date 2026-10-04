@@ -153,8 +153,8 @@
     },
     {
       "name": "lsp",
-      "scope": "JSON-RPC framing, persistent document snapshots, UTF-8/16/32 negotiation, checked completion output, synchronous/deferred dispatch and bidirectional request deadlines",
-      "coverage": "Module tests, downstream tests and independent position/edit/protocol checks"
+      "scope": "JSON-RPC framing, persistent documents, UTF-8/16/32 negotiation, checked completion/workspace edits, initialization context and dynamic capabilities, deferred dispatch, bidirectional deadlines and bounded historical resource maps",
+      "coverage": "Module and independent consumer tests for positions, edits, protocol lifecycle, initialization snapshots, workspace capabilities and repeated resource allocation/release"
     },
     {
       "name": "mail",

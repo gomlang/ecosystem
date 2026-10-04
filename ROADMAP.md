@@ -450,6 +450,20 @@ storage, descriptors and polling; its default configuration inherits no process
 resources. Stores require serial use, and the documented limits count logical resources
 rather than every byte of allocator overhead.
 
+## LSP initialization and workspace edits
+
+The `lsp` library now bounds historical request/deadline/document map storage
+through shared map compaction. Initialization exposes checked client/workspace
+parameters with isolated JSON snapshots and a callback for dynamic capabilities;
+failed initialization leaves protocol state unchanged and permits retry.
+
+Workspace edit helpers represent versioned text edits, resource operations and
+change annotations, validate ranges and references, and check client capabilities.
+Only unversioned, unannotated edits with distinct document URIs can be lowered to
+legacy `changes` without losing semantics. Applications still own filesystem/editor
+execution and the language logic producing edits. Stress tests and independent
+consumer tests cover lifecycle cleanup, capability negotiation and edit validation.
+
 ## Catalog maintenance
 
 The catalog now records every library's scope and verification coverage in
@@ -512,7 +526,7 @@ verification. See [Maintaining this catalog](README.md#maintaining-this-catalog)
 | [html](https://github.com/gomlang/html/blob/main/README.md) | DOM nodes are immutable; incremental DOM mutation, browser execution/layout and automatic template-context analysis remain separate work. Selectors use a documented subset and conservative structural-work admission, which can reject expensive queries before matching. Sanitizers have explicit conservative policies and output-context limits. Native parsing allocates its tree before validating node/depth limits; input bytes are bounded. The existing entity decoder remains a serial UTF-8 string stream. |
 | [highlight](https://github.com/gomlang/highlight/blob/main/README.md) | Full Markdown parsing, interpolation, semantic symbol scopes and TextMate/Sublime compatibility are still unsupported. Incremental edits still reconstruct and split full source even when lexical suffixes are reused. |
 | [go_doc](https://github.com/gomlang/go_doc/blob/main/README.md) | Go source/symbol extraction, import resolution, directives, legacy headings and nested list blocks remain unsupported. Automatic HTTP(S) links apply to HTML prose rendering; other render formats and the AST remain unchanged. The parser still implements a bounded comment subset, not every Go doc heuristic. |
-| [lsp](https://github.com/gomlang/lsp/blob/main/README.md) | Completion output helpers cover the documented common fields; broader feature schemas and workspace-edit execution remain application work. Worker/timer scheduling and concurrent server/session mutation are still outside the library; applications own language semantics and deadline polling. Output limits exclude caller-owned replacements and edit-span storage; coordinate/overlap errors retain precedence. |
+| [lsp](https://github.com/gomlang/lsp/blob/main/README.md) | Checked initialization and WorkspaceEdit models are available, including capability checks and lossless legacy conversion. Semantic-token builders, extended completion fields and workspace-edit execution remain application work. Worker/timer scheduling and concurrent server/session mutation remain outside the library. Output limits exclude caller-owned replacements and edit-span storage; coordinate/overlap errors retain precedence. |
 | [cache](https://github.com/gomlang/cache/blob/main/README.md) | Single global cache gate; sharding and proactive background expiry remain absent. Generic key hashing/equality and user copy/removal policies still have their documented panic and aliasing contracts. Weight measures caller-supplied units, not retained bytes. TTI updates and removals cost O(log n); backing storage can retain its high-water capacity. |
 | [incremental](https://github.com/gomlang/incremental/blob/main/README.md) | Evaluation is serialized; no parallel independent query branches or persistent revision snapshots. User policies must honor purity/copy rules and cannot be preempted while running. Cancellation in the later caller-result copy can occur after a valid memo has already been published. |
 | [pipeline](https://github.com/gomlang/pipeline/blob/main/README.md) | Expansion remains sequential; no bounded parallel flatten operator was added. Arbitrary callbacks and external blocking operations require cooperative cancellation; no typed panic recovery. |
