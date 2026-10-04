@@ -88,7 +88,7 @@
     },
     {
       "name": "dwarf",
-      "scope": "Bounded DWARF32 v2–5 units, DIEs, forms and line tables over standard random-access input",
+      "scope": "Bounded DWARF32 v2\u20135 units, DIEs, forms and line tables over standard random-access input",
       "coverage": "Library and downstream tests with checked-in compiler-produced binary fixtures and reference line tables"
     },
     {
@@ -103,8 +103,8 @@
     },
     {
       "name": "goir",
-      "scope": "Typed SSA modules, SCCP/GVN, bounded call interpreter, constrained machine IR, segmented allocation with splitting and a symbolic checker, Linux amd64 Go ABI0 calls",
-      "coverage": "Six native configurations, generated loops/calls, GC and stack-growth helpers, stage filetests, reduced failure reproducers, exhaustive parallel copies, encoded sizes and repeated compile timings"
+      "scope": "Variable-to-SSA frontend, I32/I64/Bool/F64 modules, typed stack slots, SCCP/GVN, amd64 instruction selection, checked loop-aware allocation and scalar Go ABI0 calls",
+      "coverage": "Six native configurations, integer/IEEE float edges, GC and stack growth, module roundtrips/reducers, stage filetests, repeated phase timings and runtime boundary probes"
     },
     {
       "name": "graph",
