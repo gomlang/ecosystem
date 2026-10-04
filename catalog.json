@@ -103,8 +103,8 @@
     },
     {
       "name": "goir",
-      "scope": "Variable-to-SSA frontend, I32/I64/Bool/F64 modules, typed stack slots, SCCP/GVN, amd64 instruction selection, checked loop-aware allocation and scalar Go ABI0 calls",
-      "coverage": "Six native configurations, integer/IEEE float edges, GC and stack growth, module roundtrips/reducers, stage filetests, repeated phase timings and runtime boundary probes"
+      "scope": "Typed scalar SSA modules, shared CFG analyses, checked arithmetic, private-slot mem2reg/LICM, target selection, global region allocation, CLI and Go ABI0 calls",
+      "coverage": "Nine seeded native configurations, two-allocator 0/1/7 comparisons, arithmetic traps, bit-exact memory, phase goldens, reproducible reduction, timing reports and GC/stack-growth probes"
     },
     {
       "name": "graph",
