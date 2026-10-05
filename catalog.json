@@ -62,6 +62,11 @@
       "coverage": "Module tests, real inotify reloads, versioned downstream check and race checks"
     },
     {
+      "name": "cron",
+      "scope": "Bounded five-field cron parsing, timezone-aware matching and next occurrences with explicit DST fold policies",
+      "coverage": "Module and downstream tests, race checks, 640 robfig and 900 exact-TZif reference cases; [source f7d57e0](https://github.com/gomlang/cron/commit/f7d57e0518001e00e8199305c764689fdbb916f9), [CI revision b2a4a33](https://github.com/gomlang/cron/commit/b2a4a338e7818cb2557726a9adbf076a4d3de71c) and [CI run](https://github.com/gomlang/cron/actions/runs/37369137016)"
+    },
+    {
       "name": "csv",
       "scope": "Streaming standard I/O, quoted multiline fields, configurable dialects, opt-in comments, byte/UTF-8 records, headers, precise positions, limits and typed Serde schemas",
       "coverage": "Module tests, 1,500 generated roundtrips, versioned file downstream check and race checks"
@@ -143,8 +148,8 @@
     },
     {
       "name": "jwt",
-      "scope": "Compact JWS signing/verification with HS256, RS256, ES256 and EdDSA, key selection and claims policies",
-      "coverage": "Standard Go crypto backend, strict parsing and independent signature vectors"
+      "scope": "Compact JWS signing/verification with HS256, RS256, ES256 and EdDSA, strict public JWK/JWKS import, key selection and claims policies",
+      "coverage": "Standard Go crypto backend, independent signature/JWK vectors, strict parsing, downstream and native/GoML race checks; [source 518b130](https://github.com/gomlang/jwt/commit/518b1309e21e29a5f40b383be099e6281acb9ee0), [CI revision 92f3f2b](https://github.com/gomlang/jwt/commit/92f3f2b3cd4262d4ba06c6421febe5b546c9bdcf) and [CI run](https://github.com/gomlang/jwt/actions/runs/37369061454)"
     },
     {
       "name": "llvm",
@@ -197,6 +202,11 @@
       "coverage": "Module tests, the complete migrated downstream check suite and race checks"
     },
     {
+      "name": "oauth2",
+      "scope": "OAuth 2.0 authorization code with PKCE S256 and one-use state, refresh-token and client-credentials flows, explicit client authentication and bounded TLS transport",
+      "coverage": "Independent local HTTP/TLS wire oracle, module and downstream tests, cancellation and race checks; [source 0278742](https://github.com/gomlang/oauth2/commit/027874295ff0311c489cb0104051276048aff2c8), [CI revision c3cd2e9](https://github.com/gomlang/oauth2/commit/c3cd2e94f67f15ea34227a4626644cb6c2c38e60) and [CI run](https://github.com/gomlang/oauth2/actions/runs/37369037725)"
+    },
+    {
       "name": "object",
       "scope": "Bounded ELF32/ELF64 metadata, sections, program headers, symbols, typed note records and extended numbering in either byte order",
       "coverage": "Library and downstream tests for binary layouts, note alignment/endianness, extended indexes, range validation and ownership"
@@ -212,6 +222,11 @@
       "coverage": "Module tests and race checks, versioned downstream check and 1,253 Python oracle cases"
     },
     {
+      "name": "postgres",
+      "scope": "Managed PostgreSQL connections implementing shared SQL traits, positional queries, owned rows, reusable statements, transactions, cancellation and deterministic cleanup",
+      "coverage": "Real PostgreSQL 16 integration, native and GoML tests, independent native consumer and race checks; [source 676a3e7](https://github.com/gomlang/postgres/commit/676a3e76635e729fa1368fddfbe466199c4354d5), [CI revision 560bd2a](https://github.com/gomlang/postgres/commit/560bd2ae0643e91e8651ab3759de2154431c20d9) and [CI run](https://github.com/gomlang/postgres/actions/runs/37369057046)"
+    },
+    {
       "name": "progress",
       "scope": "Concurrent bars/spinners, snapshots, rate/ETA, throttling, coordinated logging, redirected output and cancellable shutdown",
       "coverage": "Module tests, independent downstream check, 400 numerical cases, race detector and real PTY checks"
@@ -225,6 +240,11 @@
       "name": "proptest",
       "scope": "Composable generators, lazy budgeted shrinking, failure campaigns, distributions, persistent replay, opt-in rejection sampling, model/system execution with panic cleanup and IEEE edge cases",
       "coverage": "Module tests and independent downstream tests"
+    },
+    {
+      "name": "protobuf",
+      "scope": "Bounded Protocol Buffers wire codecs and explicit schemas, scalar/message presence and merging, packed fields and exact unknown-field retention",
+      "coverage": "Google protowire and dynamicpb interoperability, frozen reference vectors, downstream tests and native/GoML race checks; [source 504bba1](https://github.com/gomlang/protobuf/commit/504bba1aec0aa1d18b972b064a3394f4ea8f618e), [CI revision d498187](https://github.com/gomlang/protobuf/commit/d498187cd62048afa7336846fa5601a2787f9284) and [CI run](https://github.com/gomlang/protobuf/actions/runs/37369047578)"
     },
     {
       "name": "redis",
@@ -293,8 +313,8 @@
     },
     {
       "name": "tracing",
-      "scope": "Structured events, nested spans, explicit task contexts, filtering/sampling, composed sinks, bounded asynchronous output and coordinated cleanup",
-      "coverage": "Module tests and race checks, downstream tests and 1,307 Python reference records"
+      "scope": "Structured events, nested spans, explicit task contexts, filtering/sampling, composed sinks, bounded asynchronous output, coordinated cleanup and W3C Trace Context header propagation",
+      "coverage": "Module and downstream race checks, 1,307 Python event records and independent W3C propagation grammar/carrier checks; [source fd39064](https://github.com/gomlang/tracing/commit/fd390641e4fe6d338e9412c92948e65f51a7bfed), [CI revision 160e08a](https://github.com/gomlang/tracing/commit/160e08a7ff8314016c93bd24a87edb2ed3e39485) and [CI run](https://github.com/gomlang/tracing/actions/runs/37369185372)"
     },
     {
       "name": "tui",
