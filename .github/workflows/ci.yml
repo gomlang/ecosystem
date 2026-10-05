@@ -14,7 +14,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  catalog:
+    name: Validate catalog content
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out catalog
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Check out pinned verification inventory
+        uses: actions/checkout@v7
+        with:
+          repository: gomlang/verification
+          ref: 0e0ad852dd039068862b70d609521504a887f762
+          path: _verification
+          persist-credentials: false
+      - name: Test catalog validation
+        run: python3 -m unittest discover -s tools -p 'test_*.py' -v
+      - name: Check generated tables, history and inventory
+        run: python3 tools/catalog.py --check --inventory _verification/ci/repositories.json
+
   verify:
+    needs: catalog
     uses: gomlang/verification/.github/workflows/ecosystem-ci.yml@0e0ad852dd039068862b70d609521504a887f762
     with:
       module: ecosystem
