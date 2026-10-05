@@ -100,8 +100,9 @@ They distinguish supported designs from current compiler or API boundaries.
   with Rust bitflags cover aliases, overlapping flags, unknown bits and parsing.
   The optional `FlagValues` derive now emits public inherent constructors such
   as `Access::flag_read()`, including across package interfaces without trait
-  imports. Existing trait APIs and module constants remain compatible;
-  associated constants remain unsupported.
+  imports. Existing trait APIs and module constants remain compatible. This
+  derive emits constructors, not associated constants; the language itself now
+  supports [associated constants](https://github.com/gomlang/goml/blob/v0.1.58/docs/goml.md#associated-constants).
 
 - Logos implements a recursive regex AST, bounded Thompson NFA construction,
   generic callbacks with extras/error types and cross-package iterator methods
@@ -267,9 +268,13 @@ the transport workaround and uses standard I/O directly in its FFI package.
   monomorphization. Regression modules cover aliases, re-exports, forwarding
   helpers, and inherent impl bounds. Generic static inherent methods also retain
   owner arguments when their parameter and return types erase those arguments.
-- Integer `to_string` now works in CTFE; bitflags uses it when generating masks.
-  Derives can generate public inherent methods. General CTFE collections,
-  associated constants, and const generics remain future work.
+- Integer `to_string` works in CTFE; bitflags uses it when generating masks.
+  Derives can generate public inherent methods. GoML 0.1.58 also supports
+  [associated constants](https://github.com/gomlang/goml/blob/v0.1.58/docs/goml.md#associated-constants)
+  and [`usize` const generic parameters](https://github.com/gomlang/goml/blob/v0.1.58/docs/goml.md#const-generic-parameters).
+  Constant initializers cannot call ordinary functions or methods; type-dependent
+  associated constants in array lengths and default const arguments remain
+  unsupported. These language features do not change the existing bitflags API.
 - Derive attribute metadata does not retain every token form: numeric and raw
   string values can be omitted by attribute lowering. CLI validates the retained
   raw attribute text, rejects invalid non-string values and decodes raw strings
@@ -406,8 +411,8 @@ blocked operations and restore modes. Cross-review added regressions for wide
 cell replacement budgets, tab navigation, replacing selected text with the same
 text, bounded undo/redo storage and callback invalidation during rendering.
 
-One remaining compiler boundary is independently reproducible with the current
-stage2 toolchain (version 0.1.50):
+The terminal batch reproduced the following compiler boundary with stage2
+version 0.1.50:
 assigning a public field of a dependency struct that also contains private fields
 can typecheck and then fail ANF validation at link time. For example, with a normal
 `ecosystem::tui = "0.1.0"` dependency:
@@ -462,16 +467,21 @@ The explicit character value preserves Unicode typed roundtrips without changing
 the standard library in this batch. Format-specific schemas also preserve numeric
 looking text such as `0042` rather than guessing its type from cell contents.
 
-Two existing compiler boundaries surfaced during this batch:
+The following boundaries were observed during this batch. The generic case was
+rechecked with GoML 0.1.58 on 2026-10-06:
 
-- A generic configuration validation method whose type parameter occurs only
-  inside its implementation can pass checking but fail consumer specialization.
-  `Builder::validate_type[T: serde::Deserialize](self) -> Builder` forwarding
-  `snapshot.decode::[T]()` through a closure or generic helper failed test linking
-  with `cannot specialize ... validate_type: T does not satisfy
-  std::serde::Deserialize`. The public working API is `validate_with`, supplied
-  a concrete typed decoding callback by the consumer. Typed `Snapshot::decode`
-  itself works and is covered by external tests.
+- [Body-only generic free functions](https://github.com/gomlang/goml/blob/v0.1.58/docs/goml.md#generic-functions)
+  are supported: explicit type arguments survive package interfaces, forwarding
+  and function values. A separate consumer successfully ran a body-only
+  `validate_type[T: serde::Deserialize](input: string)` function that decodes a
+  configuration snapshot to a consumer-defined type, including a function value
+  and rejection of invalid typed input. The more specific method-and-closure
+  case still fails at linking: `Builder::validate_type[T: serde::Deserialize](self)
+  -> Builder` registering `|snapshot| snapshot.decode::[T]().map(|_| ())` reports
+  `cannot specialize ... validate_type: T does not satisfy std::serde::Deserialize`.
+  This is not a general restriction on body-only generics. Config's existing
+  `validate_with` API accepts a concrete typed decoding callback; typed
+  `Snapshot::decode` itself remains covered by external tests.
 - Large format-parser functions with many fallible operations and branches can
   cause severe generated-Go growth. The initial archive test program reached
   roughly 1.45 million generated lines; separating ZIP directory fields,
