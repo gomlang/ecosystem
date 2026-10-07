@@ -33,8 +33,8 @@
     },
     {
       "name": "bitflags",
-      "scope": "Typed integer flag sets, trait and inherent derives, unknown-bit policies, set algebra, name iteration, text and numeric Serde",
-      "coverage": "Module tests, downstream check, derive diagnostics and 4,601 Rust reference comparisons"
+      "scope": "Typed integer flag sets, combined and separate trait/inherent derives, unknown-bit policies, set algebra, name iteration, text and numeric Serde",
+      "coverage": "Module tests, downstream check, combined derive and argument diagnostics, and 4,601 Rust reference comparisons"
     },
     {
       "name": "cache",
@@ -43,8 +43,8 @@
     },
     {
       "name": "cli",
-      "scope": "Command schemas, aliases, inherited globals, groups, nested/flattened Args, typed subcommand derives and Bash/Zsh/Fish completion",
-      "coverage": "Module and downstream check tests"
+      "scope": "Command schemas, structured derive attributes, aliases, inherited globals, groups, nested/flattened Args, typed subcommands and Bash/Zsh/Fish completion",
+      "coverage": "Module and downstream check tests, including attribute argument diagnostic locations"
     },
     {
       "name": "color",
@@ -153,8 +153,8 @@
     },
     {
       "name": "lexer",
-      "scope": "Typed UTF-8 lexers, regex/literal rules, longest match, priorities, callbacks/extras, mode switching, checked source ranges and bounded Thompson NFA matching",
-      "coverage": "Module tests, downstream check, race checks and 3,155 Python reference cases"
+      "scope": "Typed UTF-8 lexers, enum derives with closure callbacks and compound extras/error types, regex/literal rules, longest match, priorities, mode switching and bounded Thompson NFA matching",
+      "coverage": "Module tests, derive and argument diagnostics, downstream check, race checks and 3,155 Python reference cases"
     },
     {
       "name": "llvm",

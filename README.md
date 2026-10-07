@@ -13,7 +13,7 @@ Each library repository contains its public API, documentation, tests and exampl
 Ordinary examples share the library's root `goml.toml`; `[dev-dependencies]`
 contains their test helpers. The verifier, Explorer application and statistics
 tool retain separate repositories. The ecosystem requires
-[GoML 0.1.57](https://github.com/gomlang/goml/releases/tag/v0.1.57) or newer.
+[GoML 0.1.59](https://github.com/gomlang/goml/releases/tag/v0.1.59) or newer.
 Source files and generated GoML bindings use `.goml`.
 Libraries with native integration document their Go adapters and system prerequisites.
 The [split manifest](https://github.com/gomlang/ecosystem/blob/main/split-manifest.tsv) records the source commit and the
@@ -104,9 +104,9 @@ The catalog contains **74 libraries**.
 | [bench](https://github.com/gomlang/bench/blob/main/README.md) | Adaptive sampling, parameterized workloads, setup exclusion, bootstrap statistics, baseline comparisons, throughput, cancellation and JSON/HTML reports | Module tests, deterministic clocks, real sorting downstream check and race checks |
 | [bigint](https://github.com/gomlang/bigint/blob/main/README.md) | Immutable signed/unsigned arbitrary-precision integers, arithmetic/division, signed and unsigned nth roots, bitwise operations, radix/byte conversions, number theory and exact Serde | Module tests, downstream tests, race checks and 1,938 Python reference cases |
 | [bigmath](https://github.com/gomlang/bigmath/blob/main/README.md) | Immutable bounded arbitrary-precision rationals and binary floating-point values with explicit rounding | Library and downstream tests with frozen Go math/big reference vectors |
-| [bitflags](https://github.com/gomlang/bitflags/blob/main/README.md) | Typed integer flag sets, trait and inherent derives, unknown-bit policies, set algebra, name iteration, text and numeric Serde | Module tests, downstream check, derive diagnostics and 4,601 Rust reference comparisons |
+| [bitflags](https://github.com/gomlang/bitflags/blob/main/README.md) | Typed integer flag sets, combined and separate trait/inherent derives, unknown-bit policies, set algebra, name iteration, text and numeric Serde | Module tests, downstream check, combined derive and argument diagnostics, and 4,601 Rust reference comparisons |
 | [cache](https://github.com/gomlang/cache/blob/main/README.md) | Generic concurrent weighted LRU, TTL/TTI, ordered batch reads/writes, injectable clocks, bounded singleflight loading, invalidation generations, copy policy and removal callbacks | Module tests and race checks, versioned downstream check and 42,240 Python reference operations |
-| [cli](https://github.com/gomlang/cli/blob/main/README.md) | Command schemas, aliases, inherited globals, groups, nested/flattened Args, typed subcommand derives and Bash/Zsh/Fish completion | Module and downstream check tests |
+| [cli](https://github.com/gomlang/cli/blob/main/README.md) | Command schemas, structured derive attributes, aliases, inherited globals, groups, nested/flattened Args, typed subcommands and Bash/Zsh/Fish completion | Module and downstream check tests, including attribute argument diagnostic locations |
 | [color](https://github.com/gomlang/color/blob/main/README.md) | Checked sRGB/linear/HSL/HSV/XYZ/Lab/Oklab conversions, CSS colors, alpha compositing, gamut mapping, contrast, Delta E and gradients | Pure GoML over standard math; module tests, downstream check tests and 4,659 numerical reference cases |
 | [compress](https://github.com/gomlang/compress/blob/main/README.md) | Incremental bounded DEFLATE, GZIP, ZLIB and LZW codecs with dictionary, checksum and bit-order contracts | Module tests, Go codec interoperability, independent downstream check and race checks |
 | [config](https://github.com/gomlang/config/blob/main/README.md) | Layered typed JSON/TOML, environment and CLI sources, merge policies, JSON Pointer edits, provenance, validation, immutable snapshots and filesystem hot reload | Module tests, real inotify reloads, versioned downstream check and race checks |
@@ -128,7 +128,7 @@ The catalog contains **74 libraries**.
 | [image](https://github.com/gomlang/image/blob/main/README.md) | PNG/JPEG/WebP codecs, premultiplied images, drawing, strict crop, nearest/bilinear resize and lossless rotations/mirrors | Native JPEG/WebP backends, independent image fixtures and consumer checks |
 | [incremental](https://github.com/gomlang/incremental/blob/main/README.md) | Typed heterogeneous inputs/queries, dynamic dependencies, revision validation, unchanged-result cutoff, atomic updates, cancellation and bounded memoization | Module tests and race checks, versioned downstream check and 15,847 from-scratch oracle queries |
 | [jwt](https://github.com/gomlang/jwt/blob/main/README.md) | Compact JWS signing/verification with HS256, RS256, ES256 and EdDSA, strict public JWK/JWKS import, key selection and claims policies | Standard Go crypto backend, independent signature/JWK vectors, strict parsing, downstream and native/GoML race checks; [source 518b130](https://github.com/gomlang/jwt/commit/518b1309e21e29a5f40b383be099e6281acb9ee0), [CI revision 92f3f2b](https://github.com/gomlang/jwt/commit/92f3f2b3cd4262d4ba06c6421febe5b546c9bdcf) and [CI run](https://github.com/gomlang/jwt/actions/runs/37369061454) |
-| [lexer](https://github.com/gomlang/lexer/blob/main/README.md) | Typed UTF-8 lexers, regex/literal rules, longest match, priorities, callbacks/extras, mode switching, checked source ranges and bounded Thompson NFA matching | Module tests, downstream check, race checks and 3,155 Python reference cases |
+| [lexer](https://github.com/gomlang/lexer/blob/main/README.md) | Typed UTF-8 lexers, enum derives with closure callbacks and compound extras/error types, regex/literal rules, longest match, priorities, mode switching and bounded Thompson NFA matching | Module tests, derive and argument diagnostics, downstream check, race checks and 3,155 Python reference cases |
 | [llvm](https://github.com/gomlang/llvm/blob/main/README.md) | LLVM 18 typed handles, SSA construction/editing, mutable-local promotion, IR traversal, target machines, ABI layouts, optimization and cross-target output | Module tests, native tests, downstream tests, race checks, four target formats and 12,420 linked-function comparisons |
 | [lsp](https://github.com/gomlang/lsp/blob/main/README.md) | JSON-RPC framing, persistent documents, UTF-8/16/32 negotiation, checked completion/workspace edits, initialization context and dynamic capabilities, deferred dispatch, bidirectional deadlines and bounded historical resource maps | Module and independent consumer tests for positions, edits, protocol lifecycle, initialization snapshots, workspace capabilities and repeated resource allocation/release |
 | [mail](https://github.com/gomlang/mail/blob/main/README.md) | Bounded mailboxes, flat and group-preserving address lists and header blocks with MIME encoded-word integration | Library and downstream tests for address/group grammar, empty groups, folding, encoded words and resource limits |
@@ -187,7 +187,7 @@ deterministic negative cases, reference interoperability where applicable, and
 fresh/cached builds. Build products belong in each module's `_artifact/` and are
 ignored by its repository.
 
-Install GoML 0.1.57 or newer and Go 1.26+ on `PATH`. With a library's dependencies
+Install GoML 0.1.59 or newer and Go 1.26+ on `PATH`. With a library's dependencies
 available in the selected registry, run these commands from that library's root:
 
 ```sh
