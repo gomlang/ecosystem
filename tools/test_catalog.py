@@ -73,6 +73,22 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(history, [(self.root / file).read_bytes() for file in
                                   ("split-manifest.tsv", "consumer-split-manifest.tsv")])
 
+    def test_renamed_library_preserves_history_and_requires_current_name(self):
+        for file in ("split-manifest.tsv", "consumer-split-manifest.tsv"):
+            path = self.root / file
+            path.write_text(path.read_text().replace("parser\t", "logos\t"))
+        history = [(self.root / file).read_bytes() for file in
+                   ("split-manifest.tsv", "consumer-split-manifest.tsv")]
+        self.data["libraries"][0]["name"] = "lexer"
+        self.save_data()
+        self.assertEqual(self.run_check("--write")[0], 0)
+        self.assertEqual(history, [(self.root / file).read_bytes() for file in
+                                  ("split-manifest.tsv", "consumer-split-manifest.tsv")])
+        for name in ("logos", "unrelated"):
+            self.data["libraries"][0]["name"] = name
+            self.save_data()
+            self.assertIn("historical libraries missing", self.run_check()[1])
+
     def test_invalid_catalog_records_fail_with_diagnostics(self):
         mutations = [
             lambda data: data.update(schema_version=True),

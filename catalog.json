@@ -118,7 +118,7 @@
     },
     {
       "name": "highlight",
-      "scope": "Extensible logos grammars, GoML/JSON/TOML/Markdown scopes, nested and cross-line regions, embedded fences, persistent incremental documents and ANSI/HTML output",
+      "scope": "Extensible lexer grammars, GoML/JSON/TOML/Markdown scopes, nested and cross-line regions, embedded fences, persistent incremental documents and ANSI/HTML output",
       "coverage": "Module tests, 200 incremental/full rebuild comparisons, rope downstream check and race checks"
     },
     {
@@ -152,14 +152,14 @@
       "coverage": "Standard Go crypto backend, independent signature/JWK vectors, strict parsing, downstream and native/GoML race checks; [source 518b130](https://github.com/gomlang/jwt/commit/518b1309e21e29a5f40b383be099e6281acb9ee0), [CI revision 92f3f2b](https://github.com/gomlang/jwt/commit/92f3f2b3cd4262d4ba06c6421febe5b546c9bdcf) and [CI run](https://github.com/gomlang/jwt/actions/runs/37369061454)"
     },
     {
+      "name": "lexer",
+      "scope": "Typed UTF-8 lexers, regex/literal rules, longest match, priorities, callbacks/extras, mode switching, checked source ranges and bounded Thompson NFA matching",
+      "coverage": "Module tests, downstream check, race checks and 3,155 Python reference cases"
+    },
+    {
       "name": "llvm",
       "scope": "LLVM 18 typed handles, SSA construction/editing, mutable-local promotion, IR traversal, target machines, ABI layouts, optimization and cross-target output",
       "coverage": "Module tests, native tests, downstream tests, race checks, four target formats and 12,420 linked-function comparisons"
-    },
-    {
-      "name": "logos",
-      "scope": "Typed UTF-8 lexers, regex/literal rules, longest match, priorities, callbacks/extras, mode switching, checked source ranges and bounded Thompson NFA matching",
-      "coverage": "Module tests, downstream check, race checks and 3,155 Python reference cases"
     },
     {
       "name": "lsp",

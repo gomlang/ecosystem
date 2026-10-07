@@ -18,6 +18,8 @@ START = "<!-- catalog:start -->"
 END = "<!-- catalog:end -->"
 NAME = re.compile(r"[a-z][a-z0-9_]*")
 SHA = re.compile(r"[0-9a-f]{40}")
+# Preserve the original split manifests while resolving renamed libraries.
+HISTORICAL_RENAMES = {"logos": "lexer"}
 
 
 def unique_object(pairs):
@@ -91,7 +93,9 @@ def check_history(root, data):
     consumers = read_manifest(root / "consumer-split-manifest.tsv", 2, "name\tsplit_commit")
     if split != consumers:
         raise ValueError(f"historical manifest modules differ: {sorted(split ^ consumers)}")
-    missing = split - {entry["name"] for entry in data["libraries"]}
+    current_names = {entry["name"] for entry in data["libraries"]}
+    missing = {name for name in split
+               if HISTORICAL_RENAMES.get(name, name) not in current_names}
     if missing:
         raise ValueError(f"historical libraries missing from catalog: {sorted(missing)}")
 

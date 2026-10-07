@@ -104,7 +104,7 @@ They distinguish supported designs from current compiler or API boundaries.
   derive emits constructors, not associated constants; the language itself now
   supports [associated constants](https://github.com/gomlang/goml/blob/v0.1.58/docs/goml.md#associated-constants).
 
-- Logos implements a recursive regex AST, bounded Thompson NFA construction,
+- Lexer implements a recursive regex AST, bounded Thompson NFA construction,
   generic callbacks with extras/error types and cross-package iterator methods
   without a native regex adapter. Reusable grammars work across independent
   concurrent lexers; Python exhaustive-prefix matching checks 3,155 cases.
@@ -439,7 +439,7 @@ The fuzzy, config, csv, websocket, highlight, archive, metrics and bench librari
 versioned modules. Unicode matching composes the standard full case fold with
 ecosystem grapheme segmentation; the normalized scalar positions must retain
 their original grapheme spans because folding can expand one character into
-several. Highlighting uses logos grammars and persistent line-state snapshots.
+several. Highlighting uses lexer grammars and persistent line-state snapshots.
 Two hundred edit sequences compare incremental spans with complete re-highlighting.
 Public byte slicing requires both endpoints to be UTF-8 boundaries, including
 when testing a short ASCII delimiter against a multibyte character. Comparing
