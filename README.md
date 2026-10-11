@@ -216,8 +216,7 @@ the sibling libraries and use it for an individual library. This does not
 change the default registry or persist an environment setting:
 
 ```sh
-(cd ../workflows && goml build)
-registry_path="$(cd ../workflows && _artifact/bin/workflows --registry-only)"
+registry_path="$(cd ../workflows && GOML="$(command -v goml)" just ecosystem-test --registry-only)"
 (
     cd ../color
     GOML_HOME="$registry_path" goml test --timeout 300s
@@ -330,13 +329,15 @@ GOML="$(command -v goml)" just ecosystem-test
 GOML="$(command -v goml)" just ecosystem-test lsp markdown diff
 GOML="$(command -v goml)" just ecosystem-test color unicode_text ansi terminal tui prompt progress diagnostics tui_markdown
 GOML="$(command -v goml)" just ecosystem-test fuzzy config csv websocket highlight archive metrics bench
-goml test --timeout 300s
+GOML="$(command -v goml)" just test
 ```
 
 With no module arguments, the verifier checks all registered libraries and their
 examples and native fixtures, the statistics CLI and the Explorer application. A missing module or
 failed check is an error. The verifier is a standalone GoML module; all test
-orchestration and assertions run through GoML without Python. It creates an isolated,
+orchestration and assertions run through GoML. The Python launcher first seeds
+a temporary registry with the sibling `testkit` library to build the runner.
+The runner creates an isolated,
 content-addressed registry snapshot under `workflows/_artifact/`, leaving the
 user's registry untouched. Module tests, named examples and native fixtures
 resolve dependencies from that same snapshot with workspace discovery disabled.
@@ -350,9 +351,14 @@ build and run GoML test suites with `GOFLAGS=-race`, including declared native
 adapter tests. `--no-race` skips that extra pass for focused development.
 
 The explicit `GOML` setting selects the compatible toolchain for both building and
-running the verifier. `just` is required for these recipes. Alternatively, run
-`goml build` in `workflows`, then invoke
-`_artifact/bin/workflows --goml "$(command -v goml)" lsp` directly.
+running the verifier. These recipes prepare the private bootstrap registry;
+building the workflows module directly requires resolving its `testkit` dependency
+first. Without `just`, use the same launcher from the workflows checkout:
+
+```sh
+python3 ci/ecosystem.py run --libraries .. --goml "$(command -v goml)" --arguments lsp
+python3 ci/ecosystem.py test --libraries .. --goml "$(command -v goml)"
+```
 
 Each implemented library has a README describing its API, semantics, limits and
 tests. [FINDINGS.md](https://github.com/gomlang/ecosystem/blob/main/FINDINGS.md) records language capabilities and compiler/API boundaries discovered during this work.
