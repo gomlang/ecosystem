@@ -100,6 +100,7 @@ class CatalogTests(unittest.TestCase):
             lambda data: data["libraries"].append(dict(data["libraries"][0])),
             lambda data: data["applications"][0].update(name="parser"),
             lambda data: data["applications"][0].update(name="verification"),
+            lambda data: data["applications"][0].update(name="workflows"),
         ]
         for mutate in mutations:
             with self.subTest(mutation=mutate):
@@ -314,7 +315,7 @@ class CatalogTests(unittest.TestCase):
             self.write(f"siblings/{name}/README.md", f"# {name}\n")
         self.write("siblings/parser/goml.toml", '[module]\npath = "ecosystem::parser"\n')
         self.write("siblings/explorer/goml.toml", '[module]\npath = "example::explorer"\n')
-        self.write("siblings/verification/ci/repositories.json", json.dumps(self.inventory()))
+        self.write("siblings/workflows/ci/repositories.json", json.dumps(self.inventory()))
         args = ["--libraries", str(self.root / "siblings")]
         self.assertEqual(self.run_check(*args)[0], 0)
         self.write("siblings/parser/goml.toml", '[module]\npath = "ecosystem::wrong"\n')

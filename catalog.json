@@ -93,7 +93,7 @@
     },
     {
       "name": "dwarf",
-      "scope": "Bounded DWARF32 v2\u20135 units, DIEs, forms and line tables over standard random-access input",
+      "scope": "Bounded DWARF32 v2–5 units, DIEs, forms and line tables over standard random-access input",
       "coverage": "Library and downstream tests with checked-in compiler-produced binary fixtures and reference line tables"
     },
     {
@@ -305,6 +305,11 @@
       "name": "terminal",
       "scope": "Linux raw sessions, typed keyboard/mouse/paste/focus/resize events, capability detection, cancellable I/O and explicit restoration",
       "coverage": "Module tests, independent downstream check, race detector and real PTY checks"
+    },
+    {
+      "name": "testkit",
+      "scope": "Reference fixture decoding, JSON assertions, process execution and an independent terminal screen model for library tests",
+      "coverage": "Unit and downstream tests for reusable helpers; ecosystem example conventions remain in the workflows runner"
     },
     {
       "name": "textproto",

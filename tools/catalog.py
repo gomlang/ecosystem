@@ -41,7 +41,7 @@ def load_catalog(root):
         raise ValueError("catalog.json requires schema_version, libraries and applications")
     if type(data["schema_version"]) is not int or data["schema_version"] != 1:
         raise ValueError("unsupported catalog schema_version (expected 1)")
-    names = {"ecosystem", "verification"}
+    names = {"ecosystem", "verification", "workflows"}
     for kind in ("libraries", "applications"):
         entries = data[kind]
         if not isinstance(entries, list) or not entries:
@@ -137,7 +137,7 @@ def check_libraries(root, data):
             raise ValueError(f"missing module coordinate: {manifest}")
         if kind == "library" and coordinate != f"ecosystem::{name}":
             raise ValueError(f"incorrect module coordinate in {manifest}: {coordinate}")
-    check_inventory(root / "verification/ci/repositories.json", data)
+    check_inventory(root / "workflows/ci/repositories.json", data)
 
 
 def cell(value):
@@ -388,7 +388,7 @@ def main(argv=None):
     mode.add_argument("--check", action="store_true", help="check without writing (default)")
     mode.add_argument("--write", action="store_true", help="regenerate the README catalog tables")
     parser.add_argument("--root", type=Path, default=ROOT, help="catalog checkout directory")
-    parser.add_argument("--inventory", type=Path, help="verification/ci/repositories.json to compare")
+    parser.add_argument("--inventory", type=Path, help="workflows/ci/repositories.json to compare")
     parser.add_argument("--libraries", type=Path, help="check sibling READMEs, module coordinates and inventory")
     args = parser.parse_args(argv)
     try:

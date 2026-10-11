@@ -16,9 +16,9 @@ of feature parity with every mature library in that category.
 | parser | Shared text/binary work and depth limits, contextual custom parsers, iterative alternatives and binary backtracking/lookahead primitives |
 
 Each addition has library and independently resolved consumer coverage. The
-verification entry point is `just ecosystem-test` in the sibling `verification`
+verification entry point is `just ecosystem-test` in the sibling `workflows`
 repository, implemented in GoML. Each repository now runs these checks through
-the shared GitHub Actions configuration in `verification`.
+the shared GitHub Actions configuration in `workflows`.
 
 ## Adoption of GoML 0.1.50
 
@@ -97,7 +97,7 @@ module link leads to its public API, limits and regression tests.
 
 All 64 libraries have implementation, documentation and regression changes with
 module-local tests and isolated downstream verification. Repository CI uses the
-[shared verification workflow](https://github.com/gomlang/verification/tree/main/ci)
+[shared verification workflow](https://github.com/gomlang/workflows/tree/main/ci)
 for the applicable race, I/O, PTY and native checks.
 
 ### Numeric and graph libraries
@@ -599,3 +599,14 @@ Further work should preserve resource bounds, recoverable errors, normal
 versioned dependency consumption and the independent reference checks already
 present. Bundled networking adapters and concurrent resource pools need actual
 I/O and race coverage, beyond a public interface or a mock implementation.
+
+## Verification infrastructure split
+
+Shared GitHub Actions workflows, toolchain installation and cross-repository
+checks now live in `gomlang/workflows`. The reusable reference fixture, JSON,
+process and terminal-screen helpers are the `ecosystem::testkit` development
+dependency, bringing the current catalog to **75 libraries and 2 applications**.
+The workflows inventory includes those 77 modules and this catalog; workflows
+itself is infrastructure rather than a public library. Project-specific example
+conventions remain in the runner. Historical verification commit and CI links
+above retain their original repository, which is kept for old pinned callers.

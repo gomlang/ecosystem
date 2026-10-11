@@ -11,11 +11,12 @@ and audit records retain the original name; catalog validation maps it to `lexer
 Each library lives in an independent [gomlang GitHub repository](https://github.com/gomlang).
 Each library repository contains its public API, documentation, tests and examples.
 Ordinary examples share the library's root `goml.toml`; `[dev-dependencies]`
-contains their test helpers. The verifier, Explorer application and statistics
-tool retain separate repositories. The ecosystem requires the current GoML development driver for unversioned
+contains their test helpers. The shared workflows and ecosystem runner live in [`workflows`](https://github.com/gomlang/workflows);
+reusable test helpers live in [`testkit`](https://github.com/gomlang/testkit).
+The Explorer application and statistics tool retain separate repositories. The ecosystem requires the current GoML development driver for unversioned
 registry dependencies. The exact tested source revision and checksum-pinned
 [GoML 0.1.59](https://github.com/gomlang/goml/releases/tag/v0.1.59) bootstrap
-release are recorded in [verification/ci/toolchain.json](https://github.com/gomlang/verification/blob/main/ci/toolchain.json).
+release are recorded in [workflows/ci/toolchain.json](https://github.com/gomlang/workflows/blob/main/ci/toolchain.json).
 Source files and generated GoML bindings use `.goml`.
 Libraries with native integration document their Go adapters and system prerequisites.
 The [split manifest](https://github.com/gomlang/ecosystem/blob/main/split-manifest.tsv) records the source commit and the
@@ -96,7 +97,7 @@ Table contents are generated from [catalog.json](catalog.json).
 
 <!-- catalog:start -->
 
-The catalog contains **74 libraries**.
+The catalog contains **75 libraries**.
 
 | Module | Implemented scope | Verification coverage |
 | --- | --- | --- |
@@ -161,6 +162,7 @@ The catalog contains **74 libraries**.
 | [tempfile](https://github.com/gomlang/tempfile/blob/main/README.md) | Secure temporary files/directories, anonymous files, atomic persistence, ownership transfer, scoped cleanup and memory-to-disk spooling | Module tests and race checks, downstream check and 160 concurrent filesystem comparisons |
 | [template](https://github.com/gomlang/template/blob/main/README.md) | Expressions, lexical scopes, conditions, loops, filters, includes, inheritance, escaping and contextual diagnostics | Module tests, downstream tests and 1,367 Jinja shared-syntax comparisons |
 | [terminal](https://github.com/gomlang/terminal/blob/main/README.md) | Linux raw sessions, typed keyboard/mouse/paste/focus/resize events, capability detection, cancellable I/O and explicit restoration | Module tests, independent downstream check, race detector and real PTY checks |
+| [testkit](https://github.com/gomlang/testkit/blob/main/README.md) | Reference fixture decoding, JSON assertions, process execution and an independent terminal screen model for library tests | Unit and downstream tests for reusable helpers; ecosystem example conventions remain in the workflows runner |
 | [textproto](https://github.com/gomlang/textproto/blob/main/README.md) | Bounded CRLF lines, folded-header framing, checked header mutation, numeric reply reading/writing and dot-encoded text streams over standard I/O | Library and downstream tests for fragmented frames, clean EOF and malformed protocol input |
 | [tracing](https://github.com/gomlang/tracing/blob/main/README.md) | Structured events, nested spans, explicit task contexts, filtering/sampling, composed sinks, bounded asynchronous output, coordinated cleanup and W3C Trace Context header propagation | Module and downstream race checks, 1,307 Python event records and independent W3C propagation grammar/carrier checks; [source fd39064](https://github.com/gomlang/tracing/commit/fd390641e4fe6d338e9412c92948e65f51a7bfed), [CI revision 160e08a](https://github.com/gomlang/tracing/commit/160e08a7ff8314016c93bd24a87edb2ed3e39485) and [CI run](https://github.com/gomlang/tracing/actions/runs/37369185372) |
 | [tui](https://github.com/gomlang/tui/blob/main/README.md) | Unicode cell buffers, incremental rendering, constrained layout, tables/trees/charts, focus and grapheme-aware editing | Module tests, downstream tests, 2,505 model-checked ANSI frames and real PTY checks |
@@ -189,7 +191,7 @@ deterministic negative cases, reference interoperability where applicable, and
 fresh/cached builds. Build products belong in each module's `_artifact/` and are
 ignored by its repository.
 
-Build the GoML source revision pinned by verification (`just make` in the
+Build the GoML source revision pinned by workflows (`just make` in the
 compiler repository), and put its `stage2/bin` and Go 1.26+ on `PATH`. With a library's dependencies
 available in the selected registry, run these commands from that library's root:
 
@@ -214,8 +216,8 @@ the sibling libraries and use it for an individual library. This does not
 change the default registry or persist an environment setting:
 
 ```sh
-(cd ../verification && goml build)
-registry_path="$(cd ../verification && _artifact/bin/verification --registry-only)"
+(cd ../workflows && goml build)
+registry_path="$(cd ../workflows && _artifact/bin/workflows --registry-only)"
 (
     cd ../color
     GOML_HOME="$registry_path" goml test --timeout 300s
@@ -252,11 +254,11 @@ coordinates and the verifier's repository inventory:
 python3 tools/catalog.py --check --libraries ..
 ```
 
-`--inventory /path/to/verification/ci/repositories.json` compares the catalog's
+`--inventory /path/to/workflows/ci/repositories.json` compares the catalog's
 complete library/application list and repository roles without requiring all
-library checkouts. CI uses this mode against its pinned verification revision.
+library checkouts. CI uses this mode against its pinned workflows revision.
 Adding or removing a repository also requires updating the inventory and runner
-in `verification`, then updating the workflow's pinned verification references
+in `workflows`, then updating the workflow's pinned workflows references
 together. A catalog entry alone does not register a library with the verifier.
 
 ## Examples and development dependencies
@@ -273,7 +275,11 @@ The bench, llvm, postgres, redis, sql, sqlite, web and yaml repositories retain 
 fixtures under `testdata/downstream/native/`. Their Go module settings and test
 servers are part of those scenarios. The standalone verifier builds and tests these fixtures
 automatically. Fixture-only helpers are declared in root `[dev-dependencies]`;
-normal downstream users do not inherit them. The verification runner retains
+normal downstream users do not inherit them. Tests import reusable fixture, JSON,
+process and terminal helpers from `ecosystem::testkit::reference`, declared as
+`"ecosystem::testkit" = true` in `[dev-dependencies]`. The `workflows` module is
+infrastructure, not a registry dependency. Project-specific example paths and
+runner environment conventions stay in `workflows`. The verification runner retains
 reference interoperability, native adapter, cache, PTY, SIMD and race checks.
 
 ## Terminal application stack
@@ -296,7 +302,7 @@ Markdown preview, background scan progress and filesystem refresh. It provides
 both an interactive application and a deterministic textual snapshot mode:
 
 ```sh
-cd ../verification
+cd ../workflows
 GOML="$(command -v goml)" just ecosystem-test explorer
 ```
 
@@ -309,7 +315,7 @@ tables and JSON output. Its lexer-aware counting handles raw and multiline
 strings without mistaking their contents for comments.
 
 ```sh
-cd ../verification
+cd ../workflows
 GOML="$(command -v goml)" just ecosystem-test goml_stats
 ../goml_stats/_artifact/bin/cmd/goml_stats/goml_stats ../parser
 ```
@@ -319,7 +325,7 @@ GOML="$(command -v goml)" just ecosystem-test goml_stats
 Run the library, example and independent downstream checks from the verifier repository:
 
 ```sh
-cd ../verification
+cd ../workflows
 GOML="$(command -v goml)" just ecosystem-test
 GOML="$(command -v goml)" just ecosystem-test lsp markdown diff
 GOML="$(command -v goml)" just ecosystem-test color unicode_text ansi terminal tui prompt progress diagnostics tui_markdown
@@ -331,13 +337,13 @@ With no module arguments, the verifier checks all registered libraries and their
 examples and native fixtures, the statistics CLI and the Explorer application. A missing module or
 failed check is an error. The verifier is a standalone GoML module; all test
 orchestration and assertions run through GoML without Python. It creates an isolated,
-content-addressed registry snapshot under `verification/_artifact/`, leaving the
+content-addressed registry snapshot under `workflows/_artifact/`, leaving the
 user's registry untouched. Module tests, named examples and native fixtures
 resolve dependencies from that same snapshot with workspace discovery disabled.
 Snapshot contents are captured once and published atomically so
 parallel verifiers cannot observe a partially populated registry. Verification
 logs and command timings are written under
-`verification/_artifact/verification/`. Real terminal checks run automatically for
+`workflows/_artifact/verification/`. Real terminal checks run automatically for
 terminal, tui, prompt, progress, tui_markdown and Explorer; they use local
 pseudo-terminals and do not require a human-controlled terminal. Race checks
 build and run GoML test suites with `GOFLAGS=-race`, including declared native
@@ -345,8 +351,8 @@ adapter tests. `--no-race` skips that extra pass for focused development.
 
 The explicit `GOML` setting selects the compatible toolchain for both building and
 running the verifier. `just` is required for these recipes. Alternatively, run
-`goml build` in `verification`, then invoke
-`_artifact/bin/verification --goml "$(command -v goml)" lsp` directly.
+`goml build` in `workflows`, then invoke
+`_artifact/bin/workflows --goml "$(command -v goml)" lsp` directly.
 
 Each implemented library has a README describing its API, semantics, limits and
 tests. [FINDINGS.md](https://github.com/gomlang/ecosystem/blob/main/FINDINGS.md) records language capabilities and compiler/API boundaries discovered during this work.
@@ -355,7 +361,7 @@ The local verifier does not download native Go dependencies. Before checking a
 module with native adapters, prefetch dependencies from this catalog checkout:
 
 ```sh
-python3 ../verification/ci/ecosystem.py native --libraries .. --module sqlite
+python3 ../workflows/ci/ecosystem.py native --libraries .. --module sqlite
 ```
 
 Replace `sqlite` with the selected module. This includes its transitive GoML
@@ -382,7 +388,7 @@ compiler's pipeline and module fixtures.
 
 ## GitHub Actions
 
-Every library, application, catalog and verification repository has a `CI`
+Every library, application, catalog and workflows repository has a `CI`
 workflow for pushes, pull requests and manual runs. This catalog first checks
 its generated tables, documentation links, historical manifests and library/
 application inventory. It then runs the verifier's own tests and compares the
@@ -390,9 +396,9 @@ runner's registered modules with the pinned repository inventory. A green
 catalog run does not mean that every library suite was run on its latest commit.
 
 Library and application workflows reuse the
-[verification infrastructure](https://github.com/gomlang/verification/tree/main/ci)
+[shared workflow infrastructure](https://github.com/gomlang/workflows/tree/main/ci)
 at a full commit SHA and test the triggering candidate against pinned sibling
-revisions with the released GoML toolchain. Their checks include formatting, tests,
+revisions with the pinned GoML source toolchain. Their checks include formatting, tests,
 independent dependency verification, smoke/cached builds and the applicable
 race, PTY, SIMD and native interoperability suites. Failure logs are uploaded.
 
