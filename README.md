@@ -196,8 +196,10 @@ available in the selected registry, run these commands from that library's root:
 ```sh
 goml fmt --check
 goml test --timeout 300s
-goml verify --timeout 300s
 ```
+
+Historical audit records may mention the removed `goml verify` command. Use the
+standalone verification runner described below for current toolchains.
 
 Modules with ecosystem dependencies use unversioned entries in the selected registry.
 Run `goml update` to refresh dependencies from the central Git index.
@@ -217,7 +219,6 @@ registry_path="$(cd ../verification && _artifact/bin/verification --registry-onl
 (
     cd ../color
     GOML_HOME="$registry_path" goml test --timeout 300s
-    GOML_HOME="$registry_path" goml verify --timeout 300s
 )
 ```
 
@@ -264,13 +265,13 @@ Most libraries use a named example with no extra manifest. Most use `examples/ba
 `diff` uses `examples/patch/`, `csv` uses `examples/inventory/`, and `cli` uses
 `examples/parse/`. Run `goml run --example <name>` from the library root.
 `goml test` builds examples and runs their tests alongside library tests.
-`goml verify --timeout 300s` copies examples into independent modules and checks
-them against an isolated registry snapshot. Cross-module API, generic and derive
-coverage is preserved without maintaining a manifest for every sample.
+The standalone verification runner builds named examples and tests their public
+API, generic and derive behavior against an isolated registry snapshot. It also
+checks cached build fingerprints without maintaining a manifest for every sample.
 
-The bench, llvm, redis, sql, sqlite, web and yaml repositories retain explicit native
+The bench, llvm, postgres, redis, sql, sqlite, web and yaml repositories retain explicit native
 fixtures under `testdata/downstream/native/`. Their Go module settings and test
-servers are part of those scenarios. `goml verify` builds and tests these fixtures
+servers are part of those scenarios. The standalone verifier builds and tests these fixtures
 automatically. Fixture-only helpers are declared in root `[dev-dependencies]`;
 normal downstream users do not inherit them. The verification runner retains
 reference interoperability, native adapter, cache, PTY, SIMD and race checks.
@@ -331,7 +332,9 @@ examples and native fixtures, the statistics CLI and the Explorer application. A
 failed check is an error. The verifier is a standalone GoML module; all test
 orchestration and assertions run through GoML without Python. It creates an isolated,
 content-addressed registry snapshot under `verification/_artifact/`, leaving the
-user's registry untouched. Ordinary module tests resolve dependencies from that snapshot; `goml verify` materializes examples and native fixtures against a separate snapshot with workspace discovery disabled. Snapshot contents are captured once and published atomically so
+user's registry untouched. Module tests, named examples and native fixtures
+resolve dependencies from that same snapshot with workspace discovery disabled.
+Snapshot contents are captured once and published atomically so
 parallel verifiers cannot observe a partially populated registry. Verification
 logs and command timings are written under
 `verification/_artifact/verification/`. Real terminal checks run automatically for
@@ -340,7 +343,7 @@ pseudo-terminals and do not require a human-controlled terminal. Race checks
 build and run GoML test suites with `GOFLAGS=-race`, including declared native
 adapter tests. `--no-race` skips that extra pass for focused development.
 
-The explicit `GOML` setting selects the installed release for both building and
+The explicit `GOML` setting selects the compatible toolchain for both building and
 running the verifier. `just` is required for these recipes. Alternatively, run
 `goml build` in `verification`, then invoke
 `_artifact/bin/verification --goml "$(command -v goml)" lsp` directly.
@@ -348,8 +351,16 @@ running the verifier. `just` is required for these recipes. Alternatively, run
 Each implemented library has a README describing its API, semantics, limits and
 tests. [FINDINGS.md](https://github.com/gomlang/ecosystem/blob/main/FINDINGS.md) records language capabilities and compiler/API boundaries discovered during this work.
 
-SQLite also requires its declared native Go dependencies to be fetched before
-readonly compilation (`cd ../sqlite && go mod download all`). Its
+The local verifier does not download native Go dependencies. Before checking a
+module with native adapters, prefetch dependencies from this catalog checkout:
+
+```sh
+python3 ../verification/ci/ecosystem.py native --libraries .. --module sqlite
+```
+
+Replace `sqlite` with the selected module. This includes its transitive GoML
+dependencies, nested examples and native fixtures. CI performs this as a separate
+step before verification. SQLite's
 bidirectional database-file check uses the system `libsqlite3.so.0` and the C
 compiler; SQLite development headers are not required. Independent
 numeric, protocol and state-machine oracle results are checked-in text fixtures
