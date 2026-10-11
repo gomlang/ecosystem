@@ -12,8 +12,10 @@ Each library lives in an independent [gomlang GitHub repository](https://github.
 Each library repository contains its public API, documentation, tests and examples.
 Ordinary examples share the library's root `goml.toml`; `[dev-dependencies]`
 contains their test helpers. The verifier, Explorer application and statistics
-tool retain separate repositories. The ecosystem requires
-[GoML 0.1.59](https://github.com/gomlang/goml/releases/tag/v0.1.59) or newer.
+tool retain separate repositories. The ecosystem requires the current GoML development driver for unversioned
+registry dependencies. The exact tested source revision and checksum-pinned
+[GoML 0.1.59](https://github.com/gomlang/goml/releases/tag/v0.1.59) bootstrap
+release are recorded in [verification/ci/toolchain.json](https://github.com/gomlang/verification/blob/main/ci/toolchain.json).
 Source files and generated GoML bindings use `.goml`.
 Libraries with native integration document their Go adapters and system prerequisites.
 The [split manifest](https://github.com/gomlang/ecosystem/blob/main/split-manifest.tsv) records the source commit and the
@@ -187,7 +189,8 @@ deterministic negative cases, reference interoperability where applicable, and
 fresh/cached builds. Build products belong in each module's `_artifact/` and are
 ignored by its repository.
 
-Install GoML 0.1.59 or newer and Go 1.26+ on `PATH`. With a library's dependencies
+Build the GoML source revision pinned by verification (`just make` in the
+compiler repository), and put its `stage2/bin` and Go 1.26+ on `PATH`. With a library's dependencies
 available in the selected registry, run these commands from that library's root:
 
 ```sh
@@ -196,7 +199,8 @@ goml test --timeout 300s
 goml verify --timeout 300s
 ```
 
-Modules with ecosystem dependencies need those versions in the selected registry.
+Modules with ecosystem dependencies use unversioned entries in the selected registry.
+Run `goml update` to refresh dependencies from the central Git index.
 Use the verification command below to create the isolated
 registry snapshot and check the library, its examples and independent downstream behavior.
 The verifier reads sibling library repositories from its parent directory by default.
