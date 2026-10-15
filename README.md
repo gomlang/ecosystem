@@ -13,9 +13,10 @@ Each library repository contains its public API, documentation, tests and exampl
 Ordinary examples share the library's root `goml.toml`; `[dev-dependencies]`
 contains their test helpers. The shared workflows and ecosystem runner live in [`workflows`](https://github.com/gomlang/workflows);
 reusable test helpers live in [`testkit`](https://github.com/gomlang/testkit).
-The Explorer application and statistics tool retain separate repositories. The ecosystem requires the current GoML development driver for unversioned
-registry dependencies. The exact tested source revision and checksum-pinned
-[GoML 0.1.59](https://github.com/gomlang/goml/releases/tag/v0.1.59) bootstrap
+The Explorer application and statistics tool retain separate repositories.
+GoML 0.1.60 supports the unversioned registry dependencies. The current tested
+source revision and checksum-pinned
+[GoML 0.1.60](https://github.com/gomlang/goml/releases/tag/v0.1.60) bootstrap
 release are recorded in [workflows/ci/toolchain.json](https://github.com/gomlang/workflows/blob/main/ci/toolchain.json).
 Source files and generated GoML bindings use `.goml`.
 Libraries with native integration document their Go adapters and system prerequisites.
@@ -415,7 +416,9 @@ need a module-root `go.mod` using Go 1.26+, including callers of existing HTML
 entity and image APIs. The affected `template`, `markdown`, `go_doc`,
 `tui_markdown` and `explorer` repositories include minimal manifests. Native
 module requirements, checksums and local replacements are managed by GoML; CI
-prepares the pinned backend dependencies before readonly builds. JPEG/WebP
+prepares the pinned backend dependencies before verification. Ordinary Go builds
+follow the consuming project's Go environment; Go library export and native SIMD
+builds use readonly, offline dependency handling. JPEG/WebP
 codecs in this expansion require no additional C library.
 
 UUID uses standard cryptographic entropy without a native adapter. JWT uses Go
