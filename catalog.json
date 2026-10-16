@@ -124,7 +124,7 @@
     {
       "name": "html",
       "scope": "Entity utilities, immutable HTML5 DOM, CSS selectors and conservative HTML sanitization",
-      "coverage": "Existing pure GoML entity code plus managed document backend, independent recovery and hostile-input fixtures"
+      "coverage": "GoML HTML5 parsing, selectors and sanitization, independent recovery and hostile-input fixtures"
     },
     {
       "name": "http",
@@ -139,7 +139,7 @@
     {
       "name": "image",
       "scope": "PNG/JPEG/WebP codecs, premultiplied images, drawing, strict crop, nearest/bilinear resize and lossless rotations/mirrors",
-      "coverage": "Native JPEG/WebP backends, independent image fixtures and consumer checks"
+      "coverage": "GoML JPEG/VP8/VP8L codecs, independent pixel and encoding fixtures, consumer and race checks"
     },
     {
       "name": "incremental",
@@ -149,7 +149,7 @@
     {
       "name": "jwt",
       "scope": "Compact JWS signing/verification with HS256, RS256, ES256 and EdDSA, strict public JWK/JWKS import, key selection and claims policies",
-      "coverage": "Standard Go crypto backend, independent signature/JWK vectors, strict parsing, downstream and native/GoML race checks; [source 518b130](https://github.com/gomlang/jwt/commit/518b1309e21e29a5f40b383be099e6281acb9ee0), [CI revision 92f3f2b](https://github.com/gomlang/jwt/commit/92f3f2b3cd4262d4ba06c6421febe5b546c9bdcf) and [CI run](https://github.com/gomlang/jwt/actions/runs/37369061454)"
+      "coverage": "GoML HMAC/RSA/P-256/Ed25519, independent signature/JWK and malformed-key vectors, strict parsing, downstream and race checks"
     },
     {
       "name": "lexer",
@@ -374,7 +374,7 @@
     {
       "name": "yaml",
       "scope": "Bounded YAML block/flow parsing and emission, multi-document streams, aliases, dynamic values and Serde",
-      "coverage": "Managed YAML backend, explicit core-schema policy and configuration consumer"
+      "coverage": "GoML YAML parser and emitter, explicit core-schema policy, official fixtures, alias budgets and configuration consumer"
     }
   ],
   "applications": [
