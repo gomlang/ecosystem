@@ -14,8 +14,8 @@ Ordinary examples share the library's root `goml.toml`; `[dev-dependencies]`
 contains their test helpers. The shared workflows and ecosystem runner live in [`workflows`](https://github.com/gomlang/workflows);
 reusable test helpers live in [`testkit`](https://github.com/gomlang/testkit).
 The Explorer application and statistics tool retain separate repositories.
-GoML 0.1.61 is the current verification baseline. Its tested source revision and checksum-pinned
-[GoML 0.1.61](https://github.com/gomlang/goml/releases/tag/v0.1.61) bootstrap
+GoML 0.1.62 is the current verification baseline. Its tested source revision and checksum-pinned
+[GoML 0.1.62](https://github.com/gomlang/goml/releases/tag/v0.1.62) bootstrap
 release are recorded in [workflows/ci/toolchain.json](https://github.com/gomlang/workflows/blob/main/ci/toolchain.json).
 Source files and generated GoML bindings use `.goml`.
 Libraries with native integration document their Go adapters and system prerequisites.
