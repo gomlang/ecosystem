@@ -1,0 +1,2865 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-10-22",
+  "scope": "The original 76-module ecosystem review. Implementations were integrated with fetched origin/main before committing. Runtime validation records distinguish original verification from post-rebase checks. Explicitly excluded sibling projects are listed separately.",
+  "excluded_packages": {
+    "esp32emu": "独立模拟器工程，不在原有 76 模块审查及本轮授权的 24 仓库功能清单内；未修改或验证。"
+  },
+  "method": "Current README, relevant public APIs and focused test sources inspected per module; selected candidates compared with official upstream documentation. Runtime validation is reported only for entries explicitly marked implemented; other entries are source reviews, not runtime certification.",
+  "priority_legend": {
+    "P1": "优先设计与实现",
+    "P2": "后续候选",
+    "P3": "长期方向或范围边界"
+  },
+  "effort_legend": {
+    "S": "局部接口或实现",
+    "M": "跨文件或子模块",
+    "L": "架构、协议或运行时扩展"
+  },
+  "packages": [
+    {
+      "package": "archive",
+      "current_capability": "TAR逐块读写、ZIP64、ZIP随机访问索引与流式解压复制均已存在。 本批新增：ZipWriter.append_stream，Stored/Deflate 与 classic/ZIP64 data descriptor。",
+      "candidate": "真正流式的ZIP entry写入，使用data descriptor延后记录CRC与尺寸。",
+      "status": "implemented",
+      "priority": "P1",
+      "effort": "L",
+      "rationale": "当前append_reader仍一次分配整条entry，无法在固定内存中写大型归档；利用已有compress增量编码，保留单owner和资源限额。",
+      "evidence": [
+        {
+          "path": "archive/zip_stream.goml",
+          "line": 1,
+          "observation": "ZipWriter.append_stream，Stored/Deflate 与 classic/ZIP64 data descriptor。",
+          "sha256": "ea1a0f8195e7002407af39e93e0d13dd16e26af9954adb9524105de4956ab546"
+        },
+        {
+          "path": "archive/tests/zip_stream_test.goml",
+          "line": 1,
+          "observation": "34 库 + 4 示例测试，四种组合由 Go archive/zip 和 unzip 读取。",
+          "sha256": "b02768380a13a82f49a85cb0c8d249ff730ee698cc885a1abc4b782c8451e90a"
+        },
+        {
+          "path": "archive/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "26d03814e480a2bab02eaa87d8a7353b2a34dc7bb6e58863913f3b446a3bd509"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://pkg.go.dev/archive/zip#Writer.CreateHeader",
+          "feature": "Go CreateHeader返回entry的io.Writer，并要求在创建下一entry前完成写入。"
+        }
+      ],
+      "acceptance": [
+        "Stored/Deflate生成的classic与ZIP64数据描述符由Go archive/zip及unzip读取。",
+        "大entry以固定压缩窗口处理，检查内存不随entry增长；短写、源错误、配额超限后writer终止。",
+        "保留append_reader既有失败语义；新接口明确部分输出及finish约束。"
+      ],
+      "validation": [
+        "Rebase 前验证：34 库 + 4 示例测试，四种组合由 Go archive/zip 和 unzip 读取。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 11 条检查全部通过；本地记录 verification/_artifact/batch24-archive-report.json。",
+        "Rebase 后完整本地测试通过：ok. 68 passed; 0 failed; 0 ignored；ok. 4 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "decimal",
+      "current_capability": "精确 base10 算术、上下文舍入和状态、div_rem、正确舍入的 sqrt/sqrt_status、Serde。",
+      "candidate": "Context.sqrt/sqrt_status的正确十进制舍入。",
+      "status": "implemented",
+      "priority": "P1",
+      "effort": "M",
+      "rationale": "为标准差、距离等计算补足基础根运算；现有bigint整平方根可利用，但必须单次正确舍入且保留inexact。",
+      "evidence": [
+        {
+          "path": "decimal/roots.goml",
+          "line": 6,
+          "observation": "使用整数平方根及精确中点比较，支持七种舍入模式与 Rounded/Inexact 状态。",
+          "sha256": "2c1e908fc0763ea04c6d72cc2eb61e342ea1f4e632b47c0be3dec3a8b552a3a3"
+        },
+        {
+          "path": "decimal/tests/sqrt_test.goml",
+          "line": 1,
+          "observation": "覆盖首选 scale、4096 位精度、负输入及表示范围边界。",
+          "sha256": "eaf7c48ae168b71ced4c0659353740b6b2f17fbc1c75c6cc711a08d818986524"
+        },
+        {
+          "path": "decimal/examples/basic/tests/sqrt_reference_test.goml",
+          "line": 1,
+          "observation": "独立 Python Decimal 参考向量覆盖中点附近与舍入状态。",
+          "sha256": "b451d3b7217e21858e27c38c7af610d6b585780b7486f88077493a6f4a66f8ba"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://pkg.go.dev/github.com/cockroachdb/apd/v3#Context.Sqrt",
+          "feature": "apd Context.Sqrt提供任意精度十进制平方根并返回Condition。"
+        }
+      ],
+      "acceptance": [
+        "零、完全平方、非平方、正负scale、4096位precision及所有舍入模式正确。",
+        "负数recoverable error，结果只舍入一次；分别定义rounded和inexact，inexact由精确余数判定。",
+        "与apd/独立十进制向量比较，并测试接近舍入中点和资源边界。"
+      ],
+      "validation": [
+        "Rebase 前验证：27 个库测试和 6 个示例测试通过，含 1288 组独立平方根参考向量。",
+        "Rebase 前验证：GoML 0.1.64 独立下游验证全部通过，包含 race；本地记录 verification/_artifact/decimal-sqrt-report.json。",
+        "Rebase 后完整本地测试通过：ok. 31 passed; 0 failed; 0 ignored；ok. 10 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "dwarf",
+      "current_capability": "有界 DWARF32 v2-v5 DIE、详细行表、直接 low/high_pc 与 v2-v4 经典 .debug_ranges；表达式保留字节。",
+      "candidate": "DIE的PC range解析，包括low/high_pc与经典.debug_ranges。",
+      "status": "implemented",
+      "priority": "P1",
+      "effort": "L",
+      "rationale": "符号化/采样需要将PC映射到编译单元和函数，单靠行表不能表示非连续函数范围；先不扩张到CFI/表达式执行。",
+      "evidence": [
+        {
+          "path": "dwarf/ranges.goml",
+          "line": 115,
+          "observation": "新增 entry_ranges 和独立 RangeLimits，不改变既有 Sections 字面量；返回半开地址区间。",
+          "sha256": "b75179f05648a03eb774bf3cee35a05c34fb0bd8a7f16788405bf49b5d874c8d"
+        },
+        {
+          "path": "dwarf/tests/data/ranges_generate.go",
+          "line": 1,
+          "observation": "Go debug/dwarf 生成 28 组跨版本、端序和地址宽度的范围参考数据。",
+          "sha256": "3b2cc722f9f1ee7defabb2b7c5072e768b1b5147b61f27fc8c565d9dcb6904e0"
+        },
+        {
+          "path": "dwarf/examples/basic/tests/ranges_test.goml",
+          "line": 1,
+          "observation": "覆盖 base selection、截断、预算、溢出和不支持的 DWARF5 范围形式。",
+          "sha256": "51abe7b879de095eb81ba8b79768616f800390a7358189e42bc5752c6b813ac5"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://pkg.go.dev/debug/dwarf#Data.Ranges",
+          "feature": "Go Data.Ranges返回DIE覆盖的[low,high) PC区间。"
+        }
+      ],
+      "acceptance": [
+        "low/high_pc的地址/常量两种语义正确，返回半开区间。",
+        "经典range list支持base selection、地址宽度、终止与溢出检查；未知v5索引形式明确Unsupported。",
+        "通过新增兼容入口避免破坏 Sections 字面量；严格限制记录与区间数量，并用 28 组 Go Data.Ranges 参考数据对照。DWARF5 rnglists 和索引地址仍明确 Unsupported。"
+      ],
+      "validation": [
+        "Rebase 前验证：8 个库测试和 9 个示例测试通过，包含 28 组 Go debug/dwarf 对照。",
+        "Rebase 前验证：GoML 0.1.64 独立下游验证全部通过；本地记录 verification/_artifact/dwarf-ranges-report.json。",
+        "Rebase 后完整本地测试通过：ok. 13 passed; 0 failed; 0 ignored；ok. 9 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "graph",
+      "current_capability": "可变多重图、路径/SCC/MST、双向环见证和拓扑代际。 本批新增：无向多重图的迭代桥检测，返回稳定 EdgeId。",
+      "candidate": "无向多重图桥检测",
+      "status": "implemented",
+      "priority": "P1",
+      "effort": "M",
+      "rationale": "识别网络单点断边；沿用 EdgeId 和迭代 DFS。仅返回桥，不扩大为流算法或动态图维护。检索未发现 bridges/articulation API。",
+      "evidence": [
+        {
+          "path": "graph/bridges.goml",
+          "line": 1,
+          "observation": "无向多重图的迭代桥检测，返回稳定 EdgeId。",
+          "sha256": "736fcbb1c70fdf954b7e33f47625d61e3e9c85116329a75f4617c608498888b6"
+        },
+        {
+          "path": "graph/tests/bridges_test.goml",
+          "line": 1,
+          "observation": "24 库 + 6 示例测试，512 图删除边 oracle 与一万节点深链。",
+          "sha256": "7889e7e4d3bbde96f190f302e894ec212cfca9d3dce6980539987307f5eb543e"
+        },
+        {
+          "path": "graph/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "8909b746de077147d270a34e781c22e1c3c3bdbd0e24fde06ce76f3b3ecc3fbd"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://docs.rs/petgraph/latest/petgraph/algo/bridges/fn.bridges.html",
+          "feature": "petgraph 提供线性桥检测，但文档限定简单无向图；本库需额外明确平行边语义。"
+        }
+      ],
+      "acceptance": [
+        "迭代实现，无向输入返回稳定 EdgeId；有向输入返回 RequiresUndirected。",
+        "自环和平行边不是桥；空图、删除后图及深链覆盖。",
+        "枚举小图，逐边删除比较连通分量作为独立 oracle；复杂度明确包含保留槽数。"
+      ],
+      "validation": [
+        "Rebase 前验证：24 库 + 6 示例测试，512 图删除边 oracle 与一万节点深链。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 9 条检查全部通过；本地记录 verification/_artifact/batch24-graph-report.json。",
+        "Rebase 后完整本地测试通过：ok. 26 passed; 0 failed; 0 ignored；ok. 6 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "http",
+      "current_capability": "纯协议头清洗、Content-Length 校验、请求/响应 framing 和诊断 dump。 本批新增：有界 bytes Range 解析和 Content-Range 格式化；单位忽略大小写。",
+      "candidate": "有界 bytes Range 解析及 Content-Range 格式化",
+      "status": "implemented",
+      "priority": "P1",
+      "effort": "M",
+      "rationale": "为静态资源和断点下载提供可复用纯函数；不打开文件、不构建服务器、不自动发送多段响应。当前源码检索未发现 Range 解析。",
+      "evidence": [
+        {
+          "path": "http/ranges.goml",
+          "line": 1,
+          "observation": "有界 bytes Range 解析和 Content-Range 格式化；单位忽略大小写。",
+          "sha256": "da78f9840e4ce5082fe3f3084397f2dea73fe777954402b77df2f80d3421a246"
+        },
+        {
+          "path": "http/tests/ranges_test.goml",
+          "line": 1,
+          "observation": "11 库 + 4 示例测试，Go ServeContent 对照及严格策略差异。",
+          "sha256": "2bba411c8b627be0301d8a9684b07ccf63029ab4b83fb5f8300f7cbb01c2a74a"
+        },
+        {
+          "path": "http/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "fe693c418d0de032a9848e96fb27fa9dfb5c3f2e2f30778cca8ab435375f8733"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://pkg.go.dev/net/http#ServeContent",
+          "feature": "ServeContent 将 Range 和条件请求视为文件响应的核心能力。"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/golang/go/go1.26.8/src/net/http/fs.go",
+          "feature": "parseRange 展示后缀/开放区间、长度截断及无交集区分；借鉴设计而非照搬所有宽松语法。"
+        },
+        {
+          "url": "https://www.rfc-editor.org/rfc/rfc9110.html#section-14.1",
+          "feature": "范围单位忽略大小写；实现与 Go oracle 的差异明确记录。"
+        }
+      ],
+      "acceptance": [
+        "支持闭区间、开放末端、suffix range，区分缺失/未知单位/无交集/无效语法。",
+        "范围数量、头长度和整数运算有界；零长资源、suffix=0、混合可满足范围有明确规则。",
+        "与固定版本 Go ServeContent 黑盒差分并记录有意的严格策略差异。"
+      ],
+      "validation": [
+        "Rebase 前验证：11 库 + 4 示例测试，Go ServeContent 对照及严格策略差异。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 11 条检查全部通过；本地记录 verification/_artifact/batch24-http-report.json。",
+        "Rebase 后完整本地测试通过：ok. 19 passed; 0 failed; 0 ignored；ok. 6 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "parser",
+      "current_capability": "文本/二进制组合器、恢复、shared budgets、binary many_until。 本批新增：ULEB128 / ZigZag 变长整数解析；区分截断和溢出并共享解析预算。",
+      "candidate": "二进制 ULEB128 和 zigzag varint",
+      "status": "implemented",
+      "priority": "P1",
+      "effort": "S",
+      "rationale": "为长度前缀协议和紧凑日志直接组合变长整数解析；明确 zigzag 不等于 SLEB128，首期不暗含两者。检索无 varint/leb128 API。",
+      "evidence": [
+        {
+          "path": "parser/binary/varint.goml",
+          "line": 1,
+          "observation": "ULEB128 / ZigZag 变长整数解析；区分截断和溢出并共享解析预算。",
+          "sha256": "e837ff03fb917875aa285ab311eca6237730f92c826f2fb079739b0a8fbc3ccb"
+        },
+        {
+          "path": "parser/tests/varint_test.goml",
+          "line": 1,
+          "observation": "34 库 + 6 示例测试，136 组 Go encoding/binary 参考向量。",
+          "sha256": "30d2907c17314e629edd37018b6498671636ed5552fa80e96a912caea72cd9ad"
+        },
+        {
+          "path": "parser/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "84781ce1f0bae329113dc6d0c9a92685f6a04c817143e4038041924d173fd406"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://pkg.go.dev/encoding/binary#Uvarint",
+          "feature": "官方 API 区分输入不足和 64 位溢出。"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/golang/go/go1.26.8/src/encoding/binary/varint.go",
+          "feature": "7-bit continuation、最多 10 字节及 signed zigzag 的独立参考实现。"
+        }
+      ],
+      "acceptance": [
+        "u64 最多 10 字节，区分 Incomplete 和 Invalid 溢出，10th byte 高位与无限 continuation 拒绝。",
+        "明确非规范冗长编码接受/拒绝策略；parse_at 偏移和共享预算受测。",
+        "与 Go encoding/binary Uvarint/Varint 对照边界和确定性随机向量；文档明确 zigzag signed encoding。"
+      ],
+      "validation": [
+        "Rebase 前验证：34 库 + 6 示例测试，136 组 Go encoding/binary 参考向量。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 9 条检查全部通过；本地记录 verification/_artifact/batch24-parser-report.json。",
+        "Rebase 后完整本地测试通过：ok. 41 passed; 0 failed; 0 ignored；ok. 6 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "s3",
+      "current_capability": "SigV4、对象 CRUD、分页、预签名、分段上传，以及带元数据、累计限额和回调生命周期的流式下载。",
+      "candidate": "带元数据的回调式流下载",
+      "status": "implemented",
+      "priority": "P1",
+      "effort": "M",
+      "rationale": "大对象下载可写入文件或 HTTP 下游，无需保留完整对象；复用 request 已有同步流生命周期。",
+      "evidence": [
+        {
+          "path": "s3/streaming.goml",
+          "line": 13,
+          "observation": "ObjectStream 提供元数据、分块读取、copy_to 和 close。",
+          "sha256": "c2cb00c67e545e879b1da34ee099ec9d322ced73acb4296af6080adb66ec9de9"
+        },
+        {
+          "path": "s3/streaming.goml",
+          "line": 118,
+          "observation": "get_object_stream 复用签名逻辑，回调结束关闭响应；对象和服务错误采用独立字节预算。",
+          "sha256": "c2cb00c67e545e879b1da34ee099ec9d322ced73acb4296af6080adb66ec9de9"
+        },
+        {
+          "path": "s3/tests/integration_test.goml",
+          "line": 454,
+          "observation": "门控 HTTP fixture 验证读取首段后才释放尾段，以及关闭、取消、限额和错误处理。",
+          "sha256": "77051c0af00c03a8c7e0f359aa918f5cb20365cf152bce90f565d348666962a7"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://pkg.go.dev/github.com/minio/minio-go/v7#Client.GetObject",
+          "feature": "MinIO GetObject 返回 Object，Object 提供 Read/Close/Stat，可流式消费对象。"
+        }
+      ],
+      "acceptance": [
+        "新增 get_object_stream/copy_to 类 API，回调可读状态、ETag 和版本元数据。",
+        "慢流、提前停止、取消、截断、非成功响应在本地 fixture 验证；回调结束即关闭。",
+        "签名和累计下载限额保持；证明回调在整个对象到达前被调用。",
+        "回调提前成功结束时不验证未读取的尾部；调用方读取任务须在回调结束前收束。"
+      ],
+      "validation": [
+        "Rebase 前验证：12 个库测试和 1 个示例测试通过；新增三个流式集成测试也通过原生 race 检查。",
+        "Rebase 前验证：GoML 0.1.64 独立下游验证全部通过，包含 race；本地记录 verification/_artifact/s3-stream-report.json。",
+        "Rebase 后完整本地测试通过：ok. 14 passed; 0 failed; 0 ignored；ok. 2 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "x509",
+      "current_capability": "PKIX Name/Extension/AlgorithmIdentifier、BasicConstraints/KeyUsage/EKU 本批新增：DNS、邮箱、URI、IPv4/IPv6 的 SubjectAltName DER 和 Extension 编解码。",
+      "candidate": "SubjectAltName/GeneralName 类型化 DER",
+      "status": "implemented",
+      "priority": "P1",
+      "effort": "M",
+      "rationale": "证书工具需读取/构造 DNS、邮箱、URI、IP 名称扩展，无需跨越整证书信任链验证边界。",
+      "evidence": [
+        {
+          "path": "x509/pkix/subject_alt_name.goml",
+          "line": 1,
+          "observation": "DNS、邮箱、URI、IPv4/IPv6 的 SubjectAltName DER 和 Extension 编解码。",
+          "sha256": "a84bca91ce7d517a9d7fde70609b8951466b6e20721dba1d3bec753eb4922c7f"
+        },
+        {
+          "path": "x509/pkix/tests/san_test.goml",
+          "line": 1,
+          "observation": "17 库 + 4 示例测试，Go crypto/x509 独立 DER 向量。",
+          "sha256": "c6f01625f97076a6a851e049acdf4365e59b666fddc847c45c6eb1e717ddd023"
+        },
+        {
+          "path": "x509/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "96ce9291f743df980f33aebca387de57320d066fc91ddfde442de465d4be952e"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://pkg.go.dev/crypto/x509#Certificate",
+          "feature": "Go Certificate 暴露 DNSNames、EmailAddresses、IPAddresses、URIs；可作为 SAN 元数据用例和独立 DER 对照。"
+        }
+      ],
+      "acceptance": [
+        "DNS/rfc822Name/URI 的 IA5String 与 IPv4/IPv6 octets 编解码；其余 GeneralName 采用明确拒绝或有界原始值。",
+        "保留顺序、重复值和 ASN.1 配额；错误 tag/长度/非法 IA5/空序列测试。",
+        "以 Go x509 生成的 SAN DER 作独立向量，不引入名称匹配、信任链或 TLS 行为。",
+        "仅实现 DNS/email/URI/IP 的类型化 DER；不引入名称匹配或证书验证。"
+      ],
+      "validation": [
+        "Rebase 前验证：17 库 + 4 示例测试，Go crypto/x509 独立 DER 向量。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 9 条检查全部通过；本地记录 verification/_artifact/batch24-x509-report.json。",
+        "Rebase 后完整本地测试通过：ok. 19 passed; 0 failed; 0 ignored；ok. 4 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "yaml",
+      "current_capability": "有界 YAML 1.2 子集、alias、多文档、Serde 与语义错误坐标 本批新增：扫描和语法错误携带检测点行列坐标，支持 BOM、CRLF、Unicode 和 EOF。",
+      "candidate": "为目前返回 0/0 的扫描/语法阶段错误补源位置",
+      "status": "implemented",
+      "priority": "P1",
+      "effort": "M",
+      "rationale": "配置文件拼写/缩进错误目前常返回零坐标；准确位置能直接接入编辑器和配置诊断。",
+      "evidence": [
+        {
+          "path": "yaml/parser.goml",
+          "line": 1,
+          "observation": "扫描和语法错误携带检测点行列坐标，支持 BOM、CRLF、Unicode 和 EOF。",
+          "sha256": "f31f321d804bfb5786fdaea7dfb4f6dbb3cfb2d2a400b721dd12c4d00bdb1784"
+        },
+        {
+          "path": "yaml/tests/source_location_test.goml",
+          "line": 1,
+          "observation": "43 库测试和示例构建。",
+          "sha256": "8d4f1be72470548f8c118de53064d8037f853d7a00a978b17b1a4269eada7264"
+        },
+        {
+          "path": "yaml/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "fcfaba4f166f55094647c79ee0a71455fe540206909d16286f14e0ca504b39a8"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://pkg.go.dev/go.yaml.in/yaml/v3#Node",
+          "feature": "go-yaml Node 保留源 Line/Column；说明源位置是配置工具常用的解析能力。"
+        }
+      ],
+      "acceptance": [
+        "所有 grammar 错误记录检测点原始源坐标，EOF 使用一致哨兵位置，不用伪造 1:1。",
+        "覆盖 BOM、CRLF、非 ASCII scalar、引号/flow/缩进错误；已有语义错误坐标不回归。",
+        "保持错误 kind 和预算，不必暴露可编辑 presentation AST。"
+      ],
+      "validation": [
+        "Rebase 前验证：43 库测试和示例构建。",
+        "Rebase 前验证：本地分支已快进到远端 main 的 874d5fa；上游仅更新 CI，未创建新 commit。首次独立冷构建超过 600 秒，失败记录保留，最终复核使用临时验证器的 1800 秒单命令预算。",
+        "Rebase 前验证：验证器已移除 YAML 过时的 go test ./adapter 配置：当前仓库为纯 GoML，无 Go module/adapter；验证器自身 36 项测试通过。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 18 条检查全部通过，包含独立 consumer、缓存构建、示例运行及库/下游 race 测试；本地记录 verification/_artifact/batch24-yaml-report.json。",
+        "Rebase 后完整本地测试通过：ok. 43 passed; 0 failed; 0 ignored；ok. 0 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "ansi",
+      "current_capability": "样式/超链接、增量转义解析、Unicode字素硬换行及宽度策略。",
+      "candidate": "保留样式和超链接的按词/Unicode断行换行接口。",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "终端帮助与Markdown段落需要避免英文单词在任意字素处断开；复用unicode_text断行，不引入屏幕模拟。",
+      "evidence": [
+        {
+          "path": "ansi/text.goml",
+          "line": 309,
+          "observation": "wrap_with逐字素按列装填；rg未发现word_wrap/wrap_words接口。",
+          "sha256": "f9bec931ba2215981debe54db806b1c347ee03cec15918371c7d4bfbf23af643"
+        },
+        {
+          "path": "ansi/tests/text_test.goml",
+          "line": 41,
+          "observation": "现有测试验证硬换行后样式、链接、尾空行和列数。",
+          "sha256": "ba5c8786c144f693a3150493a93a8bc22bfbe04d0bb449ea0d55ba7dd43914fd"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "增加独立换行模式，原wrap行为保持兼容。",
+        "跨Span英文单词、CJK、组合字符、NBSP、长词回退与WidthOptions一致；每行不超预算。"
+      ]
+    },
+    {
+      "package": "bigint",
+      "current_capability": "不可变大整数、两种除法、位操作、modpow、模逆和整次根。",
+      "candidate": "大位数乘法的Karatsuba阈值路径。",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "bigmath和decimal共享此算术基础；先用真实尺寸基准证实收益，再启用阈值，避免小整数回退。",
+      "evidence": [
+        {
+          "path": "bigint/arithmetic.goml",
+          "line": 159,
+          "observation": "mul仍为双重limb循环；rg未找到karatsuba。",
+          "sha256": "a63ad910e2be69ab143aef43b7adb6560c79555fd40e9e48790714795a0ce236"
+        },
+        {
+          "path": "bigint/tests/inverse_test.goml",
+          "line": 7,
+          "observation": "模逆已经实现且有穷举参照，不是待新增功能。",
+          "sha256": "13935239e023570b07ac9962030c3c95374843c7bd5e82ab87e2b743f535ad49"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "与独立math/big逐值比较随机和进位边界乘积。",
+        "覆盖非等长、零、单limb及阈值两侧；记录不同位数耗时和分配，不以时间阈值作易抖动单测。"
+      ]
+    },
+    {
+      "package": "bigmath",
+      "current_capability": "有界有理数和二进制任意精度Float；上下文舍入、sqrt、交叉约分。",
+      "candidate": "Float到指定小数位/有效位的十进制格式化。",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "目前只能显示significand*2^exponent，用户无法直接生成可读高精度数值；格式化应直接使用精确有理数，不经过f64。",
+      "evidence": [
+        {
+          "path": "bigmath/float.goml",
+          "line": 331,
+          "observation": "to_string输出二进制代数形式；rg无format_decimal/to_decimal。",
+          "sha256": "8884d273250960dfd21f7af2e187d79a98d8c01e120445c1e36fbc507a70a19a"
+        },
+        {
+          "path": "bigmath/tests/float_test.goml",
+          "line": 18,
+          "observation": "现有测试以精确文本辅助验证Float，新增显示不能改变原语义。",
+          "sha256": "86048187c6339850de84d9ca5ee6badd24a073fa00d208ad29cac866d57070df"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "零、负数、极大/极小指数与六种舍入模式有独立math/big参考。",
+        "显式输出位数预算；原to_string与精确表示保持稳定。"
+      ]
+    },
+    {
+      "package": "color",
+      "current_capability": "sRGB/线性RGB/Lab/Oklab转换、插值、像素、调色板及有限CSS解析。",
+      "candidate": "CSS oklab()/oklch()输入。",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "现代主题文件常用Oklch，当前已有数值模型但不能直接读文本；先实现这两个函数，不混入D50 Lab、relative color或calc。",
+      "evidence": [
+        {
+          "path": "color/parse.goml",
+          "line": 173,
+          "observation": "CSS解析入口已有预算、空白和分隔规则；rg无oklab/oklch函数字面量分支。",
+          "sha256": "07da60f1efb9b03ca112850be50392743ad3349af658dd9414831b586f6ca84c"
+        },
+        {
+          "path": "color/README.md",
+          "line": 134,
+          "observation": "明确排除oklab/oklch语法但模型已经提供。",
+          "sha256": "2dfaf3fdbea5748adec825296e519fb08b160a93325ababaa637d603b6d3e3b0"
+        },
+        {
+          "path": "color/tests/whitespace_test.goml",
+          "line": 7,
+          "observation": "现有CSS whitespace一致性测试应扩展到新函数。",
+          "sha256": "da31a19dad88f6cc98ba7fc976ee0d8acb2dcfed64ddc4af5d972af19dd0eb08"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "校验百分比、alpha、角度与缺失/多余分量，遵守CSS空白与4096字节限额。",
+        "确定超出sRGB gamut的显式策略，与独立CSS Color参考向量比对。"
+      ]
+    },
+    {
+      "package": "compress",
+      "current_capability": "DEFLATE/GZIP/ZLIB/LZW增量编解码；GZIP头元数据读取已经实现。",
+      "candidate": "GZIP writer支持显式Header元数据。",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "需要归档原文件名或mtime的调用方目前只能读不能写元数据；保持new默认头可复现且无需系统时间。",
+      "evidence": [
+        {
+          "path": "compress/gzip/writer.goml",
+          "line": 70,
+          "observation": "new写入固定十字节头，rg无with_header/new_with_header。",
+          "sha256": "6e3cf680259f735a5313792071f2ec42cfa0c93025255ae93abc5811a7b9635b"
+        },
+        {
+          "path": "compress/README.md",
+          "line": 94,
+          "observation": "with_metadata与last_header已有读取能力。",
+          "sha256": "f0c90ec3fc7cc63c7e3079e319984298c7a4a42356a90d0271c7c5c518741bc7"
+        },
+        {
+          "path": "compress/gzip/tests/gzip_test.goml",
+          "line": 13,
+          "observation": "有Go GZIP编解码oracle可扩展头互操作测试。",
+          "sha256": "d69d43f6be837be0e64368bd8d823d6eb34c3f849b0ae550a5f99430f23081d6"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "mtime/OS/name/comment/extra按RFC1952字节语义写出，拒绝内嵌NUL与超预算。",
+        "Go gzip.Reader能恢复元数据；现有new字节不变，短写和header失败保持sticky状态。"
+      ]
+    },
+    {
+      "package": "datetime",
+      "current_capability": "Gregorian/ISO周、精确duration、TZif和固定tzdata、格式化及ISO/RFC3339解析。",
+      "candidate": "与现有格式化directive子集对称的显式pattern解析。",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "日志与CSV时间字段不总是RFC3339；不增加locale数据库或含糊日期猜测。",
+      "evidence": [
+        {
+          "path": "datetime/text.goml",
+          "line": 113,
+          "observation": "LocalDateTime::format已有pattern入口。",
+          "sha256": "a46183ffe48a20d9ab2efd5807b8c3ca701cc84e64c098552db33d866139415b"
+        },
+        {
+          "path": "datetime/README.md",
+          "line": 53,
+          "observation": "明确尚无arbitrary-pattern parsing；rg未发现parse_pattern。",
+          "sha256": "22bae56de0b5bc7191eb6affaa88c9b73bd13caee8f74fee223dc27fbbe1e791"
+        },
+        {
+          "path": "datetime/tests/fixture_layout_test.goml",
+          "line": 31,
+          "observation": "TZif已独立构造fixture，不需要重复增加时区基础能力。",
+          "sha256": "85c5766836af3da619b88c6d811e2b9c53b4473860ea5f91efd642d660ca7c5b"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "只支持文档声明的数字directive；重复冲突、缺失字段、超范围、尾部垃圾拒绝。",
+        "解析/格式化往返涵盖闰年、ISO周边界及offset；无时区默认值猜测。"
+      ]
+    },
+    {
+      "package": "explorer",
+      "current_capability": "只读双栏文件浏览、后台目录扫描、root通知及受限Markdown预览。",
+      "candidate": "取消和代次校验的后台预览加载。",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "当前预览I/O在UI线程，慢盘会阻塞交互；保留只读示例定位，不增加文件管理操作。",
+      "evidence": [
+        {
+          "path": "explorer/scan.goml",
+          "line": 221,
+          "observation": "read_preview同步打开并循环读取文件。",
+          "sha256": "188943ab847991b92340d61737792dc3b72622760ea2069eae2642cee2d9bf79"
+        },
+        {
+          "path": "explorer/README.md",
+          "line": 50,
+          "observation": "明确慢文件系统预览会延迟交互；rg无preview_worker。",
+          "sha256": "14eb731a2d66de8285263553f7da40e88f02ad55f66603524ad06b3db75b6876"
+        },
+        {
+          "path": "explorer/tests/explorer_test.goml",
+          "line": 133,
+          "observation": "已有扫描worker背压取消测试可借鉴。",
+          "sha256": "db98964d546e27d91f6fe3b5fafbef8d310a8826c8423a8b41a9f5baf4716c38"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "快速换选只发布最新请求，旧结果不覆盖当前路径。",
+        "队列及预览字节有界，退出join worker；注入阻塞读取验证UI事件仍可处理。"
+      ]
+    },
+    {
+      "package": "fuzzy",
+      "current_capability": "Unicode预处理、多种单pattern匹配、并行TopK和不可变增量session。",
+      "candidate": "独立多term查询模型，支持AND及显式否定。",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "文件选择器常需foo bar排除test；不能把原find字符串空格悄悄变成语法。",
+      "evidence": [
+        {
+          "path": "fuzzy/model.goml",
+          "line": 126,
+          "observation": "Pattern只有一份value/units/kind；rg无Query/Term/Atom公开模型。",
+          "sha256": "d407948b6daf7a8555ffa3de4775038f57d9cc5d0fe239a3bf629be1a749871b"
+        },
+        {
+          "path": "fuzzy/tests/topk_test.goml",
+          "line": 8,
+          "observation": "稳定TopK已有全排序参照，可复用组合查询结果排序。",
+          "sha256": "4c953ea5a4ee166faa43d52faa2d78864c43c7a11eef2ec4cc1970ceb6de8c90"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "新入口明确转义/字面空格和否定行为，旧匹配无变化。",
+        "每term预算计入总工作，负term不误用增量前缀缓存；串行/并行结果一致。"
+      ]
+    },
+    {
+      "package": "go_doc",
+      "current_capability": "Go注释AST与Comment/Text/Markdown/HTML输出；URL自动链接和转义已实现。",
+      "candidate": "可选符号链接解析回调。",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "S",
+      "rationale": "文档站点已有包索引，可把[Type.Method]连接到页面而不让此库自己加载Go包。",
+      "evidence": [
+        {
+          "path": "go_doc/model.goml",
+          "line": 59,
+          "observation": "DocLink保留符号文字。",
+          "sha256": "a307d017a71b369aa8377fa3baad4df536d1d020e8d0882b3b528b6d83d91562"
+        },
+        {
+          "path": "go_doc/README.md",
+          "line": 46,
+          "observation": "因未提供resolver，符号只渲染为code；rg无Resolver接口。",
+          "sha256": "7d4ff5a7ec46eb011cb902ad92d1319ce1b43f8397188e3cb78c3ba6cc80cf26"
+        },
+        {
+          "path": "go_doc/tests/markdown_test.goml",
+          "line": 29,
+          "observation": "现有code span边界可作为未解析fallback测试。",
+          "sha256": "2d20590c95d7e21c7515856db4ed8a5066cffdd7a1b7d48c7ebdb7418967f588"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "resolver返回None保持code fallback；URL和label按目标格式转义并计输出限额。",
+        "callback只处理DocLink，不能改变plain/Comment语义；指定失败传播行为。"
+      ]
+    },
+    {
+      "package": "gomlquickjs",
+      "current_capability": "大部分QuickJS语法/builtins、模块、async与合作式worker已有实现。",
+      "candidate": "std.parseExtJSON专用数据解析器。",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "现在通过global_eval解析文本，接受范围比扩展JSON大；需要按数据语法实现，避免函数调用等JavaScript表达式被当数据接受。不声称当前产品是sandbox。",
+      "evidence": [
+        {
+          "path": "gomlquickjs/builtins/std_object.goml",
+          "line": 1644,
+          "observation": "parseExtJSON把输入包在括号中交给global_eval。",
+          "sha256": "a0d9bde3ae4fd602d7950ecc9320d88bb8f010161ed87b1de3cac9cc1170b7c2"
+        },
+        {
+          "path": "gomlquickjs/compiler/compiler_test.goml",
+          "line": 5236,
+          "observation": "现有测试覆盖扩展数据文字与特殊数值，未体现拒绝可执行表达式。",
+          "sha256": "1f1b618f8e34089bc099faaab2406a9cae69c945027a37f69260c9d1cb344a27"
+        },
+        {
+          "path": "gomlquickjs/README.md",
+          "line": 198,
+          "observation": "README已明确该边界，不应报告为未披露漏洞。",
+          "sha256": "607c5212ce00438c36e8efa9f851f878f12a061c45611d9ff880618003910f1e"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://bellard.org/quickjs/quickjs.html",
+          "feature": "QuickJS官方列出parseExtJSON的数据语法扩展：注释、ASCII未引号键、尾逗号、单引号字符串和扩展数值。"
+        }
+      ],
+      "acceptance": [
+        "对照固定QuickJS baseline的数据语法，涵盖注释、ASCII未引号key、尾逗号、单引号、转义和扩展数值。",
+        "函数调用、赋值、getter、计算属性不执行且按参考行为拒绝；记录全局副作用探针。",
+        "错误偏移、UTF16和深度/长度预算明确，不改变普通JSON.parse。"
+      ]
+    },
+    {
+      "package": "ignore",
+      "current_capability": "Gitignore 层级匹配、worktree excludes、有界遍历和并行回调。",
+      "candidate": "显式配置额外逐目录 ignore 文件名",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "让搜索/构建工具支持项目自己的 .ignore 文件；不自动读取宿主全局 Git 配置，不改变默认 Gitignore 行为。",
+      "evidence": [
+        {
+          "path": "ignore/walker.goml",
+          "line": 18,
+          "observation": "WalkOptions 当前配置 gitignore、初始规则与 exclude 回调。",
+          "sha256": "d08b9752268a96ebd973c8cbaee18f2fa0a8a783049fb0d6a15bd8f8c22c7abf"
+        },
+        {
+          "path": "ignore/walker.goml",
+          "line": 345,
+          "observation": "逐目录文件名固定为 .gitignore。",
+          "sha256": "d08b9752268a96ebd973c8cbaee18f2fa0a8a783049fb0d6a15bd8f8c22c7abf"
+        },
+        {
+          "path": "ignore/tests/walker_test.goml",
+          "line": 32,
+          "observation": "已有层级规则/剪枝及自定义 excludes 测试。",
+          "sha256": "c74db0446e5ea3f09a62a7baeddbcba993887923fc6e60e30d3c5ce2d1616488"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "新增独立构造选项，定义多个文件的优先级和相对路径作用域。",
+        "拒绝路径穿越/无效名字，沿用源读取限额、O_NOFOLLOW 和取消行为。"
+      ]
+    },
+    {
+      "package": "image",
+      "current_capability": "RGBA 图像、PNG/JPEG/WebP、crop/resize 和八向无损 orientation。",
+      "candidate": "抗混叠面积缩小过滤器",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "高比例缩略图避免单点/双线性采样丢失细节；首期只做 downscale，保持预乘 alpha，不引入颜色管理。",
+      "evidence": [
+        {
+          "path": "image/transform/transform.goml",
+          "line": 7,
+          "observation": "Filter 仅 Nearest 和 Bilinear。",
+          "sha256": "37992715e7bcd7e9aeecbabe8cf3d1cd295a900031a0ce854361eee2a434f627"
+        },
+        {
+          "path": "image/transform/tests/transform_test.goml",
+          "line": 39,
+          "observation": "已有预乘 alpha 无暗边测试，应保持像素不变量。",
+          "sha256": "2d2f9cd0806997921944627871c97be76c9b800848920df04aab1dc15c2e0a89"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "棋盘格缩小得到面积均值；非整数缩放、单像素轴和透明边界有独立参考向量。",
+        "沿用尺寸/像素限额，明确放大行为和舍入规则，保持各通道不大于 alpha。"
+      ]
+    },
+    {
+      "package": "incremental",
+      "current_capability": "异构 query/input、LRU、批量修改、同修订 grouped reads。",
+      "candidate": "按查询键清除 memo",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "让长期服务精确释放不再使用文档的缓存，不清空整个查询家族；仅缓存驱逐，不伪装输入变化或绕过纯函数契约。",
+      "evidence": [
+        {
+          "path": "incremental/database.goml",
+          "line": 244,
+          "observation": "clear 当前遍历并删除整个 query.entries。",
+          "sha256": "57d056d4e73a2cd172ded73a901e90593722fe71cf788b4e37b77acb844ad8df"
+        },
+        {
+          "path": "incremental/database.goml",
+          "line": 262,
+          "observation": "inspect 可观察家族缓存，适合验证精准驱逐。",
+          "sha256": "57d056d4e73a2cd172ded73a901e90593722fe71cf788b4e37b77acb844ad8df"
+        },
+        {
+          "path": "incremental/tests/evaluate_test.goml",
+          "line": 87,
+          "observation": "已有跨任务批次一致性测试。",
+          "sha256": "a0a07b6a56bc7f28066d962209db226a09ec053f24775ba5391b9332e7fd4bfa"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "同数据库键驱逐返回是否存在；外部句柄报错且无修改。",
+        "依赖被驱逐项的父 memo 后续验证正确；取消等待/并发读取遵循现有 gate 规则。"
+      ]
+    },
+    {
+      "package": "jwt",
+      "current_capability": "显式算法策略、PEM/HMAC 密钥和本地 key rotation，四种签名算法。",
+      "candidate": "有界本地公钥 JWK/JWKS 导入",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "便于对接离线或由应用可信获取的身份提供方公钥；不根据 token jku/jwk 自动取钥，不做网络缓存。",
+      "evidence": [
+        {
+          "path": "jwt/jwt.goml",
+          "line": 101,
+          "observation": "Key 构造目前为 hmac/private_pem/public_pem。",
+          "sha256": "c03a18111828c15a11e957c183af6879acda585a113e2534ae1d50fd69176354"
+        },
+        {
+          "path": "jwt/tests/jwt_test.goml",
+          "line": 131,
+          "observation": "已有 issuer/audience/算法 fail-closed 回归。",
+          "sha256": "ba10ddc85be4fcbaaf24a45ec4d1b90b84ad2cc1342f53dbe86ed8d26af2f4ca"
+        },
+        {
+          "path": "jwt/README.md",
+          "line": 86,
+          "observation": "明确当前不提供 JWK/JWKS 导入或 retrieval。",
+          "sha256": "f6215a25041bec8b34caeaf0813bc852b36f835a44485945ce49bbf8cee4b038"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "仅接受支持算法的 RSA/P-256/Ed25519 公钥，校验 kty/crv/alg/use/key_ops 一致性。",
+        "重复 kid、私钥成员、超限数组、非法 base64url 和过小 RSA 拒绝。",
+        "保持显式允许算法与 token header 限制，官方向量与 PEM 等价验证。"
+      ]
+    },
+    {
+      "package": "lexer",
+      "current_capability": "Thompson NFA、derive、自定义优先级、extras/fork/morph 和扫描预算。",
+      "candidate": "可复用命名 regex 子模式",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "消除数字、标识符等重复规则；采用编译期展开，非运行时递归和非捕获组功能。",
+      "evidence": [
+        {
+          "path": "lexer/README.md",
+          "line": 168,
+          "observation": "明确尚无 named subpatterns。",
+          "sha256": "7905d718ca9908bd24f1679aa05c3fc9e750d2bbdecfb87efc86ec97c0a6a792"
+        },
+        {
+          "path": "lexer/tests/derive_test.goml",
+          "line": 107,
+          "observation": "已覆盖 derive 选项/转义与运行时规则的一致性。",
+          "sha256": "04718a715ae97270b7babb58fc611f642208a5a0be4b23a3aa17b50eaf0b357b"
+        },
+        {
+          "path": "lexer/derive.goml",
+          "line": 3,
+          "observation": "derive 使用现有 comptime API 构建规则。",
+          "sha256": "80daa9497f131e3bb889f614ba9b208b930c12ad5ffea90c070e4002a0f2abaa"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "运行时 Grammar 和 derive 两条路径行为一致，引用循环/未知名字有定位错误。",
+        "展开后仍受模式字节数和自动机预算限制；优先级/最长匹配语义保持。"
+      ]
+    },
+    {
+      "package": "llvm",
+      "current_capability": "LLVM18 AOT、SSA 编辑、aggregate values、目标机与 ABI layout。",
+      "candidate": "受检全局变量和常量数据 API",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "L",
+      "rationale": "让编译器输出字符串常量/静态表，不必手写 IR；首期不含 TLS、任意 linkage 属性或 JIT。",
+      "evidence": [
+        {
+          "path": "llvm/README.md",
+          "line": 335,
+          "observation": "明确尚未暴露 globals。",
+          "sha256": "3187c8bb78f9c4c33b425ffcb77e8d7abf795b4ebe38e7c0d2bb2ed8ffc2d067"
+        },
+        {
+          "path": "llvm/ssa.goml",
+          "line": 102,
+          "observation": "现有 entry_alloca/local 支持函数局部存储。",
+          "sha256": "fa64e8cc1436351eb3131f4b43af4c38e6a08344c722ff35a9b77f351573a5ec"
+        },
+        {
+          "path": "llvm/tests/aggregate_test.goml",
+          "line": 7,
+          "observation": "已有 aggregate 类型与插入点验证，可用于初始化值检查。",
+          "sha256": "8f12497bc4f2cd342ef31922d04f20061caeb70e458217cc6c286e2906b9817d"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "initializer 与全局类型同 context 且兼容；重复名字、已关闭句柄有明确错误。",
+        "生成 IR/对象由 LLVM 工具校验并链接执行字符串/数组访问；保持资源关闭并发契约。"
+      ]
+    },
+    {
+      "package": "lsp",
+      "current_capability": "编码协商、rope 文档、workspace edits、completion、deferred requests。",
+      "candidate": "语义 token legend 与相对编码辅助模型",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "语言服务器提供分类后免手写五整数编码；本包仅协议编码与校验，不生成语言语义。",
+      "evidence": [
+        {
+          "path": "lsp/features.goml",
+          "line": 63,
+          "observation": "已有 Diagnostic 等类型化结果模型。",
+          "sha256": "de34aeb0ee00f4e4c59c9923bdeff1be27fd2d2a5b27bcffc4746d1b2a55f3c7"
+        },
+        {
+          "path": "lsp/tests/completion_test.goml",
+          "line": 61,
+          "observation": "已有 completion 枚举/范围验证模式。",
+          "sha256": "de75a4f71434a27847972ed372b4bbdbb1c56571468194dc20f1745b0c60293d"
+        },
+        {
+          "path": "lsp/README.md",
+          "line": 382,
+          "observation": "语义生成归应用，raw JSON 已能处理对应消息；未见 typed semantic-token API。",
+          "sha256": "cd975415d9b0f7479a7d1a9f042ed923b751706f0838810a05f2e21b23963253"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "校验 token 排序、非负位置、legend 下标、modifier 位集合与长度。",
+        "按协商编码计算相对位置，UTF-16 astral/CRLF/重叠策略有测试；首期 full response，不承诺 delta 缓存。"
+      ]
+    },
+    {
+      "package": "mail",
+      "current_capability": "现代 RFC5322 子集地址/组结构和 bounded header 解析。",
+      "candidate": "受检地址与地址组格式化",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "把已解析/程序生成收件人安全写回头值；输出语义等价，不恢复原注释或空白，不发送邮件。",
+      "evidence": [
+        {
+          "path": "mail/model.goml",
+          "line": 75,
+          "observation": "Address 已有解码姓名和邮箱分量。",
+          "sha256": "d31a278567a385ef55105ccab57d62107bcffa2666ed9988916a20af36cecc4c"
+        },
+        {
+          "path": "mail/address.goml",
+          "line": 416,
+          "observation": "parse_address_items 保留邮箱与命名组。",
+          "sha256": "0264875dea67d61372ac41c1bc2643e26a7557466e07d259d6e9f72f1e7709c1"
+        },
+        {
+          "path": "mail/tests/groups_test.goml",
+          "line": 8,
+          "observation": "已覆盖空组、Unicode 名称与原顺序。",
+          "sha256": "8bd2e08e1ee784eb96b4187069359f5331a818a43a06661b814396c1e0b4dc4a"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "特殊字符姓名正确 quote/encoded-word，拒绝 CRLF 注入与非法地址。",
+        "format 再 parse 保留邮箱/组语义，输出受 Limits 约束；长头折行明确交由上层。"
+      ]
+    },
+    {
+      "package": "markdown",
+      "current_capability": "CommonMark 加可选 GFM tables/task lists、AST visitor 和限额。",
+      "candidate": "可选 GFM 删除线",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "补齐常见 GitHub 文本格式；继续隔离 CommonMark 默认行为，不一并承诺脚注/数学。",
+      "evidence": [
+        {
+          "path": "markdown/gfm.goml",
+          "line": 13,
+          "observation": "GfmOptions 只有 tables/task_lists。",
+          "sha256": "95c4eafd4f501aaac3ca0856d34143a23ef9c38a3a4595d0a65f378128b3f2a9"
+        },
+        {
+          "path": "markdown/model.goml",
+          "line": 21,
+          "observation": "当前 Inline 不含删除线节点。",
+          "sha256": "74c64b6e735674bf58e53a268daf6cb9fcdb23cd194c335a2c092316861ea639"
+        },
+        {
+          "path": "markdown/tests/gfm_test.goml",
+          "line": 61,
+          "observation": "已有扩展独立开关测试。",
+          "sha256": "e35f7d1323897fec33bfdd965e04cb40bc316eff5621ee5d90635c6ec86150ee"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "采用 GFM 官方删除线样例，覆盖嵌套 emphasis、escape/code/link 边界。",
+        "扩展关闭保持现有结果，AST walker/render/资源预算共同覆盖新节点。"
+      ]
+    },
+    {
+      "package": "metrics",
+      "current_capability": "并发注册、快照/collector、Prometheus 0.0.4 有界和流式输出。",
+      "candidate": "OpenMetrics 1.0 文本输出",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "接入支持 OpenMetrics 的采集端并输出已有 unit；首期不添加 exemplar/native histogram。",
+      "evidence": [
+        {
+          "path": "metrics/prometheus.goml",
+          "line": 7,
+          "observation": "content_type 固定 text/plain version=0.0.4。",
+          "sha256": "a3dca47686f1cbda418e97bfd2d7fea1539ef0d63027d7b4710748c627658073"
+        },
+        {
+          "path": "metrics/prometheus.goml",
+          "line": 102,
+          "observation": "已有 Write sink 和逐次写出上限。",
+          "sha256": "a3dca47686f1cbda418e97bfd2d7fea1539ef0d63027d7b4710748c627658073"
+        },
+        {
+          "path": "metrics/tests/stream_export_test.goml",
+          "line": 70,
+          "observation": "已验证各指标/转义/快照一致性。",
+          "sha256": "2b912449ba687795b8b3484c7e0a1c3009de64af8bea8b1914e0631f9d22304e"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "独立 API/Content-Type，正确 UNIT、计数器命名和 EOF 标记；保留旧输出。",
+        "与官方 parser 校验，snapshot 和流式输出一致，预算及短写错误不产生成功的截断响应。"
+      ]
+    },
+    {
+      "package": "notify",
+      "current_capability": "Linux inotify 单/多根、递归维护、rescan 恢复和 scoped subscription。",
+      "candidate": "可选有界事件去抖层",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "编辑器保存产生多次 MODIFY 时减少重复构建；独立于原始 watcher，不把事件视为审计日志。",
+      "evidence": [
+        {
+          "path": "notify/stream.goml",
+          "line": 15,
+          "observation": "已有 scoped 订阅实现，是新适配层的输入。",
+          "sha256": "4a356b07d00339a4cc3110eee055e4f0e256e1082aca8abf6325b2a6eeca9e7c"
+        },
+        {
+          "path": "notify/options.goml",
+          "line": 7,
+          "observation": "Options 当前配置递归/mask/ignore，无 debounce。",
+          "sha256": "433ad3e54a16a218d27d50d63db988d40703d8c283d2dfdaabdc129736e1dfa5"
+        },
+        {
+          "path": "notify/tests/notify_test.goml",
+          "line": 178,
+          "observation": "订阅已有背压/取消/close 生命周期测试。",
+          "sha256": "a4cdbc0c7c42d522b26b38a5f0deaa8b6c4846acc0ecf95b0bdb96dd8eaf0148"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "每路径合并窗口与 max_pending 显式；溢出升级 rescan，不静默丢失。",
+        "root Removed/Error 不延迟隐藏；假时钟确定性测试，取消/close 不遗留任务。"
+      ]
+    },
+    {
+      "package": "progress",
+      "current_capability": "多 job、rate/ETA、受检渲染与并发日志/生命周期。",
+      "candidate": "显式暂停/恢复及有效运行时长",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "交互式下载暂停后 ETA 不因空闲时间失真；维持默认 elapsed/rate 行为兼容，不启动后台任务。",
+      "evidence": [
+        {
+          "path": "progress/README.md",
+          "line": 55,
+          "observation": "明确尚无 pause/resume accounting。",
+          "sha256": "9387dafbb631c635b3273a30f17fae51b26b0eada5ba31101af870db6fb90c8d"
+        },
+        {
+          "path": "progress/manager.goml",
+          "line": 495,
+          "observation": "现有 Job 生命周期有 reset/finish/fail/cancel。",
+          "sha256": "76b9be159747fce698450c97a0f63826e418a149e392701b7c301ec72e73ce4e"
+        },
+        {
+          "path": "progress/tests/model_test.goml",
+          "line": 102,
+          "observation": "已有可注入时钟/回退/reset 语义测试。",
+          "sha256": "ad2b117bf863c1bcbe2d9dd488dd5220dd0ef2951a881a21235bd16ba885961d"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "重复 pause/resume、完成后操作与暂停时进度更新语义显式。",
+        "用假时钟验证暂停时长不计入新增 active_elapsed/rate；取消/关停仍可完成。"
+      ]
+    },
+    {
+      "package": "prompt",
+      "current_capability": "文本/completion/history、typed Select/MultiSelect 与自定义 ranker。",
+      "candidate": "多选可见项批量选择/清除",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "S",
+      "rationale": "长列表筛选后批量选中匹配项；保留隐藏选择，不更改 disabled 项。",
+      "evidence": [
+        {
+          "path": "prompt/select.goml",
+          "line": 156,
+          "observation": "已公开 selected_indices。",
+          "sha256": "ae5f9008955cec19b97a5bae6ea9d01e7c9261cf08cbd8cf829594a9a7276bcb"
+        },
+        {
+          "path": "prompt/select.goml",
+          "line": 316,
+          "observation": "事件处理当前以 Space toggle 单项为主，检索无批量选择 API。",
+          "sha256": "ae5f9008955cec19b97a5bae6ea9d01e7c9261cf08cbd8cf829594a9a7276bcb"
+        },
+        {
+          "path": "prompt/tests/ranker_test.goml",
+          "line": 53,
+          "observation": "已有隐藏选择保留/disabled 跳过契约。",
+          "sha256": "692d3f2fe8f67bf3d1f302438a324032fe6a6127e386820c556bd2defe015627"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "新增模型方法和明确快捷键；选择超过 maximum 时原子拒绝或明示策略。",
+        "过滤后仅作用可见 enabled 项，保留原始提交顺序；已完成模型拒绝修改。"
+      ]
+    },
+    {
+      "package": "proptest",
+      "current_capability": "可缩减策略、stateful command generator/runner、campaign/coverage 与回归种子。",
+      "candidate": "协作取消的 run/campaign 入口",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "长 campaign 可响应 IDE/CI 取消；只在样本、属性、shrink 步骤间检查，不承诺抢占阻塞用户回调。",
+      "evidence": [
+        {
+          "path": "proptest/runner.goml",
+          "line": 168,
+          "observation": "run 当前只有 strategy/options/property，没有 Context。",
+          "sha256": "6d77871ef2a1af3afbe5b0d1c189b04e1436c1b7136615d3b1670a7a81a8acc5"
+        },
+        {
+          "path": "proptest/campaign.goml",
+          "line": 155,
+          "observation": "run_campaign 为统一调度入口。",
+          "sha256": "f4e14c7a027fff8b7b0e0a7db93f6544ada5ca6040c5ab6a5e3af1c9bb539fc9"
+        },
+        {
+          "path": "proptest/collections.goml",
+          "line": 114,
+          "observation": "stateful 生成器已存在，应排除为新需求。",
+          "sha256": "a6eac132832321d3f7fea4d20553d782fabe7279bf09f49355fdb107ec95e30f"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "取消报告含已执行计数和可重放 seed，不能误报 Passed。",
+        "预取消不调用策略/属性；缩减中取消保留已知反例，清理回调仍执行。"
+      ]
+    },
+    {
+      "package": "regexp",
+      "current_capability": "有界 NFA、数字捕获、懒匹配/分割、字面量和回调替换",
+      "candidate": "命名捕获与按名称提取/替换",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "复杂日志规则不再依赖易漂移的捕获序号；先限定一种命名语法和重复名策略。",
+      "evidence": [
+        {
+          "path": "regexp/README.md",
+          "line": 94,
+          "observation": "明确拒绝 named captures；检索公开源码未发现命名捕获 API。",
+          "sha256": "1b0c4287c829ae347762350169965c7ae4aa976a9b4bb63553332355537be656"
+        },
+        {
+          "path": "regexp/model.goml",
+          "line": 27,
+          "observation": "Match.capture 只接受数字 index。",
+          "sha256": "dbe05aa141daa95e5ba1487992892f331254f9017453babe61f04fc887fc144e"
+        },
+        {
+          "path": "regexp/tests/iterator_test.goml",
+          "line": 8,
+          "observation": "现有迭代测试已覆盖 Unicode、捕获和空匹配，不应重复提案。",
+          "sha256": "643ba32679581dfa9e792a4fd88907617b927c766bf28b3ce9bbd5d1578b5217"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "名称到现有编号稳定映射，重复名和非法名可恢复报错。",
+        "命名替换与数字替换共享 work/output limits；保持现有选择语义。"
+      ]
+    },
+    {
+      "package": "rope",
+      "current_capability": "持久 AVL UTF-8 文本、UTF-16/行索引、正反向迭代和流 I/O",
+      "candidate": "跨叶片的字素簇迭代",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "L",
+      "rationale": "编辑器的光标/删除需要完整字素，避免先展平大文档；需复用 Unicode 分段规则并处理任意长簇。",
+      "evidence": [
+        {
+          "path": "rope/README.md",
+          "line": 101,
+          "observation": "明确无 grapheme iterators。",
+          "sha256": "883556c238005c7e81b5d9dc498f08c10c5e3e8550bcaae153fbabf7b8ef2310"
+        },
+        {
+          "path": "rope/rope.goml",
+          "line": 140,
+          "observation": "当前 scalar 访问单位是 Unicode scalar。",
+          "sha256": "a27da847e5ed1ac70c14f8c3443750366db0c53c10b6a13755fe9b823e918452"
+        },
+        {
+          "path": "rope/tests/reverse_lines_test.goml",
+          "line": 63,
+          "observation": "已有跨叶 CRLF 和快照测试模式可扩展到字素。",
+          "sha256": "ee16eb7e03421a982669e5e85aba79ec34da0b7aabfd72a0364f6f93cea3bf0c"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "组合符、ZWJ、RI 奇偶序列跨 1024-byte 叶片边界与 unicode_text 一致。",
+        "不展平整个 rope；保留快照，明确超长单簇资源策略。"
+      ]
+    },
+    {
+      "package": "sqlite",
+      "current_capability": "原生 SQLite、预编译、严格类型查询、取消、事务和嵌套 savepoint",
+      "candidate": "受控在线备份 API",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "L",
+      "rationale": "业务备份不能简单复制活动 WAL 数据库；需要一致备份和可取消的分步执行。",
+      "evidence": [
+        {
+          "path": "sqlite/README.md",
+          "line": 3,
+          "observation": "底层使用 modernc.org/sqlite，现有能力侧重查询与事务。",
+          "sha256": "13f5bf7f49c87d487bc42cede70ccb36cce9b0f82e74ed32c1830b21b898b544"
+        },
+        {
+          "path": "sqlite/session.goml",
+          "line": 178,
+          "observation": "Database 公共生命周期入口；全包 pub backup 检索无结果。",
+          "sha256": "dca6d3f1a04a32ff9486f57f11dff1fb568fb23e86194835dc1dc4917065bd2c"
+        },
+        {
+          "path": "sqlite/tests/sqlite_test.goml",
+          "line": 212,
+          "observation": "活动游标 busy 和早停释放已有测试，备份需明确同类资源互斥。",
+          "sha256": "2f5295df08e3fda5b7bc010944b79bbee6a018dd36ec76362bd47ce12cfd5418"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "先核实固定 modernc 驱动可用备份入口，再封装目标所有权、busy 和取消。",
+        "活动 WAL、内存到磁盘、一致快照、目标错误以及取消后清理有独立 SQLite 对照。"
+      ]
+    },
+    {
+      "package": "template",
+      "current_capability": "表达式、作用域、继承/include、过滤器、上下文 HTML 转义",
+      "candidate": "有界模板宏与显式导入",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "L",
+      "rationale": "复用按钮/表单等有参模板片段，减少 include 对隐式上下文的依赖；需同时设计递归和转义上下文。",
+      "evidence": [
+        {
+          "path": "template/README.md",
+          "line": 245,
+          "observation": "明确无 macros/imports。",
+          "sha256": "371aab0465db28ce681a88c3a5b386cf11ac56b0af61bc04d977689c1b923224"
+        },
+        {
+          "path": "template/model.goml",
+          "line": 47,
+          "observation": "已有执行/输出 Limits 可承载宏调用预算。",
+          "sha256": "c14d83f179a0e520376d63f37641431bf37da650a6e34561ca9d1375e5737b02"
+        },
+        {
+          "path": "template/tests/html_context_test.goml",
+          "line": 15,
+          "observation": "已有 HTML 上下文测试助手，宏输出必须保留同等安全语义。",
+          "sha256": "df8a1e3b13616bfbd1de7467421a46ca182091822f8f75ad984287bb0c2f14e5"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "显式参数/默认值/词法作用域；不增加任意对象方法调用。",
+        "递归深度和操作限额有效；HTML 上下文跨宏调用校验，错误保留调用位置。"
+      ]
+    },
+    {
+      "package": "terminal",
+      "current_capability": "Linux session、CSI/SS3 键、SGR 鼠标、粘贴/焦点/取消",
+      "candidate": "可选 Kitty keyboard 协议协商与事件类型",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "L",
+      "rationale": "TUI 可区分按下/重复/释放以及传统编码混淆的组合键；默认兼容旧终端。",
+      "evidence": [
+        {
+          "path": "terminal/README.md",
+          "line": 69,
+          "observation": "明确不协商 Kitty keyboard 或 key-release。",
+          "sha256": "f270bf34dcd59b1cc21ef58639144c6e0d8664c22dac2febcbf69546c2a1c090"
+        },
+        {
+          "path": "terminal/model.goml",
+          "line": 47,
+          "observation": "KeyEvent 为当前按键模型扩展入口。",
+          "sha256": "3670ecd5977a2f5137b2d85539d42b25fac15b1ca9744fecffe6deca6bc5a703"
+        },
+        {
+          "path": "terminal/tests/decoder_test.goml",
+          "line": 317,
+          "observation": "kitty 文本仅作为未知控制串测试，不是键盘协议支持。",
+          "sha256": "ca45e72582acf6f036c47e869ee79d7afd76c5d43f73b2fc34ed62967aa63edb"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "显式启用/退出并保证 close 清理，非支持终端回退。",
+        "分片 CSI-u、修饰符、重复/释放和 malformed 参数有纯解码及 PTY 测试。"
+      ]
+    },
+    {
+      "package": "tracing",
+      "current_capability": "本地结构化 span、显式 task 上下文、过滤/采样、有界异步 sink",
+      "candidate": "独立分布式 trace-context 编解码和桥接",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "L",
+      "rationale": "HTTP 服务间关联日志需要 W3C traceparent；不能把当前递增 u64 ID 直接伪装成分布式 ID。",
+      "evidence": [
+        {
+          "path": "tracing/README.md",
+          "line": 71,
+          "observation": "现有 ID 为本地计数，明确非分布式 ID。",
+          "sha256": "4913ed944a50c3f59d367d906a4ec49a0c17213be2c5c40decbf337bdc0af972"
+        },
+        {
+          "path": "tracing/span.goml",
+          "line": 12,
+          "observation": "TraceContext 持有 u64 ID 和本地 owner/state。",
+          "sha256": "3caf6152ce762eaa78392d0bed58f0d4ad9ef327a405e51890e7a86c58cd5297"
+        },
+        {
+          "path": "tracing/tests/payload_limits_test.goml",
+          "line": 9,
+          "observation": "已有字段合并及 payload 配额，传播 metadata 也需有界。",
+          "sha256": "e9c2e0f8425a84ef2503b6e3cb64ae8f74a2bfd244500bddae1be273f1cb9232"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "独立 128-bit trace ID/64-bit span ID 与严格编码验证。",
+        "显式 extract/inject，远端 parent 不能引用本地 owner；采样位和非法输入回退政策可测。"
+      ]
+    },
+    {
+      "package": "tui",
+      "current_capability": "缓冲差分渲染、组件、字素编辑器与 undo/redo",
+      "candidate": "可选软换行编辑模式",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "L",
+      "rationale": "在窄终端编辑多行说明/消息时不必横向滚动；必须把视觉行与逻辑文本位置分开。",
+      "evidence": [
+        {
+          "path": "tui/README.md",
+          "line": 89,
+          "observation": "明确不支持 soft-wrapped editing。",
+          "sha256": "dd21f57e0a56661950a057988c506a7baa9e20402b2ad8ff1db3eb0d83793a06"
+        },
+        {
+          "path": "tui/editor.goml",
+          "line": 13,
+          "observation": "Editor 维护 scroll_x/scroll_y 和 preferred_column。",
+          "sha256": "83ff7db755e2e95736113fa88301d0b3e332b2762bc24abddbe02ed0b82246bf"
+        },
+        {
+          "path": "tui/tests/editor_test.goml",
+          "line": 16,
+          "observation": "已有字素删除与 undo/redo，新增换行不能回归。",
+          "sha256": "e7c1f0b7b8a2f7312c5d21a6777fb152b6efc7ee828537f7e24727ee7c181cdb"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "视觉行上下移动、Home/End、resize 和 selection 与文本字节位置一致。",
+        "宽字素、tab、超长簇、撤销/重做及视口边缘有快照测试。"
+      ]
+    },
+    {
+      "package": "tui_markdown",
+      "current_capability": "CommonMark 终端排版、可选表格、交互搜索/链接",
+      "candidate": "可选任务列表呈现",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "README/工作清单中的 - [ ] 与 - [x] 可显示为清晰状态，不需要引入整个 GFM。",
+      "evidence": [
+        {
+          "path": "tui_markdown/README.md",
+          "line": 58,
+          "observation": "明确未添加 task lists。",
+          "sha256": "3d66a199d9b38d563e4f31e19e4c256e7d412f140193ef96256df69bac85c78a"
+        },
+        {
+          "path": "tui_markdown/model.goml",
+          "line": 76,
+          "observation": "Options 是显式扩展配置入口。",
+          "sha256": "9f5d65b7c830b1f1742a51c1c2b192f2e6f7908f130ab44450587889764e18df"
+        },
+        {
+          "path": "tui_markdown/tests/viewer_test.goml",
+          "line": 13,
+          "observation": "已有 resize/search/link 交互测试，扩展需保持偏移和重排正确。",
+          "sha256": "cdd13691ac5c5e4306e6a83800402c96dd442a960732c179d425cf59ce393f3a"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "opt-in，只识别合法列表首标记；代码块/转义保持原文。",
+        "嵌套列表、Unicode 宽度、搜索偏移及默认输出不变有快照。"
+      ]
+    },
+    {
+      "package": "unicode_text",
+      "current_capability": "Unicode 16 字素/词/行分段、宽度、换行和 GraphemeIndex",
+      "candidate": "UAX #29 默认句子分段",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "文本预览和编辑器按句选择可复用同一 Unicode 数据基线；不承诺自然语言智能断句。",
+      "evidence": [
+        {
+          "path": "unicode_text/README.md",
+          "line": 41,
+          "observation": "明确无 sentence segmentation。",
+          "sha256": "68b27e25ce96bfb5015fe2bab0929cd06ef1625c2b50e11d02e0db2029e9d84b"
+        },
+        {
+          "path": "unicode_text/word.goml",
+          "line": 156,
+          "observation": "现有 segment API 返回带字节位置的词段，可复用 API 风格。",
+          "sha256": "2b853141fcddb7bd2f024ce7de59a503609f7e08687b94e02322794af9297867"
+        },
+        {
+          "path": "unicode_text/tests/segmentation_test.goml",
+          "line": 55,
+          "observation": "已有多语言词边界断言，不等于句子边界能力。",
+          "sha256": "0105b67f348fd5a9bd252195729e2bee618efb884cd475e89803d9660f644489"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "固定 Unicode 16 SentenceBreakProperty 与官方 SentenceBreakTest 来源及哈希。",
+        "句段覆盖完整输入并返回 UTF-8 字节偏移，缩写/数字/CRLF/Extend 依 UAX 默认规则。"
+      ]
+    },
+    {
+      "package": "walkdir",
+      "current_capability": "惰性 DFS、过滤/排序、取消、同文件系统、显式关闭",
+      "candidate": "显式目录描述符预算",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "扫描深层目录时可预先限制 FD 而不是碰到全进程 EMFILE；不以静默关闭/重新路径打开破坏当前祖先身份保证。",
+      "evidence": [
+        {
+          "path": "walkdir/README.md",
+          "line": 90,
+          "observation": "每个活动祖先保留一个描述符，确保 rename 后仍安全定位。",
+          "sha256": "fc82e3004d1e1a5befbec907f2a8795acb58d5fe9ee3e6f415fc89176ae65d13"
+        },
+        {
+          "path": "walkdir/README.md",
+          "line": 92,
+          "observation": "极深树可到达进程 descriptor limit。",
+          "sha256": "fc82e3004d1e1a5befbec907f2a8795acb58d5fe9ee3e6f415fc89176ae65d13"
+        },
+        {
+          "path": "walkdir/walkdir.goml",
+          "line": 32,
+          "observation": "已有 cancellation，pub max_open 检索未发现；预算应与取消组合。",
+          "sha256": "dd5e4e5e44e540e857f13eeb20ca4cf95c25f665fe3ed81d1460fa73901b3933"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "独立 max_open_dirs 预算，超额返回明确资源错误并保留兄弟分支语义。",
+        "深树、提前 close、取消与目录重命名测试，确认不泄漏 FD。"
+      ]
+    },
+    {
+      "package": "wasm",
+      "current_capability": "Core 数字/控制、多值、引用、bulk 操作、受控 WASI",
+      "candidate": "可选保留 name 自定义节用于错误栈",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "嵌入者排查 trap 时希望看到函数名，不必引入完整 DWARF 或 JIT。",
+      "evidence": [
+        {
+          "path": "wasm/README.md",
+          "line": 101,
+          "observation": "明确 name sections 和源码映射尚未暴露。",
+          "sha256": "9084d254b03049a4f2922cb44a279bdb67b462c952a0166d961a232d98a4e19f"
+        },
+        {
+          "path": "wasm/binary.goml",
+          "line": 405,
+          "observation": "custom section 当前读取名称后跳过全部内容。",
+          "sha256": "8525c07b2106292fffbdcec4855b85d0224bdcd386529ef043410301b5ee83dd"
+        },
+        {
+          "path": "wasm/tests/runtime_test.goml",
+          "line": 7,
+          "observation": "现有二进制 fixture 加载入口适合加入带 name 节的模块。",
+          "sha256": "48d54af58bc16016d5c1215c728322277f1eaa6ce2595f8521f10a6774685e11"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "模块/函数名与 index 关联，并独立限制 retained metadata 字节。",
+        "未知 subsection、重复索引、坏 UTF-8/LEB 与位置任意的 custom 节政策明确；执行语义不依赖 debug 名称。"
+      ]
+    },
+    {
+      "package": "web",
+      "current_capability": "HTTP 服务、流/SSE、路由、静态资源、会话/CSRF/限流、TLS/WebSocket",
+      "candidate": "静态文件 Last-Modified 与日期条件请求",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "浏览器和代理缓存常发 If-Modified-Since；与已有 ETag 优先级结合可减少传输。",
+      "evidence": [
+        {
+          "path": "web/README.md",
+          "line": 99,
+          "observation": "明确不支持 date validators。",
+          "sha256": "2eaa12853f1885fcf1308473742e661590fe306503560460cff4dd38bbe0f86d"
+        },
+        {
+          "path": "web/README.md",
+          "line": 93,
+          "observation": "已有 If-Match/If-None-Match 优先级。",
+          "sha256": "2eaa12853f1885fcf1308473742e661590fe306503560460cff4dd38bbe0f86d"
+        },
+        {
+          "path": "web/tests/extras_test.goml",
+          "line": 27,
+          "observation": "extras 中已有 middleware/静态资源测试基础。",
+          "sha256": "2c45594d44e11c4449a9a5d26471e9b7f17a84360e0832449ad7b91711abd507"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "基于同一已打开文件 metadata 生成 HTTP 日期，保持秒精度。",
+        "If-Unmodified-Since/If-Modified-Since 与 ETag 条件优先级、HEAD、无效日期和未来时间有协议测试。"
+      ]
+    },
+    {
+      "package": "websocket",
+      "current_capability": "RFC6455 完整帧/消息状态机、分片、并发读写及取消",
+      "candidate": "受控的流式消息发送",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "L",
+      "rationale": "大消息生产者可边生成边发，避免整个消息和所有帧一次入队；区别于现有 whole-message 分片。",
+      "evidence": [
+        {
+          "path": "websocket/session.goml",
+          "line": 145,
+          "observation": "send_fragmented 接收完整 Message。",
+          "sha256": "8db53d887ab8c9e9bdda563d362302e72193f442016ff1344b7c9c7366343041"
+        },
+        {
+          "path": "websocket/README.md",
+          "line": 113,
+          "observation": "现有分片按总队列预算原子入队，明确无无界 streaming writer。",
+          "sha256": "6332087cc220cb47cb85c7a39dc6cabe3da9e02afd75011a2fce979fd0fcdc00"
+        },
+        {
+          "path": "websocket/tests/frame_test.goml",
+          "line": 15,
+          "observation": "存在固定 masking fixture，可扩展流式分片准确字节断言。",
+          "sha256": "c011933539122b2cda3cc12b418621017d0b2b54aff41b7462853681fc089a1f"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "callback/reader API，固定缓冲背压、单消息发送锁与控制帧插入规则明确。",
+        "取消/中途错误终止消息并关闭连接，UTF-8 跨块验证及 close 竞态测试。"
+      ]
+    },
+    {
+      "package": "xml",
+      "current_capability": "有界增量 XML token、命名空间、flat scalar Serde optional/repeated",
+      "candidate": "嵌套结构的显式 Serde schema",
+      "status": "candidate",
+      "priority": "P2",
+      "effort": "L",
+      "rationale": "常见 API/XML 配置包含子对象，用户目前需手写 token 循环；保持显式映射而非隐式猜测属性/元素。",
+      "evidence": [
+        {
+          "path": "xml/README.md",
+          "line": 43,
+          "observation": "当前 schema 明确 flat，排除 nested structs/mixed content。",
+          "sha256": "9c9a2ae4516287f8b1c3333131e66e4cb8573798ec26600ca31762fdaaccc48c"
+        },
+        {
+          "path": "xml/serde.goml",
+          "line": 20,
+          "observation": "Field.kind 仅 ScalarKind。",
+          "sha256": "9456a2b5cbe22f670a6d4e01c6633469419e1f0a8cd1e57f47c9e0129d28c8a3"
+        },
+        {
+          "path": "xml/tests/repeated_test.goml",
+          "line": 78,
+          "observation": "标量 repeated 元素已存在且保持成员顺序，不应重复实现。",
+          "sha256": "8882d10cc74dc1e696e905aa2ebc6cdfad7f61d476c807f6e9c9bf592110db67"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "递归 schema 节点有独立深度上限；required/optional/repeated 与 expanded namespace 一致。",
+        "嵌套对象/向量、未知字段、字段路径和预算失败测试；mixed content 继续明确不支持。"
+      ]
+    },
+    {
+      "package": "bench",
+      "current_capability": "自适应采样、bootstrap统计、单case基线比较、JSON/HTML及严格复算校验。 本批新增：compare_suite[_with] 与 JSON/HTML 比较报告，区分新增、移除和不兼容项。",
+      "candidate": "Suite级基线匹配与比较报告。",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "CI通常比较整套参数化基准；目前调用方需自己按group/name/parameter匹配并处理新增/删除case。",
+      "evidence": [
+        {
+          "path": "bench/suite_comparison.goml",
+          "line": 1,
+          "observation": "compare_suite[_with] 与 JSON/HTML 比较报告，区分新增、移除和不兼容项。",
+          "sha256": "2b46f243639acbd01de4730d7d59bacc16fea3b9df9b4ad516d28d25ddbfd315"
+        },
+        {
+          "path": "bench/tests/suite_comparison_test.goml",
+          "line": 1,
+          "observation": "20 库测试，身份匹配、重复拒绝、取消及总 bootstrap 预算。",
+          "sha256": "27495f3a21fb258f0a0cbe7ff14f8cf8e7022417aea53cee1432f8c5fbecc9e1"
+        },
+        {
+          "path": "bench/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "0e8aba72a91c28d387012535e17e520df9173255d6cd95208acc53addcfc048e"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "稳定匹配case身份并拒绝重复键，报告新增、移除和不可比较case。",
+        "兼容性检查沿用单case规则，零均值和无显著变化不误判；输出顺序确定。"
+      ],
+      "validation": [
+        "Rebase 前验证：20 库测试，身份匹配、重复拒绝、取消及总 bootstrap 预算。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 15 条检查全部通过；本地记录 verification/_artifact/batch24-bench-report.json。",
+        "Rebase 后完整本地测试通过：ok. 24 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "cache",
+      "current_capability": "并发有界LRU、TTL/TTI、singleflight、批量操作和索引过期队列。 本批新增：原子 resize / capacity；LRU 淘汰、入库重检和锁外回调。",
+      "candidate": "运行时调整entry/weight容量。",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "服务可随内存预算变化收缩缓存，无需丢弃整个cache及其加载协调状态；只调整容量，不动态替换回调。",
+      "evidence": [
+        {
+          "path": "cache/cache.goml",
+          "line": 1,
+          "observation": "原子 resize / capacity；LRU 淘汰、入库重检和锁外回调。",
+          "sha256": "0d1678b08e182357ea6aea3a5143845cc267ee89a8242b29e21ed8d289283e64"
+        },
+        {
+          "path": "cache/tests/resize_test.goml",
+          "line": 1,
+          "observation": "40 库 + 6 示例测试全部 race 通过，包含并发调容、写入和关闭。",
+          "sha256": "12ef5b08f6597a38b9e0477765aaa6fc06edb5f952cfb17bcdd033d3b3476a43"
+        },
+        {
+          "path": "cache/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "d098664674357b147414e90ab1b03e1ecf26f4b3534c2652b73c2da3ef40816e"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "原子应用容量并按LRU驱逐到新阈值；非法参数不修改状态。",
+        "通知锁外运行；并发insert/load/close与缩容后统计保持一致。"
+      ],
+      "validation": [
+        "Rebase 前验证：40 库 + 6 示例测试全部 race 通过，包含并发调容、写入和关闭。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 11 条检查全部通过；本地记录 verification/_artifact/batch24-cache-report.json。",
+        "Rebase 后完整本地测试通过：ok. 41 passed; 0 failed; 0 ignored；ok. 6 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "cli",
+      "current_capability": "schema和derive、类型转换、子命令、环境/default、静态shell补全。 本批新增：显式 negatable 布尔 flag，支持 --name / --no-name、derive、帮助和三种 shell 补全。",
+      "candidate": "显式声明可否定布尔flag，例如--color/--no-color。",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "允许CLI覆盖默认或环境启用的布尔值；不要把所有no-前缀隐式解释为否定。",
+      "evidence": [
+        {
+          "path": "cli/parse.goml",
+          "line": 1,
+          "observation": "显式 negatable 布尔 flag，支持 --name / --no-name、derive、帮助和三种 shell 补全。",
+          "sha256": "0ab4117121ef28fa5e38e93f1119cb2e6549f3a8f61d57c1a86a8b2d4786d7d9"
+        },
+        {
+          "path": "cli/tests/negatable_test.goml",
+          "line": 1,
+          "observation": "新增测试覆盖默认值和环境覆盖、重复参数、命名冲突与 derive。",
+          "sha256": "2ebbaa5ba28f7b73d25409a1c24230f3d49ed29d8ce1746f84890913861adf95"
+        },
+        {
+          "path": "cli/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "2c0477de1289bd358a4f180ca7b67d3a5ad0230f3af235fc8e989f114f45c40b"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "builder/derive/help/completion一致生成；检查显式no-名称冲突。",
+        "重复与正反顺序策略明确，环境/default能够被false覆盖，原flag不变。"
+      ],
+      "validation": [
+        "Rebase 前验证：19 库测试与 16 parse 示例测试通过，34 组非法 derive fixture；shell/PTY 使用固定 Fish 3.7.0-1。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 12 条检查全部通过；本地记录 verification/_artifact/batch24-cli-report.json。",
+        "Rebase 前验证：Fish 3.7.0-1 位于 cli/_artifact/fish37；未将工具包纳入源代码。Fish 4.2 的既有补全/PTY 测试存在差异，本次不宣称其兼容性。",
+        "Rebase 后独立验证 12 项通过；固定 Fish 3.7。"
+      ]
+    },
+    {
+      "package": "config",
+      "current_capability": "不可变分层配置、provenance、动态source、校验、取消及热重载。 本批新增：Snapshot.redacted_json，按显式 JSON Pointer 脱敏导出并保留原快照。",
+      "candidate": "显式JSON Pointer集合的脱敏快照导出。",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "S",
+      "rationale": "诊断配置常需输出effective config；不凭字段名猜测敏感项，不改变实际快照或decode结果。",
+      "evidence": [
+        {
+          "path": "config/redact.goml",
+          "line": 1,
+          "observation": "Snapshot.redacted_json，按显式 JSON Pointer 脱敏导出并保留原快照。",
+          "sha256": "10acdda16eb769a038622fd985f5f11971826df33bde6d781d7d0caeedfc15e0"
+        },
+        {
+          "path": "config/tests/redact_test.goml",
+          "line": 1,
+          "observation": "28 库 + 3 示例测试，根路径、转义、重叠、缺失路径及预算。",
+          "sha256": "a62f476105984f9f5f1f133fabd8b52d54c4a06731091803a498ec941c2d7e9d"
+        },
+        {
+          "path": "config/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "2f9e5f20cbc16530bcdc9e4eb16e7659048cd46332e099347e919c7fc45b94c1"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "对象/数组/根路径与~0/~1转义正确；不存在路径的策略显式。",
+        "脱敏仅改导出副本，重复/重叠路径有确定结果，输出遵守预算。"
+      ],
+      "validation": [
+        "Rebase 前验证：28 库 + 3 示例测试，根路径、转义、重叠、缺失路径及预算。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 11 条检查全部通过；本地记录 verification/_artifact/batch24-config-report.json。",
+        "Rebase 后完整本地测试通过：ok. 44 passed; 0 failed; 0 ignored；ok. 11 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "diagnostics",
+      "current_capability": "多文件Unicode诊断、ANSI/plain、编辑建议和UTF16位置索引。 本批新增：export_json / JsonOptions，版本化诊断、UTF-8/UTF-16 位置与建议编辑。",
+      "candidate": "版本化结构化JSON诊断导出。",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "编辑器/CI不应反向解析终端文本；复用源身份和UTF16索引，不直接承担LSP网络协议。",
+      "evidence": [
+        {
+          "path": "diagnostics/json.goml",
+          "line": 1,
+          "observation": "export_json / JsonOptions，版本化诊断、UTF-8/UTF-16 位置与建议编辑。",
+          "sha256": "c5b4f4ad81f20c72a8cb47bc45aa5155bdae14a19c5da794e894f540cecdc45b"
+        },
+        {
+          "path": "diagnostics/tests/json_test.goml",
+          "line": 1,
+          "observation": "29 库 + 7 示例测试，源归属、重复文件名、CRLF、转义及精确预算。",
+          "sha256": "7526bc455c1e5530ff2b04b8da0816d5403fb269a37d1b7e782383fab6aa88b4"
+        },
+        {
+          "path": "diagnostics/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "f7c54861da2016a846b492b30f5f4dc3f5b29f960557ecbce3fe28885965da6b"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "明确schema版本、severity、code、labels和suggestions；验证source identity后导出。",
+        "Unicode UTF8/UTF16边界与EOF一致，ANSI不开启，控制字符JSON转义并设输出预算。"
+      ],
+      "validation": [
+        "Rebase 前验证：29 库 + 7 示例测试，源归属、重复文件名、CRLF、转义及精确预算。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 9 条检查全部通过；本地记录 verification/_artifact/batch24-diagnostics-report.json。",
+        "Rebase 后完整本地测试通过：ok. 32 passed; 0 failed; 0 ignored；ok. 7 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "diff",
+      "current_capability": "Myers最短编辑、线性空间Hirschberg、严格unified patch及反向应用。 本批新增：可选 Algorithm::Patience，唯一锚点和 LIS，Hirschberg 回退共享预算。",
+      "candidate": "可选Patience行diff。",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "重排函数/重复括号文件需要更可读的锚点；作为非最短路径模式而非替换现有算法。",
+      "evidence": [
+        {
+          "path": "diff/patience.goml",
+          "line": 1,
+          "observation": "可选 Algorithm::Patience，唯一锚点和 LIS，Hirschberg 回退共享预算。",
+          "sha256": "cc6c8c75b780a0e335a27f49716fbd7474a0bc63d43fe657d0b2ac2822d5d5c2"
+        },
+        {
+          "path": "diff/tests/patience_test.goml",
+          "line": 1,
+          "observation": "11 库 + 5 示例测试，961 对序列重建与 48 组 GNU patch 数据。",
+          "sha256": "53e890047dff8cfec8d08dfec7fbc8c05923796834fb49f9688777c24d02d05c"
+        },
+        {
+          "path": "diff/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "97d3f2c07a5310fea7ab664024e4f627ef4ca2b3caf4347683c7128bf50bd71a"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "唯一行锚点和无锚点fallback有确定tie规则。",
+        "重建/反向patch正确，工作及空间预算涵盖索引与fallback；移动代码fixture证明布局差异。"
+      ],
+      "validation": [
+        "Rebase 前验证：11 库 + 5 示例测试，961 对序列重建与 48 组 GNU patch 数据。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 9 条检查全部通过；本地记录 verification/_artifact/batch24-diff-report.json。",
+        "Rebase 后完整本地测试通过：ok. 14 passed; 0 failed; 0 ignored；ok. 5 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "goir",
+      "current_capability": "SSA标量IR、优化、寄存器分配和amd64 ABI0；已有rotate/bitcount/minmax，本轮新增I32/I64 Bswap。",
+      "candidate": "I32/I64字节序反转Bswap指令。",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "二进制协议和格式解析可直接表达字节序转换；当前可移位组合但缺专用IR操作。",
+      "evidence": [
+        {
+          "path": "goir/model.goml",
+          "line": 12,
+          "observation": "UnaryOp加入Bswap，沿用共享Unary构建与验证路径。",
+          "sha256": "436ac3663cc5a1e7606d3ac9171f38f5b0212cbf7ba43c9dc75c95deabaaaf1b"
+        },
+        {
+          "path": "goir/numeric.goml",
+          "line": 231,
+          "observation": "evaluate_unary按I32/I64宽度反转字节，再统一规范化结果。",
+          "sha256": "b1583886d5ae2feaff597f225e2889d60f83ac5c24a3dce7da1d6230c42145cd"
+        },
+        {
+          "path": "goir/tests/bswap_test.goml",
+          "line": 9,
+          "observation": "边界值、文本往返及常量折叠回归。",
+          "sha256": "3d7e4f7a11d9b38ded2a8eb8271b91a856b4f1e024a506a2a2d3d8c9698b72e9"
+        },
+        {
+          "path": "goir/examples/basic/tests/data/scalar_reference_test.go",
+          "line": 349,
+          "observation": "两种宽度、7种后端/分配配置，每宽度518个输入对照Go math/bits。",
+          "sha256": "8d9fbcc1e569c494373571b7dc46633b06c07908a6f9b840428e7ef35f1ec194"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://llvm.org/docs/LangRef.html#llvm-bswap-intrinsics",
+          "feature": "LLVM bswap的整数按字节反转语义"
+        },
+        {
+          "url": "https://pkg.go.dev/math/bits#ReverseBytes32",
+          "feature": "Go独立字节序反转oracle"
+        }
+      ],
+      "acceptance": [
+        "贯通Builder/verify/interp/text/constant fold/mach/两个amd64 backend。",
+        "I32高位规范化及两次反转恒等；独立Go bits.ReverseBytes32/64 oracle覆盖随机与边界值。"
+      ],
+      "validation": [
+        "Rebase 前验证：goml test --timeout 180s：101库测试、12 example/native测试通过。",
+        "Rebase 前验证：独立registry snapshot及下游consumer verifier完成，report.success=true；包括格式、测试、构建和示例执行。",
+        "Rebase 前验证：未增加双Bswap消除优化；原生差分验证两次反转恒等。",
+        "Rebase 上游仅文档/CI 变化，保留此前完整验证；源码字节未改变，格式与 diff 检查通过。"
+      ]
+    },
+    {
+      "package": "gomlgo",
+      "current_capability": "Go1.26 frontend与VM、同模块包执行、原生/解释器channel混合select；本轮补原生发送、取消提交竞争和退出清理。",
+      "candidate": "原生channel发送及mixed select提交、取消与清理。",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "L",
+      "rationale": "原生可写channel可参与发送和select；就绪探测与实际提交分离，取消等待必须尊重已完成的原生通信。",
+      "evidence": [
+        {
+          "path": "gomlgo/nativebridge/advanced.go",
+          "line": 212,
+          "observation": "ChannelInvocationAppendSend及原生select panic捕获。",
+          "sha256": "7c8716af1194ba35d81090faf9aef952ae298fa0d46dcac46cd13bd7113eb933"
+        },
+        {
+          "path": "gomlgo/interpreter/scheduler.goml",
+          "line": 721,
+          "observation": "只读就绪探测，避免取消未被选中的mixed waiter。",
+          "sha256": "e03f860ce937727e65247c74014e0c3efa74a21dfcd0746d43f7d8654a1befcc"
+        },
+        {
+          "path": "gomlgo/interpreter/interpreter_test.goml",
+          "line": 925,
+          "observation": "调度器回归验证probe不撤销waiter，已完成native分支不能再被local认领。",
+          "sha256": "d0682f85746f17762180a5834ab398dd1cefead7fbc4d46929f53a674e9dedf3"
+        },
+        {
+          "path": "gomlgo/interpreter/interpreter_test.goml",
+          "line": 991,
+          "observation": "测试注入真实host channel后运行lowering+scheduler，并对照Go执行同源码。",
+          "sha256": "d0682f85746f17762180a5834ab398dd1cefead7fbc4d46929f53a674e9dedf3"
+        },
+        {
+          "path": "gomlgo/README.md",
+          "line": 102,
+          "observation": "明确mixed select同时就绪时本地分支优先、原生仲裁不受seed控制，native close仍不支持。",
+          "sha256": "87848ff9a919901229e42a91bfda41e155025d47436e531c655c48af8b93e945"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://go.dev/ref/spec#Select_statements",
+          "feature": "Go select求值、提交、默认分支语义"
+        },
+        {
+          "url": "https://pkg.go.dev/reflect#Select",
+          "feature": "原生channel选择桥接参考"
+        }
+      ],
+      "acceptance": [
+        "覆盖ready/default/full/nil/closed channel，发送值求值一次，与Go执行结果比较。",
+        "取消不能撤销已提交的通信；只读probe不移除native等待；错误退出取消并join挂起send。",
+        "当前保留mixed-ready本地优先边界；不宣称跨native/local的均匀随机公平，native close仍不支持。"
+      ],
+      "validation": [
+        "Rebase 前验证：最终just ci exit0：292 passed、2项原有ignored；native race、scan/parser/type差分及CLI smoke全部通过。",
+        "Rebase 前验证：新增native send E2E以测试专属FFI注入真实host通道，完整lowering+scheduler与Go oracle比较；CLI smoke覆盖同源码的普通通道路径。",
+        "Rebase 前验证：scheduler_errors_join_pending_native_sends验证instruction limit错误退出后挂起nil native send已取消并join；新增unbuffered native send race回归通过。",
+        "Rebase 后 just fmt ci 通过，含 292 项 GoML 测试（2 项忽略）、native race、差分与 smoke。"
+      ]
+    },
+    {
+      "package": "highlight",
+      "current_capability": "有状态词法高亮、持久文档编辑和全量 ANSI/HTML 渲染。 本批新增：Document.to_ansi_range / to_html_range，复用已有词法状态渲染半开行范围。",
+      "candidate": "按行范围渲染 ANSI/HTML",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "S",
+      "rationale": "终端/网页只展示可见片段时避免渲染整篇；保留既有词法状态，输出 API 不承担语义着色。",
+      "evidence": [
+        {
+          "path": "highlight/render.goml",
+          "line": 1,
+          "observation": "Document.to_ansi_range / to_html_range，复用已有词法状态渲染半开行范围。",
+          "sha256": "889ebcef4e0fbf4fe81573fab4f36ca43eab6cac0e0b1410a52cbae9221720e4"
+        },
+        {
+          "path": "highlight/tests/range_test.goml",
+          "line": 1,
+          "observation": "27 库 + 4 示例测试，跨行注释、Unicode、空范围与精确输出预算。",
+          "sha256": "301b1dfd9d4d1fe09c1219b7ed8b1befc3446423c69f43360fac7f0d358ff5dc"
+        },
+        {
+          "path": "highlight/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "b11b2d05f035b7c10805b9f2840cd25e97c1bbe49a7e11bd02a521fc0a8ac9fd"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "明确半开行范围、越界及空范围语义。",
+        "范围输出沿用控制字符处理、HTML 转义和总字节限额；不重新词法解析。"
+      ],
+      "validation": [
+        "Rebase 前验证：27 库 + 4 示例测试，跨行注释、Unicode、空范围与精确输出预算。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 11 条检查全部通过；本地记录 verification/_artifact/batch24-highlight-report.json。",
+        "Rebase 后完整本地测试通过：ok. 27 passed; 0 failed; 0 ignored；ok. 4 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "html",
+      "current_capability": "HTML5 DOM、字符串 CSS 查询、保守 sanitizer 和流式实体解码。 本批新增：不可变 Selector::compile 与 compiled 查询；每次匹配重检目标配额。",
+      "candidate": "不可变预编译 CSS Selector",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "重复爬取同结构文档时复用选择器解析；每次匹配仍做树规模/work admission，不能绕过现有限制。",
+      "evidence": [
+        {
+          "path": "html/dom/compiled.goml",
+          "line": 1,
+          "observation": "不可变 Selector::compile 与 compiled 查询；每次匹配重检目标配额。",
+          "sha256": "b01f468b27f067ca1066b7706ce6b1e113e0541eaf46dbb7502154ab4810fe38"
+        },
+        {
+          "path": "html/dom/tests/compiled_test.goml",
+          "line": 1,
+          "observation": "GoML 编译选择器、目标限额、并发跨文档复用回归测试。",
+          "sha256": "72d50d547217e4e7567ba7a1457449d3342f1b4ed8d561956fb61fb602f972d3"
+        },
+        {
+          "path": "html/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "5537e8490c5d252afad82b7b36c839dff404b86de724b6481129d8b9b81b0818"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "编译时验证语法/字节上限，执行时重新验证目标树结构工作上限。",
+        "与字符串查询结果一致，可并发跨文档使用，保持 max_matches 限额。"
+      ],
+      "validation": [
+        "整合上游纯 GoML DOM 后，编译选择器复用 GoML CSS parser 和 matcher；保留每次执行的字节、结构工作量与匹配数量限制。",
+        "Rebase 后 GoML 0.1.64 独立验证 14 项通过，含 39 项库测试、5 项示例测试、独立 consumer 和 race 下的并发复用测试。"
+      ]
+    },
+    {
+      "package": "mime",
+      "current_capability": "媒体类型/RFC2231、encoded-word、quoted-printable 和 multipart 流。 本批新增：FormDisposition 解析与格式化，UTF-8 quoted-string 输出和原始文件名。",
+      "candidate": "multipart/form-data disposition 辅助 API",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "S",
+      "rationale": "常见表单上传免手工拼 Content-Disposition；只解析字段名/原始文件名，不创建文件或相信路径。",
+      "evidence": [
+        {
+          "path": "mime/disposition.goml",
+          "line": 1,
+          "observation": "FormDisposition 解析与格式化，UTF-8 quoted-string 输出和原始文件名。",
+          "sha256": "8049d6fdf77a57cdeb4415c647447b9cf6b79fafb4e24658d7f837ae9a09986e"
+        },
+        {
+          "path": "mime/tests/disposition_test.goml",
+          "line": 1,
+          "observation": "43 库 + 4 示例测试，wire 断言、转义、控制字符与限额。",
+          "sha256": "500a07b34d20cd4c6869793dccc03bc2933c29e843aaf1a41fda6873f480a07d"
+        },
+        {
+          "path": "mime/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "b0c984142cb894a6121040b2869215614ee90aa9582042fb1a6712ec7cd7d673"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://www.rfc-editor.org/rfc/rfc7578.html#section-4.2",
+          "feature": "form-data 输出使用 UTF-8 quoted-string，不生成 filename* 参数。"
+        }
+      ],
+      "acceptance": [
+        "构造/解析 name 和 filename，校验控制字符、重复字段和 disposition 类型。",
+        "Unicode、引号、反斜线、文件名路径保留/净化策略显式，header 输出受现有限额。"
+      ],
+      "validation": [
+        "Rebase 前验证：43 库 + 4 示例测试，wire 断言、转义、控制字符与限额。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 11 条检查全部通过；本地记录 verification/_artifact/batch24-mime-report.json。",
+        "Rebase 后完整本地测试通过：ok. 65 passed; 0 failed; 0 ignored；ok. 11 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "msgpack",
+      "current_capability": "全 wire 类型、serde、incremental Unpacker 和标准 I/O 多帧流。 本批新增：StreamReader / Unpacker 的 skip_next，不构造被跳过帧的 Value。",
+      "candidate": "StreamReader 的显式 skip_next",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "S",
+      "rationale": "日志/消息消费时跳过无关顶层帧而不构造 Value；已有 slice skip_prefix，需求仅补 I/O 层。",
+      "evidence": [
+        {
+          "path": "msgpack/io.goml",
+          "line": 1,
+          "observation": "StreamReader / Unpacker 的 skip_next，不构造被跳过帧的 Value。",
+          "sha256": "e803e2566eda833241651aaee8194609d92d421626b464dac01beabb54284f29"
+        },
+        {
+          "path": "msgpack/tests/io_test.goml",
+          "line": 1,
+          "observation": "26 库 + 6 示例测试，连续帧、EOF、截断与预算。",
+          "sha256": "bb8f796c8fb30bab16eae6a341d4399fc8745bb645a88a6c36c5bcd01e85b47e"
+        },
+        {
+          "path": "msgpack/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "49646d532e7bd1e11119d9b4ba2ebf22f31858d6649c9d948abbd92a8822afbc"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "返回是否跳过一帧，正常 EOF、截断、错误后的 fused 状态一致。",
+        "保留后续帧和缓冲字节，继续执行 wire/深度/元素限制；不宣称绕过 max_bytes 流式丢弃巨帧。"
+      ],
+      "validation": [
+        "Rebase 前验证：26 库 + 6 示例测试，连续帧、EOF、截断与预算。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 9 条检查全部通过；本地记录 verification/_artifact/batch24-msgpack-report.json。",
+        "Rebase 后完整本地测试通过：ok. 35 passed; 0 failed; 0 ignored；ok. 9 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "ndarray",
+      "current_capability": "泛型视图/广播、reductions、LU/QR/Cholesky 和 SIMD。 本批新增：按轴 cumsum / cumprod，支持负轴和非连续视图，保持 checked 算术。",
+      "candidate": "按轴累计和/累计积",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "支持时间序列前缀统计和扫描计算；沿用 Scalar checked 算术，不新增 dtype 推断。",
+      "evidence": [
+        {
+          "path": "ndarray/scan.goml",
+          "line": 1,
+          "observation": "按轴 cumsum / cumprod，支持负轴和非连续视图，保持 checked 算术。",
+          "sha256": "cf674a9e94b5ad47ae9c6fe2a379d8afd1b7202e42dbb456f5a4fb8707e179fc"
+        },
+        {
+          "path": "ndarray/tests/scan_test.goml",
+          "line": 1,
+          "observation": "24 库 + 5 示例测试，独立前缀循环、负 stride、空轴及溢出。",
+          "sha256": "1768753c82f4567ad8b6d51b72f9c8c1cf70220f0066a4d952624968f543c6df"
+        },
+        {
+          "path": "ndarray/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "63a94a0fded59e145f90fbe7b3a452b17bd7e091c8f883f9dde72b4de3d39d84"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "输出保持形状，支持非连续/负 stride view、空轴和负轴策略。",
+        "整数溢出返回错误，浮点顺序明示，独立前缀循环 oracle 与 NumPy 固定向量对照。"
+      ],
+      "validation": [
+        "Rebase 前验证：24 库 + 5 示例测试，独立前缀循环、负 stride、空轴及溢出。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 19 条检查全部通过；本地记录 verification/_artifact/batch24-ndarray-report.json。",
+        "Rebase 后完整本地测试通过：ok. 50 passed; 0 failed; 0 ignored；ok. 31 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "object",
+      "current_capability": "ELF32/64双端序、symbols/notes、REL/RELA、dynamic、zlib压缩节；本轮新增GNU符号版本元数据。",
+      "candidate": "GNU symbol version 元数据读取",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "分析共享库 ABI 依赖时区分同名符号版本；仅读取 versym/verdef/verneed，不实现动态链接选择。",
+      "evidence": [
+        {
+          "path": "object/elf/versions.goml",
+          "line": 4,
+          "observation": "独立VersionLimits保持既有Limits兼容，控制输入、记录及字符串预算。",
+          "sha256": "7d5e495ae763f37dcc1929bbe539447edff525d4f0b24878e06e26613b533baf"
+        },
+        {
+          "path": "object/elf/versions.goml",
+          "line": 336,
+          "observation": "公开verdef/verneed/versym读取接口，解析符号版本、隐藏位及库名。",
+          "sha256": "7d5e495ae763f37dcc1929bbe539447edff525d4f0b24878e06e26613b533baf"
+        },
+        {
+          "path": "object/elf/tests/versions_test.goml",
+          "line": 80,
+          "observation": "合法分离aux布局、畸形链/索引及累计限额回归。",
+          "sha256": "a011f40adfe26bbc80950c7775233e94bbca55a8df45fd18e3d49f3dbd9ee891"
+        },
+        {
+          "path": "object/examples/basic/tests/versions_test.goml",
+          "line": 9,
+          "observation": "公开API的四种ELF布局consumer覆盖。",
+          "sha256": "e121821ef49d2db6f454382dcc0cfd4335af0cc88ea908f6d90ac4811d41474d"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://pkg.go.dev/debug/elf#File.DynamicVersions",
+          "feature": "Go GNU版本定义接口和独立oracle"
+        },
+        {
+          "url": "https://github.com/bminor/glibc/blob/master/elf/dl-version.c",
+          "feature": "GNU版本定义/需求相对偏移布局参考"
+        }
+      ],
+      "acceptance": [
+        "绑定 dynsym 序号、隐藏位、版本定义/需求与库名；两种端序/位宽样例。",
+        "拒绝链表循环、截断、无效索引与超配额；对照 readelf 或 Go debug/elf，保持基础 Limits 兼容。"
+      ],
+      "validation": [
+        "Rebase 前验证：goml test：22库测试与13 example测试全部通过。",
+        "Rebase 前验证：Go 1.26 debug/elf独立oracle覆盖ELF32/ELF64、大小端四种fixture；8份库/consumer fixture重生成一致。",
+        "Rebase 前验证：全仓fmt --check及git diff --check通过。",
+        "Rebase 前验证：独立registry snapshot及下游consumer verifier完成，所有命令通过，report.success=true。",
+        "Rebase 上游仅文档/CI 变化，保留此前完整验证；源码字节未改变，格式与 diff 检查通过。"
+      ]
+    },
+    {
+      "package": "pipeline",
+      "current_capability": "惰性可重跑 Stream、parallel/merge/zip、chunks/windows 和 fold_while。 本批新增：Stream.dedup_by，相邻输入去重且每次执行独立保存上一项。",
+      "candidate": "相邻去重 dedup_by",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "S",
+      "rationale": "处理排序流或连续状态通知时只保留变化项；仅保存上一项，不引入无界全局 distinct 集合。",
+      "evidence": [
+        {
+          "path": "pipeline/stages.goml",
+          "line": 1,
+          "observation": "Stream.dedup_by，相邻输入去重且每次执行独立保存上一项。",
+          "sha256": "9254624bd7c4f75ae19a4e67d2efacf0f3978d4fa8cdd76e9b53ae92af2a1c0a"
+        },
+        {
+          "path": "pipeline/tests/sequence_test.goml",
+          "line": 1,
+          "observation": "29 库 + 5 示例测试，重复执行、早停与独立参考。",
+          "sha256": "99a3730031857ea989a8e8fa1a5c06f0968f186b7baaedc051faa509047ed2dc"
+        },
+        {
+          "path": "pipeline/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "481837e95d0e707dff88301774b271883fa900ea398260ba90e5c1836a48904d"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "空流/单项/全重复/自定义相等覆盖，等价于独立线性参考实现。",
+        "多次执行状态隔离，早停和取消不额外消费；记录回调/可变值快照契约。"
+      ],
+      "validation": [
+        "Rebase 前验证：29 库 + 5 示例测试，重复执行、早停与独立参考。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 11 条检查全部通过；本地记录 verification/_artifact/batch24-pipeline-report.json。",
+        "Rebase 后完整本地测试通过：ok. 30 passed; 0 failed; 0 ignored；ok. 5 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "redis",
+      "current_capability": "RESP2/3、typed commands、pool、事务/WATCH、TLS 和 Pub/Sub。 本批新增：类型化 XADD / XRANGE / XREAD，以及 StreamId / StreamEntry / StreamRead。",
+      "candidate": "Redis Streams typed XADD/XRANGE/XREAD",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "为日志和事件消费者提供结构化条目/ID，减少 raw reply 解码；首期不自动 ack/retry 或引入 consumer-group 管理。",
+      "evidence": [
+        {
+          "path": "redis/commands/streams.goml",
+          "line": 1,
+          "observation": "类型化 XADD / XRANGE / XREAD，以及 StreamId / StreamEntry / StreamRead。",
+          "sha256": "69eda33c704530f2b5e3213f478e063619baeee8763a516cb6579285185569a5"
+        },
+        {
+          "path": "redis/tests/streams_test.goml",
+          "line": 1,
+          "observation": "45 库测试，实际 Redis 7.2.6 RESP2/3 consumer 验证二进制字段和 BLOCK 总期限。",
+          "sha256": "2281bdbb56554bfaa0f20cda198010f7b04851382e62596d7bfcba186e3cff14"
+        },
+        {
+          "path": "redis/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "20b487593089920745e09c33186876f75c47ea59cb38ecb2f553b7816992daeb"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "条目 ID 保留 unsigned 两段/特殊 ID 的上下文规则；字段二进制和重复顺序保留。",
+        "RESP2/3 + 真实固定 Redis 版本对照，BLOCK 的服务器等待仍受 Operation 总期限。",
+        "typed 解码错误保持 framing 同步；不默认将阻塞读自动重试。"
+      ],
+      "validation": [
+        "Rebase 前验证：45 库测试，实际 Redis 7.2.6 RESP2/3 consumer 验证二进制字段和 BLOCK 总期限。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 15 条检查全部通过；本地记录 verification/_artifact/batch24-redis-report.json。",
+        "Rebase 后完整本地测试通过：ok. 59 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "request",
+      "current_capability": "HTTP/1.1 和 HTTP/2 缓冲客户端；回调式流读写、SSE 本批新增：send_gzip_stream[_with] / GzipResponse，显式 gzip 流及压缩和解压预算。",
+      "candidate": "流式响应的可选 gzip 解码",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "下载压缩文本时可直接消费解码流，无需回到整包缓冲；同时单独限制压缩和解压字节。",
+      "evidence": [
+        {
+          "path": "request/gzip_stream.goml",
+          "line": 1,
+          "observation": "send_gzip_stream[_with] / GzipResponse，显式 gzip 流及压缩和解压预算。",
+          "sha256": "eec3ff5bbe7634200e89a810a5a95bef75751bef8874e8b07e9ac53cf704aff1"
+        },
+        {
+          "path": "request/tests/streaming_test.goml",
+          "line": 1,
+          "observation": "86 库 + 3 示例测试，分片门控、取消、panic、截断和 checksum。",
+          "sha256": "b91f0611b37f7ef890005c6553e5128be0d38759351eeef03411fbbd90ac2b5f"
+        },
+        {
+          "path": "request/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "2ccb26ca09356e4acd25fe413314dc2c151d1fdb40d259643713a76fbe3f7f71"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "显式启用，原始流模式不变；校验 gzip 尾部和截断。",
+        "解压字节限额、取消、回调异常关闭均有本地分片服务测试。",
+        "显式 gzip API 要求响应为单个 gzip content coding；提前成功结束不验证未读尾部。"
+      ],
+      "validation": [
+        "Rebase 前验证：86 库 + 3 示例测试，分片门控、取消、panic、截断和 checksum。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 13 条检查全部通过；本地记录 verification/_artifact/batch24-request-report.json。",
+        "Rebase 后完整本地测试通过：ok. 132 passed; 0 failed; 0 ignored；ok. 3 passed; 0 failed; 0 ignored。",
+        "Rebase 后完整 132 项库测试与 3 项示例测试通过；关闭连接回归使用服务端完成握手，连续 15 次通过。"
+      ]
+    },
+    {
+      "package": "sql",
+      "current_capability": "后端连接/事务/游标契约、SQLite 适配器、连接池、迁移 本批新增：Preparer / PreparedStatement / with_statement，SQLite 连接与事务适配。",
+      "candidate": "可选 prepared-statement 契约",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "泛型数据访问层重复执行参数化语句时不必下转到 sqlite；采用附加 trait 避免破坏已有 Driver。",
+      "evidence": [
+        {
+          "path": "sql/prepared.goml",
+          "line": 1,
+          "observation": "Preparer / PreparedStatement / with_statement，SQLite 连接与事务适配。",
+          "sha256": "c03577ad8c17b1b8248110b4e0c3b1d7ed3eb807dec285711636b5f191570c07"
+        },
+        {
+          "path": "sql/tests/prepared_test.goml",
+          "line": 1,
+          "observation": "39 库测试，重复绑定、忙游标、事务/lease 失效、快照及 panic 清理。",
+          "sha256": "df52b086a550401b38852d2b1ef83c5897135c7d2a96ff3f82857a944e8a14e8"
+        },
+        {
+          "path": "sql/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "7ca7f54f636a2a191dce3c49ab6aa539d9291cfbc0ff4e5fa1a51ac7b69f5eba"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "附加 prepare trait 和独立 statement 关闭语义。",
+        "SQLite 实现覆盖重复参数、活动游标忙状态、事务结束失效及绑定快照。"
+      ],
+      "validation": [
+        "Rebase 前验证：39 库测试，重复绑定、忙游标、事务/lease 失效、快照及 panic 清理。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 15 条检查全部通过；本地记录 verification/_artifact/batch24-sql-report.json。",
+        "Rebase 后完整本地测试通过：ok. 40 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "tabwriter",
+      "current_capability": "有界流式表格、终端宽度、逐列左右对齐 本批新增：WidthPolicy::Ansi，按可见 Unicode 宽度对齐并保留 SGR 样式。",
+      "candidate": "可选 ANSI 样式感知宽度",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "彩色 CLI 表格目前会把控制序列算入列宽；复用 ansi 解析层而非发明第二套终端解析器。",
+      "evidence": [
+        {
+          "path": "tabwriter/writer.goml",
+          "line": 1,
+          "observation": "WidthPolicy::Ansi，按可见 Unicode 宽度对齐并保留 SGR 样式。",
+          "sha256": "5a609e17ddcbd80b371f2ee1b3bfdb6950743ae9243f54e27b8dea86b93f86fd"
+        },
+        {
+          "path": "tabwriter/tests/ansi_test.goml",
+          "line": 1,
+          "observation": "13 库测试通过、1 个既有忽略项；4 示例测试；拒绝 OSC 等非 SGR 控制。",
+          "sha256": "4136bd9d59165b5c96fbfd7e34b59c6ceb9fa5862c5827b3f32469304fe34cce"
+        },
+        {
+          "path": "tabwriter/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "d7ef718b06ecaacbf9de899525f3b4a1ed9e786c5607c5128053daa66d573fb9"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "显式策略保留合法样式序列且测量可见字素。",
+        "未知/截断控制序列政策明确；跨 push 分片、CJK/emoji、左右对齐和限额覆盖。",
+        "ANSI 策略仅接受文本和 SGR，拒绝 OSC 超链接及其他控制序列。"
+      ],
+      "validation": [
+        "Rebase 前验证：13 库测试通过、1 个既有忽略项；4 示例测试；拒绝 OSC 等非 SGR 控制。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 9 条检查全部通过；本地记录 verification/_artifact/batch24-tabwriter-report.json。",
+        "Rebase 后完整本地测试通过：ok. 13 passed; 0 failed; 1 ignored；ok. 4 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "uuid",
+      "current_capability": "v4/v7、同步单调 v7、Serde 与 GUID 混合端序 本批新增：Uuid::v5 与四种标准命名空间。",
+      "candidate": "名称空间 UUID v5",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "S",
+      "rationale": "稳定资源标识可由 namespace+name 重现，不应依赖随机或时钟。",
+      "evidence": [
+        {
+          "path": "uuid/v5.goml",
+          "line": 1,
+          "observation": "Uuid::v5 与四种标准命名空间。",
+          "sha256": "06c368ccb0aa82b6e00602e4d8301490996cb6680fcbe5e32c344c29d7bd2eaf"
+        },
+        {
+          "path": "uuid/tests/v5_test.goml",
+          "line": 1,
+          "observation": "17 库 + 4 示例测试，60 组 hashlib 向量含二进制与分块边界。",
+          "sha256": "6b5a2f3d7f7f30b86c6503c3d5de4e19fadd39c40ea86a5a0a869bf41836e020"
+        },
+        {
+          "path": "uuid/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "424689145bb54885352543d9340c244b2a67ce38778a2b41b40faa97acfd075f"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "RFC 标准 namespace 常量和 v5 固定向量。",
+        "名称字节语义明确，不做隐式 Unicode 规范化；版本/variant 和 nil namespace 验证。"
+      ],
+      "validation": [
+        "Rebase 前验证：17 库 + 4 示例测试，60 组 hashlib 向量含二进制与分块边界。",
+        "Rebase 前验证：GoML 0.1.64 独立验证 11 条检查全部通过；本地记录 verification/_artifact/batch24-uuid-report.json。",
+        "Rebase 后完整本地测试通过：ok. 17 passed; 0 failed; 0 ignored；ok. 4 passed; 0 failed; 0 ignored。"
+      ]
+    },
+    {
+      "package": "verification",
+      "current_capability": "旧独立验证器，拥有 runner/reference 和下游物化",
+      "candidate": "明确旧验证入口与 workflows/testkit 的迁移边界",
+      "status": "scope_boundary",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "两份运行器和不同模块清单容易让用户从不同入口得到不同验证范围；先核实消费者再决定兼容层，不立即删除。",
+      "evidence": [
+        {
+          "path": "verification/README.md",
+          "line": 28,
+          "observation": "自述 all 74 libraries，与 workflows 当前 README 75 有差异。",
+          "sha256": "4b0977645d97913df13b4e5ad3cb083743cb7302ffbad60fea68a6d36d395bed"
+        },
+        {
+          "path": "verification/goml.toml",
+          "line": 2,
+          "observation": "仍声明 ecosystem::verification 独立模块。",
+          "sha256": "cd44dff45b1c1b0dfc99d71d63f9a2da92c4ab2df8b42ab39c95f5e46f920782"
+        },
+        {
+          "path": "workflows/README.md",
+          "line": 7,
+          "observation": "workflows 声明 testkit 为唯一库依赖。",
+          "sha256": "e635c7b7f07b2d3a0d6253d538ddcdb35211362558911aa8e5fdffe8d22057ee"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "枚举仍依赖 verification::reference 与旧 just 入口的仓库。",
+        "在保留用户命令的前提下给出唯一 runner 所属与迁移验证，禁止静默缩小检查。"
+      ]
+    },
+    {
+      "package": "workflows",
+      "current_capability": "共享 CI、私有注册表、race/PTy/SIMD 检查和原子 JSON 报告 本批新增：--keep-going 继续验证后续模块，并记录 passed / failed / skipped 结果。",
+      "candidate": "失败后继续收集模块结果的 --keep-going",
+      "status": "implemented",
+      "priority": "P2",
+      "effort": "M",
+      "rationale": "全生态扫描遇到首个失败目前看不到其余包状态，增加显式选项可一次得到完整修复清单。",
+      "evidence": [
+        {
+          "path": "workflows/runner.goml",
+          "line": 1,
+          "observation": "--keep-going 继续验证后续模块，并记录 passed / failed / skipped 结果。",
+          "sha256": "a5ab2934446522a94663538987fd227127d997ca330522d807db24d121e4875c"
+        },
+        {
+          "path": "workflows/tests/registry_test.goml",
+          "line": 1,
+          "observation": "33 库测试和构建；fake driver 集成覆盖失败后继续与默认停止。",
+          "sha256": "f539a02df14ef5a9bf5c3bd9883110ef8597354bbf85109418f502d64b26e972"
+        },
+        {
+          "path": "workflows/README.md",
+          "line": 1,
+          "observation": "新增公开 API、使用方式和兼容边界已记录。",
+          "sha256": "e635c7b7f07b2d3a0d6253d538ddcdb35211362558911aa8e5fdffe8d22057ee"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "默认保持 fail-fast；显式 keep-going 逐模块记错误并最终返回非零。",
+        "共享 toolchain/registry 初始化失败仍立即停止；报告区分 failed/skipped/passed。"
+      ],
+      "validation": [
+        "Rebase 前验证：33 库测试和构建；fake driver 集成覆盖失败后继续与默认停止。",
+        "Rebase 前验证：使用专属 workspace 和 CI 固定 testkit 67a9a2d9fbe3e415d291d959cc3296167c52d82d；完整测试与构建日志位于 workflows/_artifact/keep-going-{test,build}.log。",
+        "Rebase 后完整本地 33 项测试通过。"
+      ]
+    },
+    {
+      "package": "goml_stats",
+      "current_capability": "Git ignore层级扫描、准确代码/注释计数、文件/包/模块JSON与文本统计。",
+      "candidate": "两个已保存报告之间的增量比较。",
+      "status": "candidate",
+      "priority": "P3",
+      "effort": "M",
+      "rationale": "用于PR或迁移前后代码体积变化，比较报告即可，不自行执行git或检出仓库。",
+      "evidence": [
+        {
+          "path": "goml_stats/project.goml",
+          "line": 33,
+          "observation": "Report仅描述单次扫描。",
+          "sha256": "d74aa23c37c2023003eb8cc93d6158d16cf5ca7c51c98dd7b9239c22e789741b"
+        },
+        {
+          "path": "goml_stats/render.goml",
+          "line": 43,
+          "observation": "已有JSON输出；rg无compare/diff/baseline API。",
+          "sha256": "ede6abb18075ec12b9eb729a2e440bc4342aad27c9869f08a19b129c7401cc3c"
+        },
+        {
+          "path": "goml_stats/tests/cli_test.goml",
+          "line": 34,
+          "observation": "CLI结果测试基础已存在。",
+          "sha256": "75e371b5405be027d25b4004fed0c3753226441a37e58983e652435b12c8e272"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "版本化导入校验后按相对路径匹配，报告新增/删除与signed delta。",
+        "根目录变化不造成全部文件假变化；输入预算明确且不把JSON误差当负计数。"
+      ]
+    },
+    {
+      "package": "textproto",
+      "current_capability": "CRLF、头字段、dot-stuffing、SMTP 数字与增强回复读写",
+      "candidate": "显式 FTP 多行回复模式",
+      "status": "candidate",
+      "priority": "P3",
+      "effort": "M",
+      "rationale": "协议适配器可复用有界 framing，但不能放宽现有 SMTP 读回复的严格政策。",
+      "evidence": [
+        {
+          "path": "textproto/README.md",
+          "line": 44,
+          "observation": "明确拒绝 FTP 无代码中间行。",
+          "sha256": "ae51a8300c516bae7c7ee82f2743a60f905ae7e09b78f28a6636fc6b6a28bda0"
+        },
+        {
+          "path": "textproto/reader.goml",
+          "line": 307,
+          "observation": "现有 read_response 是统一数字回复入口。",
+          "sha256": "f0551d4a4e79ba4e3cfcb70bb5e28dee0adb37612a5de57472ec514471ba5f50"
+        },
+        {
+          "path": "textproto/tests/reply_test.goml",
+          "line": 1,
+          "observation": "存在独立 reply 测试文件，新增模式需与旧语义差分。",
+          "sha256": "034baa22aa242723a0f6efe526a5d24aaf4e9efa5dd00239d362e3db536b168d"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "独立 API/模式，仅同码+空格终止 FTP 回复。",
+        "中间任意字节行、截断、总行/字节限制及后续回复缓冲验证。"
+      ]
+    },
+    {
+      "package": "asn1",
+      "current_capability": "有界DER树、低tag TLV、BIT STRING、时间及任意宽INTEGER原始字节接口。",
+      "candidate": "维持显式DER子集，暂不增加反射映射、BER和证书验证。",
+      "status": "scope_boundary",
+      "priority": "P3",
+      "effort": "S",
+      "rationale": "专门包已经承接证书层；没有明确消费者需求时扩充通用ASN.1语言会显著扩大复杂度。README开头的任意精度整数说明须区分树API和新增字节API。",
+      "evidence": [
+        {
+          "path": "asn1/model.goml",
+          "line": 56,
+          "observation": "Value::Integer仍是i64树模型。",
+          "sha256": "930a5ec5b2f133d3770ceff520e5f01e07c47f312cc216a2691548b07f5c903b"
+        },
+        {
+          "path": "asn1/integer_bytes.goml",
+          "line": 13,
+          "observation": "任意宽INTEGER字节编码已存在，不应再列为缺失。",
+          "sha256": "3bb0d31dd21b2fa9a249470e8534c4f0a30ea9d4585882f1e1b0554ec70c4efe"
+        },
+        {
+          "path": "asn1/tests/bit_string_test.goml",
+          "line": 7,
+          "observation": "测试穷举尾部padding规范性。",
+          "sha256": "7608e338be96e5e9b8ec34ced9470d5be081726b92651899213dead4b49d67a8"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "文档清晰区分i64树与任意宽字节接口；保持canonical DER和配额契约。",
+        "只有出现实际高tag/BER消费者后再设计独立扩展。"
+      ]
+    },
+    {
+      "package": "bitflags",
+      "current_capability": "类型安全derive、合并FlagSet derive、未知位保留、枚举、文本及人类可读/二进制Serde。",
+      "candidate": "保持现有flag模型，暂不扩大为动态位集或运行时schema。",
+      "status": "scope_boundary",
+      "priority": "P3",
+      "effort": "S",
+      "rationale": "固定整数宽度的需求已完整；动态集合属于另一数据结构，增加会模糊语义而无直接消费者。",
+      "evidence": [
+        {
+          "path": "bitflags/flags.goml",
+          "line": 27,
+          "observation": "核心实现围绕Flags trait及整数掩码。",
+          "sha256": "c8841f5f4ddced8a37cb466e26dea6053022d9cd6f474db65c32f185c034fac0"
+        },
+        {
+          "path": "bitflags/tests/derive_combined_test.goml",
+          "line": 14,
+          "observation": "合并derive和静态构造器已有测试，不应重复提出。",
+          "sha256": "c8d25c90acf9bffcd8f366a624e69e2e8bdbcb4744f81770a6e78a326a0dfa97"
+        },
+        {
+          "path": "bitflags/README.md",
+          "line": 119,
+          "observation": "单bit迭代能力已经存在。",
+          "sha256": "5b1c47d5b6e57ff14c61f59f6c000486e43d0b25e833ed96e92c1bc9602a2778"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "保持所有整数宽度、未知位与Serde兼容性；只对实际缺陷/derive诊断继续完善。"
+      ]
+    },
+    {
+      "package": "csv",
+      "current_capability": "流式Byte/StringRecord、方言、注释、表头策略及显式schema Serde。",
+      "candidate": "保持显式schema与方言，不加入默认自动类型/分隔符猜测。",
+      "status": "scope_boundary",
+      "priority": "P3",
+      "effort": "S",
+      "rationale": "0042标识符与空值语义必须由调用者决定；自动猜测在没有消费者要求时会破坏当前确定性。",
+      "evidence": [
+        {
+          "path": "csv/tests/serde_test.goml",
+          "line": 36,
+          "observation": "测试保留0042为文本且按schema转换。",
+          "sha256": "de1af7f20390dba806721b0f3bcae4c5bafc692988766630ee18adedff1a5d2a"
+        },
+        {
+          "path": "csv/model.goml",
+          "line": 145,
+          "observation": "ReadOptions构造显式方言默认。",
+          "sha256": "c20a551d07216847b05f01ac59f991300248cf8bb413cf49114da0245a54f7d4"
+        },
+        {
+          "path": "csv/README.md",
+          "line": 132,
+          "observation": "空cell到Option的表示边界已有公开说明。",
+          "sha256": "a7f09e604b1eddfcb3869c313e746463e7bcc9e5c28c8f579af1066c5472c28f"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "维持原始字节接口、位置和schema诊断；若增加嗅探应是单独有界、带置信度的显式工具。"
+      ]
+    },
+    {
+      "package": "syntax",
+      "current_capability": "不可变 green/red 树、typed AST、范围查询、持久替换",
+      "candidate": "保持语法树与增量解析调度分层",
+      "status": "scope_boundary",
+      "priority": "P3",
+      "effort": "S",
+      "rationale": "并非每项 Rowan/IDE 能力都适合移入树库；增量重解析和跨编辑位置追踪需要语法/文档策略，暂作为边界。",
+      "evidence": [
+        {
+          "path": "syntax/README.md",
+          "line": 98,
+          "observation": "明确不包含 grammar、incremental parser 或持久编辑位置追踪。",
+          "sha256": "ec3b11fa92c8e9e2882c3d0fc21b686aadf59bd8b7aec90401e50b0c6237e44b"
+        },
+        {
+          "path": "syntax/red.goml",
+          "line": 316,
+          "observation": "已有 replace_with 可作为上层增量库的树替换基础。",
+          "sha256": "a11531ab5266d5d6cdb18a985c722f92ebe25b83bba416e85fabda30e4ab2442"
+        },
+        {
+          "path": "syntax/tests/tree_test.goml",
+          "line": 47,
+          "observation": "已有结构相等、共享身份和复制隔离测试。",
+          "sha256": "63db317064ef6681657acfd70688cf3f8b531920279a32cd8b18ead125b6ca83"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "示例标明 syntax 与 rope/incremental 的职责。",
+        "未来集成先在上层实现重解析窗口，避免承诺节点身份跨编辑自动稳定。"
+      ]
+    },
+    {
+      "package": "tempfile",
+      "current_capability": "命名/匿名临时文件、目录、spool、原子持久化和定位 I/O",
+      "candidate": "保持显式所有权与清理，不引入 GC 自动删除",
+      "status": "scope_boundary",
+      "priority": "P3",
+      "effort": "S",
+      "rationale": "当前接口已覆盖常用临时资源场景；自动终结器会削弱可预测清理，跨平台移植需等标准库支撑。",
+      "evidence": [
+        {
+          "path": "tempfile/README.md",
+          "line": 91,
+          "observation": "明确没有 GC finalizer，必须 close/transfer/scope。",
+          "sha256": "a83940fdc4d52f4d37f49ae9937c374e200553a9e7dec0d02e92361d1778e52a"
+        },
+        {
+          "path": "tempfile/positioned.goml",
+          "line": 74,
+          "observation": "定位 read_exact_at/write_all_at 已存在。",
+          "sha256": "d4ab5bc7c6833fc185de13999ecff742f3c23273b9c402b18f8d07afffe5e525"
+        },
+        {
+          "path": "tempfile/tests/positioned_test.goml",
+          "line": 65,
+          "observation": "已覆盖并发定位 spool 写，不能作为待新增功能。",
+          "sha256": "86d3dbb94e2bd44ec34c16e31983062b19746c81b3ba68e5092c8c959c03674b"
+        }
+      ],
+      "references": [],
+      "acceptance": [
+        "维持普通错误与 cleanup 错误可同时观察。",
+        "新平台能力以标准库 descriptor 接口先落地为前提。"
+      ]
+    }
+  ]
+}

@@ -8,7 +8,7 @@
     },
     {
       "name": "archive",
-      "scope": "GoML USTAR/PAX and ZIP/ZIP64 codecs, CRC32, bounded TAR streaming and ZIP indexing, explicit DOS timestamp offsets, DEFLATE/GZIP codecs, metadata and rooted extraction with an openat fallback for older kernels",
+      "scope": "GoML USTAR/PAX and ZIP/ZIP64 codecs, CRC32, bounded TAR streaming and ZIP indexing, explicit DOS timestamp offsets, DEFLATE/GZIP codecs, metadata and rooted extraction with an openat fallback for older kernels; streaming ZIP entries with classic/ZIP64 data descriptors",
       "coverage": "Module tests, GNU gzip/tar/Info-ZIP interoperability, downstream check and race checks"
     },
     {
@@ -18,7 +18,7 @@
     },
     {
       "name": "bench",
-      "scope": "Adaptive sampling, parameterized workloads, setup exclusion, bootstrap statistics, baseline comparisons, throughput, cancellation and JSON/HTML reports",
+      "scope": "Adaptive sampling, parameterized workloads, setup exclusion, bootstrap statistics, baseline comparisons, throughput, cancellation and JSON/HTML reports; suite-level baseline matching and comparison reports",
       "coverage": "Module tests, deterministic clocks, real sorting downstream check and race checks"
     },
     {
@@ -38,12 +38,12 @@
     },
     {
       "name": "cache",
-      "scope": "Generic concurrent weighted LRU, TTL/TTI, ordered batch reads/writes, injectable clocks, bounded singleflight loading, invalidation generations, copy policy and removal callbacks",
-      "coverage": "Module tests and race checks, versioned downstream check and 42,240 Python reference operations"
+      "scope": "Generic concurrent weighted LRU, TTL/TTI, ordered batch reads/writes, injectable clocks, bounded singleflight loading, invalidation generations, copy policy and removal callbacks; atomic runtime capacity resizing",
+      "coverage": "Module tests and race checks, isolated downstream check and 42,240 Python reference operations"
     },
     {
       "name": "cli",
-      "scope": "Command schemas, structured derive attributes, aliases, inherited globals, groups, nested/flattened Args, typed subcommands and Bash/Zsh/Fish completion",
+      "scope": "Command schemas, structured derive attributes, aliases, inherited globals, groups, nested/flattened Args, typed subcommands and Bash/Zsh/Fish completion; explicit negatable boolean flags",
       "coverage": "Module and downstream check tests, including attribute argument diagnostic locations"
     },
     {
@@ -58,8 +58,8 @@
     },
     {
       "name": "config",
-      "scope": "Layered typed JSON/TOML, environment and CLI sources, merge policies, JSON Pointer edits, provenance, validation, immutable snapshots and filesystem hot reload",
-      "coverage": "Module tests, real inotify reloads, versioned downstream check and race checks"
+      "scope": "Layered typed JSON/TOML, environment and CLI sources, merge policies, JSON Pointer edits, provenance, validation, immutable snapshots and filesystem hot reload; explicit JSON Pointer redacted exports",
+      "coverage": "Module tests, real inotify reloads, isolated downstream check and race checks"
     },
     {
       "name": "cron",
@@ -78,23 +78,23 @@
     },
     {
       "name": "decimal",
-      "scope": "Exact base-10 arithmetic over bigint, integral quotient/remainder, precision contexts, seven rounding modes, quantization, checked conversions and representation-preserving Serde",
-      "coverage": "Module tests, versioned downstream check, race checks and 3,072 Python Decimal value/error/status comparisons plus 192 independent integer quotient/remainder vectors"
+      "scope": "Exact base-10 arithmetic over bigint, integral quotient/remainder, correctly rounded square roots, precision contexts, seven rounding modes, quantization, checked conversions and representation-preserving Serde",
+      "coverage": "Module tests, isolated downstream checks, race checks, 3,072 Python Decimal comparisons, 192 quotient/remainder vectors and 1,288 square-root rounding/status vectors"
     },
     {
       "name": "diagnostics",
-      "scope": "Checked source caches/spans, Unicode multi-file labels, themes, clipping, suggestions and conflict-checked edits",
+      "scope": "Checked source caches/spans, Unicode multi-file labels, themes, clipping, suggestions and conflict-checked edits; bounded versioned JSON diagnostics with UTF-8/UTF-16 positions",
       "coverage": "Module tests, downstream tests and 6,236 independent source/edit/rendering cases"
     },
     {
       "name": "diff",
-      "scope": "Myers and linear-space Hirschberg differences, unified patches, checked application, context and newline preservation",
+      "scope": "Myers and linear-space Hirschberg differences, unified patches, checked application, context and newline preservation; optional Patience line differences",
       "coverage": "Tests and GNU interoperability"
     },
     {
       "name": "dwarf",
-      "scope": "Bounded DWARF32 v2–5 units, DIEs, forms and line tables over standard random-access input",
-      "coverage": "Library and downstream tests with checked-in compiler-produced binary fixtures and reference line tables"
+      "scope": "Bounded DWARF32 v2–5 units, DIEs, forms, line tables and PC ranges including classic range lists over standard random-access input",
+      "coverage": "Library and downstream tests with compiler-produced fixtures, reference line tables and 28 Go debug/dwarf PC-range oracle cases"
     },
     {
       "name": "fuzzy",
@@ -108,27 +108,27 @@
     },
     {
       "name": "goir",
-      "scope": "Typed scalar SSA modules, shared CFG analyses, checked arithmetic, private-slot mem2reg/LICM, target selection, global region allocation, CLI and Go ABI0 calls",
+      "scope": "Typed scalar SSA modules, shared CFG analyses, checked arithmetic, I32/I64 rotations, bit counts, byte swaps and signed/unsigned min/max, private-slot mem2reg/LICM, target selection, global region allocation, CLI and Go ABI0 calls",
       "coverage": "Nine seeded native configurations, two-allocator 0/1/7 comparisons, arithmetic traps, bit-exact memory, phase goldens, reproducible reduction, timing reports and GC/stack-growth probes"
     },
     {
       "name": "graph",
-      "scope": "Mutable directed/undirected graphs, stable IDs, traversal, components, topological order and dependency generations, directed/undirected cycle witnesses, shortest paths and spanning trees",
+      "scope": "Mutable directed/undirected graphs, stable IDs, traversal, components, topological order and dependency generations, directed/undirected cycle witnesses, shortest paths and spanning trees; iterative multigraph bridge detection",
       "coverage": "Independent algorithm checks, 512 directed-graph generation references and downstream check tests"
     },
     {
       "name": "highlight",
-      "scope": "Extensible lexer grammars, GoML/JSON/TOML/Markdown scopes, nested and cross-line regions, embedded fences, persistent incremental documents and ANSI/HTML output",
+      "scope": "Extensible lexer grammars, GoML/JSON/TOML/Markdown scopes, nested and cross-line regions, embedded fences, persistent incremental documents and ANSI/HTML output; state-preserving line-range rendering",
       "coverage": "Module tests, 200 incremental/full rebuild comparisons, rope downstream check and race checks"
     },
     {
       "name": "html",
-      "scope": "Entity utilities, immutable HTML5 DOM, CSS selectors and conservative HTML sanitization",
+      "scope": "Entity utilities, immutable HTML5 DOM, CSS selectors and conservative HTML sanitization; reusable immutable compiled selectors",
       "coverage": "GoML HTML5 parsing, selectors and sanitization, independent recovery and hostile-input fixtures"
     },
     {
       "name": "http",
-      "scope": "Transport-independent HTTP header validation, hop-by-hop filtering and HTTP/1.1 request/response framing",
+      "scope": "Transport-independent HTTP header validation, hop-by-hop filtering and HTTP/1.1 request/response framing; bounded byte ranges and Content-Range formatting",
       "coverage": "Library and downstream tests for framing ambiguity, syntax errors and output limits"
     },
     {
@@ -183,18 +183,18 @@
     },
     {
       "name": "mime",
-      "scope": "MIME media types, RFC 2231 parameters, RFC 2047 encoded words and streaming multipart bodies with bounded discard",
+      "scope": "MIME media types, RFC 2231 parameters, RFC 2047 encoded words and streaming multipart bodies with bounded discard; form-data disposition parsing and UTF-8 quoted formatting",
       "coverage": "Library and downstream tests for malformed parameters, encoding boundaries and bounded multipart streams"
     },
     {
       "name": "msgpack",
-      "scope": "MessagePack wire types, direct Serde and standard stream integration, typed/dynamic frames, malformed-input limits and interoperability",
+      "scope": "MessagePack wire types, direct Serde and standard stream integration, typed/dynamic frames, malformed-input limits and interoperability; allocation-saving frame skipping",
       "coverage": "Module tests, downstream checks and 2,490 reference interoperability cases"
     },
     {
       "name": "ndarray",
-      "scope": "Generic shared views, slicing, broadcasting, checked arithmetic, reductions, batched multiplication, LU/Cholesky/QR solves and SIMD",
-      "coverage": "Module tests, versioned downstream check, 2,929 NumPy cases and native/SSE2/scalar builds"
+      "scope": "Generic shared views, slicing, broadcasting, checked arithmetic, reductions, batched multiplication, LU/Cholesky/QR solves and SIMD; checked per-axis cumulative sums and products",
+      "coverage": "Module tests, isolated downstream check, 2,929 NumPy cases and native/SSE2/scalar builds"
     },
     {
       "name": "notify",
@@ -208,18 +208,18 @@
     },
     {
       "name": "object",
-      "scope": "Bounded ELF32/ELF64 metadata, sections, program headers, symbols, typed note records and extended numbering in either byte order",
-      "coverage": "Library and downstream tests for binary layouts, note alignment/endianness, extended indexes, range validation and ownership"
+      "scope": "Bounded ELF32/ELF64 metadata, sections, program headers, symbols, GNU symbol versions, REL/RELA and dynamic records, dynamic strings, opt-in zlib section decompression, notes and extended numbering in either byte order",
+      "coverage": "Library and downstream tests for binary layouts, relocation, dynamic and GNU version table links/quotas, bounded decompression, note alignment/endianness, extended indexes, range validation and ownership"
     },
     {
       "name": "parser",
-      "scope": "Text/binary combinators including sentinel-terminated collections, recursive grammars, shared work/depth budgets, explicit multi-error recovery, linear literal scans, spans, contextual errors and operator precedence",
+      "scope": "Text/binary combinators including sentinel-terminated collections, recursive grammars, shared work/depth budgets, explicit multi-error recovery, linear literal scans, spans, contextual errors and operator precedence; ULEB128 and ZigZag varints",
       "coverage": "Module and downstream check tests"
     },
     {
       "name": "pipeline",
-      "scope": "Lazy streams, bounded parallel transforms, filtering, ordering, batching/windows, merge/zip, early-stopping folds, backpressure and cancellation",
-      "coverage": "Module tests and race checks, versioned downstream check and 1,253 Python oracle cases"
+      "scope": "Lazy streams, bounded parallel transforms, filtering, ordering, batching/windows, merge/zip, early-stopping folds, backpressure and cancellation; adjacent deduplication",
+      "coverage": "Module tests and race checks, isolated downstream check and 1,253 Python oracle cases"
     },
     {
       "name": "postgres",
@@ -248,8 +248,8 @@
     },
     {
       "name": "redis",
-      "scope": "RESP2/3 codec, typed commands, pipelining, transactions, Pub/Sub, bounded pools, DNS/TLS, injectable transport, context cancellation and total deadlines",
-      "coverage": "Module tests and race checks, versioned downstream fixtures, 2,391 protocol cases, Redis 7.2.5 RESP2/3 interoperability and DNS/TLS cases in normal/race builds"
+      "scope": "RESP2/3 codec, typed commands, pipelining, transactions, Pub/Sub, bounded pools, DNS/TLS, injectable transport, context cancellation and total deadlines; typed Streams commands and replies",
+      "coverage": "Module tests and race checks, isolated downstream fixtures, 2,391 protocol cases, Redis 7.2.5 RESP2/3 interoperability and DNS/TLS cases in normal/race builds"
     },
     {
       "name": "regexp",
@@ -258,7 +258,7 @@
     },
     {
       "name": "request",
-      "scope": "GoML HTTP(S)/HTTP2 clients with pooled multiplexed connections, request builders, JSON/form/multipart, redirects, per-stream cancellation, TLS policy and bounded responses",
+      "scope": "GoML HTTP(S)/HTTP2 clients with pooled multiplexed connections, request builders, JSON/form/multipart, redirects, per-stream cancellation, TLS policy and bounded responses; explicit bounded streaming gzip decoding",
       "coverage": "Module tests, race checks, downstream checks and HTTP/TLS/proxy interoperability with native reference servers"
     },
     {
@@ -268,12 +268,12 @@
     },
     {
       "name": "s3",
-      "scope": "S3-compatible SigV4 client, object operations, listing, presigning and multipart lifecycle",
-      "coverage": "AWS signing vectors and local independent wire-protocol checks"
+      "scope": "S3-compatible SigV4 client, object operations, callback-scoped streaming downloads, listing, presigning and multipart lifecycle",
+      "coverage": "AWS signing vectors and local wire-protocol checks including gated streaming, limits, truncation, cancellation and callback cleanup"
     },
     {
       "name": "sql",
-      "scope": "Typed database contracts and pools, SQLite adaptation, transactional migrations and checksum history",
+      "scope": "Typed database contracts and pools, SQLite adaptation, transactional migrations and checksum history; optional prepared-statement contracts with SQLite adaptation",
       "coverage": "Real SQLite upgrade, drift, rollback and concurrent migration checks"
     },
     {
@@ -288,7 +288,7 @@
     },
     {
       "name": "tabwriter",
-      "scope": "Bounded streaming tab alignment, explicit left/right column alignment and byte or terminal-column measurement",
+      "scope": "Bounded streaming tab alignment, explicit left/right column alignment and byte or terminal-column measurement; SGR-aware visible-width alignment",
       "coverage": "Library and downstream tests for alignment, ragged rows, width policies, fragmented input, CRLF and buffer/output limits"
     },
     {
@@ -338,7 +338,7 @@
     },
     {
       "name": "uuid",
-      "scope": "UUID values, strict text/network-byte/GUID-byte conversions, secure v4/v7, synchronized monotonic v7, ordering/Hash and Serde",
+      "scope": "UUID values, strict text/network-byte/GUID-byte conversions, secure v4/v7, synchronized monotonic v7, ordering/Hash and Serde; namespace-based v5 generation",
       "coverage": "RFC 9562 vectors, concurrent generation, monotonic carry/rollback/exhaustion and independent consumer checks"
     },
     {
@@ -363,7 +363,7 @@
     },
     {
       "name": "x509",
-      "scope": "PKIX distinguished names, extensions, algorithm identifiers and typed BasicConstraints, KeyUsage and ExtendedKeyUsage DER structures",
+      "scope": "PKIX distinguished names, extensions, algorithm identifiers and typed BasicConstraints, KeyUsage and ExtendedKeyUsage DER structures; typed SubjectAltName DER",
       "coverage": "Library and downstream DER roundtrips, canonical ordering and malformed-structure checks; certificate verification is outside scope"
     },
     {
@@ -373,7 +373,7 @@
     },
     {
       "name": "yaml",
-      "scope": "Bounded YAML block/flow parsing and emission, multi-document streams, aliases, dynamic values and Serde",
+      "scope": "Bounded YAML block/flow parsing and emission, multi-document streams, aliases, dynamic values and Serde; scanner and grammar error source positions",
       "coverage": "GoML YAML parser and emitter, explicit core-schema policy, official fixtures, alias budgets and configuration consumer"
     }
   ],

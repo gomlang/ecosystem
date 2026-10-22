@@ -1,0 +1,873 @@
+[
+  {
+    "package": "regexp",
+    "current_capability": "有界 NFA、数字捕获、懒匹配/分割、字面量和回调替换",
+    "candidate": "命名捕获与按名称提取/替换",
+    "status": "candidate",
+    "priority": "P2",
+    "effort": "M",
+    "rationale": "复杂日志规则不再依赖易漂移的捕获序号；先限定一种命名语法和重复名策略。",
+    "evidence": [
+      {
+        "path": "regexp/README.md",
+        "line": 94,
+        "observation": "明确拒绝 named captures；检索公开源码未发现命名捕获 API。"
+      },
+      {
+        "path": "regexp/model.goml",
+        "line": 27,
+        "observation": "Match.capture 只接受数字 index。"
+      },
+      {
+        "path": "regexp/tests/iterator_test.goml",
+        "line": 8,
+        "observation": "现有迭代测试已覆盖 Unicode、捕获和空匹配，不应重复提案。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "名称到现有编号稳定映射，重复名和非法名可恢复报错。",
+      "命名替换与数字替换共享 work/output limits；保持现有选择语义。"
+    ]
+  },
+  {
+    "package": "request",
+    "current_capability": "HTTP/1.1 和 HTTP/2 缓冲客户端；回调式流读写、SSE 本批新增：send_gzip_stream[_with] / GzipResponse，显式 gzip 流及压缩和解压预算。",
+    "candidate": "流式响应的可选 gzip 解码",
+    "status": "implemented",
+    "priority": "P2",
+    "effort": "M",
+    "rationale": "下载压缩文本时可直接消费解码流，无需回到整包缓冲；同时单独限制压缩和解压字节。",
+    "evidence": [
+      {
+        "path": "request/gzip_stream.goml",
+        "line": 1,
+        "observation": "send_gzip_stream[_with] / GzipResponse，显式 gzip 流及压缩和解压预算。"
+      },
+      {
+        "path": "request/tests/streaming_test.goml",
+        "line": 1,
+        "observation": "86 库 + 3 示例测试，分片门控、取消、panic、截断和 checksum。"
+      },
+      {
+        "path": "request/README.md",
+        "line": 1,
+        "observation": "新增公开 API、使用方式和兼容边界已记录。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "显式启用，原始流模式不变；校验 gzip 尾部和截断。",
+      "解压字节限额、取消、回调异常关闭均有本地分片服务测试。",
+      "显式 gzip API 要求响应为单个 gzip content coding；提前成功结束不验证未读尾部。"
+    ],
+    "validation": [
+      "Rebase 前验证：86 库 + 3 示例测试，分片门控、取消、panic、截断和 checksum。",
+      "Rebase 前验证：GoML 0.1.64 独立验证 13 条检查全部通过；本地记录 verification/_artifact/batch24-request-report.json。",
+      "Rebase 后完整本地测试通过：ok. 132 passed; 0 failed; 0 ignored；ok. 3 passed; 0 failed; 0 ignored。",
+      "Rebase 后完整 132 项库测试与 3 项示例测试通过；关闭连接回归使用服务端完成握手，连续 15 次通过。"
+    ]
+  },
+  {
+    "package": "rope",
+    "current_capability": "持久 AVL UTF-8 文本、UTF-16/行索引、正反向迭代和流 I/O",
+    "candidate": "跨叶片的字素簇迭代",
+    "status": "candidate",
+    "priority": "P2",
+    "effort": "L",
+    "rationale": "编辑器的光标/删除需要完整字素，避免先展平大文档；需复用 Unicode 分段规则并处理任意长簇。",
+    "evidence": [
+      {
+        "path": "rope/README.md",
+        "line": 101,
+        "observation": "明确无 grapheme iterators。"
+      },
+      {
+        "path": "rope/rope.goml",
+        "line": 140,
+        "observation": "当前 scalar 访问单位是 Unicode scalar。"
+      },
+      {
+        "path": "rope/tests/reverse_lines_test.goml",
+        "line": 63,
+        "observation": "已有跨叶 CRLF 和快照测试模式可扩展到字素。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "组合符、ZWJ、RI 奇偶序列跨 1024-byte 叶片边界与 unicode_text 一致。",
+      "不展平整个 rope；保留快照，明确超长单簇资源策略。"
+    ]
+  },
+  {
+    "package": "s3",
+    "current_capability": "SigV4、对象 CRUD、分页、预签名、分段上传，以及带元数据、累计限额和回调生命周期的流式下载。",
+    "candidate": "带元数据的回调式流下载",
+    "status": "implemented",
+    "priority": "P1",
+    "effort": "M",
+    "rationale": "大对象下载可写入文件或 HTTP 下游，无需保留完整对象；复用 request 已有同步流生命周期。",
+    "evidence": [
+      {
+        "path": "s3/streaming.goml",
+        "line": 13,
+        "observation": "ObjectStream 提供元数据、分块读取、copy_to 和 close。"
+      },
+      {
+        "path": "s3/streaming.goml",
+        "line": 118,
+        "observation": "get_object_stream 复用签名逻辑，回调结束关闭响应；对象和服务错误采用独立字节预算。"
+      },
+      {
+        "path": "s3/tests/integration_test.goml",
+        "line": 454,
+        "observation": "门控 HTTP fixture 验证读取首段后才释放尾段，以及关闭、取消、限额和错误处理。"
+      }
+    ],
+    "references": [
+      {
+        "url": "https://pkg.go.dev/github.com/minio/minio-go/v7#Client.GetObject",
+        "feature": "MinIO GetObject 返回 Object，Object 提供 Read/Close/Stat，可流式消费对象。"
+      }
+    ],
+    "acceptance": [
+      "新增 get_object_stream/copy_to 类 API，回调可读状态、ETag 和版本元数据。",
+      "慢流、提前停止、取消、截断、非成功响应在本地 fixture 验证；回调结束即关闭。",
+      "签名和累计下载限额保持；证明回调在整个对象到达前被调用。",
+      "回调提前成功结束时不验证未读取的尾部；调用方读取任务须在回调结束前收束。"
+    ],
+    "validation": [
+      "Rebase 前验证：12 个库测试和 1 个示例测试通过；新增三个流式集成测试也通过原生 race 检查。",
+      "Rebase 前验证：GoML 0.1.64 独立下游验证全部通过，包含 race；本地记录 verification/_artifact/s3-stream-report.json。",
+      "Rebase 后完整本地测试通过：ok. 14 passed; 0 failed; 0 ignored；ok. 2 passed; 0 failed; 0 ignored。"
+    ]
+  },
+  {
+    "package": "sql",
+    "current_capability": "后端连接/事务/游标契约、SQLite 适配器、连接池、迁移 本批新增：Preparer / PreparedStatement / with_statement，SQLite 连接与事务适配。",
+    "candidate": "可选 prepared-statement 契约",
+    "status": "implemented",
+    "priority": "P2",
+    "effort": "M",
+    "rationale": "泛型数据访问层重复执行参数化语句时不必下转到 sqlite；采用附加 trait 避免破坏已有 Driver。",
+    "evidence": [
+      {
+        "path": "sql/prepared.goml",
+        "line": 1,
+        "observation": "Preparer / PreparedStatement / with_statement，SQLite 连接与事务适配。"
+      },
+      {
+        "path": "sql/tests/prepared_test.goml",
+        "line": 1,
+        "observation": "39 库测试，重复绑定、忙游标、事务/lease 失效、快照及 panic 清理。"
+      },
+      {
+        "path": "sql/README.md",
+        "line": 1,
+        "observation": "新增公开 API、使用方式和兼容边界已记录。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "附加 prepare trait 和独立 statement 关闭语义。",
+      "SQLite 实现覆盖重复参数、活动游标忙状态、事务结束失效及绑定快照。"
+    ],
+    "validation": [
+      "Rebase 前验证：39 库测试，重复绑定、忙游标、事务/lease 失效、快照及 panic 清理。",
+      "Rebase 前验证：GoML 0.1.64 独立验证 15 条检查全部通过；本地记录 verification/_artifact/batch24-sql-report.json。",
+      "Rebase 后完整本地测试通过：ok. 40 passed; 0 failed; 0 ignored。"
+    ]
+  },
+  {
+    "package": "sqlite",
+    "current_capability": "原生 SQLite、预编译、严格类型查询、取消、事务和嵌套 savepoint",
+    "candidate": "受控在线备份 API",
+    "status": "candidate",
+    "priority": "P2",
+    "effort": "L",
+    "rationale": "业务备份不能简单复制活动 WAL 数据库；需要一致备份和可取消的分步执行。",
+    "evidence": [
+      {
+        "path": "sqlite/README.md",
+        "line": 3,
+        "observation": "底层使用 modernc.org/sqlite，现有能力侧重查询与事务。"
+      },
+      {
+        "path": "sqlite/session.goml",
+        "line": 178,
+        "observation": "Database 公共生命周期入口；全包 pub backup 检索无结果。"
+      },
+      {
+        "path": "sqlite/tests/sqlite_test.goml",
+        "line": 212,
+        "observation": "活动游标 busy 和早停释放已有测试，备份需明确同类资源互斥。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "先核实固定 modernc 驱动可用备份入口，再封装目标所有权、busy 和取消。",
+      "活动 WAL、内存到磁盘、一致快照、目标错误以及取消后清理有独立 SQLite 对照。"
+    ]
+  },
+  {
+    "package": "syntax",
+    "current_capability": "不可变 green/red 树、typed AST、范围查询、持久替换",
+    "candidate": "保持语法树与增量解析调度分层",
+    "status": "scope_boundary",
+    "priority": "P3",
+    "effort": "S",
+    "rationale": "并非每项 Rowan/IDE 能力都适合移入树库；增量重解析和跨编辑位置追踪需要语法/文档策略，暂作为边界。",
+    "evidence": [
+      {
+        "path": "syntax/README.md",
+        "line": 98,
+        "observation": "明确不包含 grammar、incremental parser 或持久编辑位置追踪。"
+      },
+      {
+        "path": "syntax/red.goml",
+        "line": 316,
+        "observation": "已有 replace_with 可作为上层增量库的树替换基础。"
+      },
+      {
+        "path": "syntax/tests/tree_test.goml",
+        "line": 47,
+        "observation": "已有结构相等、共享身份和复制隔离测试。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "示例标明 syntax 与 rope/incremental 的职责。",
+      "未来集成先在上层实现重解析窗口，避免承诺节点身份跨编辑自动稳定。"
+    ]
+  },
+  {
+    "package": "tabwriter",
+    "current_capability": "有界流式表格、终端宽度、逐列左右对齐 本批新增：WidthPolicy::Ansi，按可见 Unicode 宽度对齐并保留 SGR 样式。",
+    "candidate": "可选 ANSI 样式感知宽度",
+    "status": "implemented",
+    "priority": "P2",
+    "effort": "M",
+    "rationale": "彩色 CLI 表格目前会把控制序列算入列宽；复用 ansi 解析层而非发明第二套终端解析器。",
+    "evidence": [
+      {
+        "path": "tabwriter/writer.goml",
+        "line": 1,
+        "observation": "WidthPolicy::Ansi，按可见 Unicode 宽度对齐并保留 SGR 样式。"
+      },
+      {
+        "path": "tabwriter/tests/ansi_test.goml",
+        "line": 1,
+        "observation": "13 库测试通过、1 个既有忽略项；4 示例测试；拒绝 OSC 等非 SGR 控制。"
+      },
+      {
+        "path": "tabwriter/README.md",
+        "line": 1,
+        "observation": "新增公开 API、使用方式和兼容边界已记录。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "显式策略保留合法样式序列且测量可见字素。",
+      "未知/截断控制序列政策明确；跨 push 分片、CJK/emoji、左右对齐和限额覆盖。",
+      "ANSI 策略仅接受文本和 SGR，拒绝 OSC 超链接及其他控制序列。"
+    ],
+    "validation": [
+      "Rebase 前验证：13 库测试通过、1 个既有忽略项；4 示例测试；拒绝 OSC 等非 SGR 控制。",
+      "Rebase 前验证：GoML 0.1.64 独立验证 9 条检查全部通过；本地记录 verification/_artifact/batch24-tabwriter-report.json。",
+      "Rebase 后完整本地测试通过：ok. 13 passed; 0 failed; 1 ignored；ok. 4 passed; 0 failed; 0 ignored。"
+    ]
+  },
+  {
+    "package": "tempfile",
+    "current_capability": "命名/匿名临时文件、目录、spool、原子持久化和定位 I/O",
+    "candidate": "保持显式所有权与清理，不引入 GC 自动删除",
+    "status": "scope_boundary",
+    "priority": "P3",
+    "effort": "S",
+    "rationale": "当前接口已覆盖常用临时资源场景；自动终结器会削弱可预测清理，跨平台移植需等标准库支撑。",
+    "evidence": [
+      {
+        "path": "tempfile/README.md",
+        "line": 91,
+        "observation": "明确没有 GC finalizer，必须 close/transfer/scope。"
+      },
+      {
+        "path": "tempfile/positioned.goml",
+        "line": 74,
+        "observation": "定位 read_exact_at/write_all_at 已存在。"
+      },
+      {
+        "path": "tempfile/tests/positioned_test.goml",
+        "line": 65,
+        "observation": "已覆盖并发定位 spool 写，不能作为待新增功能。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "维持普通错误与 cleanup 错误可同时观察。",
+      "新平台能力以标准库 descriptor 接口先落地为前提。"
+    ]
+  },
+  {
+    "package": "template",
+    "current_capability": "表达式、作用域、继承/include、过滤器、上下文 HTML 转义",
+    "candidate": "有界模板宏与显式导入",
+    "status": "candidate",
+    "priority": "P2",
+    "effort": "L",
+    "rationale": "复用按钮/表单等有参模板片段，减少 include 对隐式上下文的依赖；需同时设计递归和转义上下文。",
+    "evidence": [
+      {
+        "path": "template/README.md",
+        "line": 245,
+        "observation": "明确无 macros/imports。"
+      },
+      {
+        "path": "template/model.goml",
+        "line": 47,
+        "observation": "已有执行/输出 Limits 可承载宏调用预算。"
+      },
+      {
+        "path": "template/tests/html_context_test.goml",
+        "line": 15,
+        "observation": "已有 HTML 上下文测试助手，宏输出必须保留同等安全语义。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "显式参数/默认值/词法作用域；不增加任意对象方法调用。",
+      "递归深度和操作限额有效；HTML 上下文跨宏调用校验，错误保留调用位置。"
+    ]
+  },
+  {
+    "package": "terminal",
+    "current_capability": "Linux session、CSI/SS3 键、SGR 鼠标、粘贴/焦点/取消",
+    "candidate": "可选 Kitty keyboard 协议协商与事件类型",
+    "status": "candidate",
+    "priority": "P2",
+    "effort": "L",
+    "rationale": "TUI 可区分按下/重复/释放以及传统编码混淆的组合键；默认兼容旧终端。",
+    "evidence": [
+      {
+        "path": "terminal/README.md",
+        "line": 69,
+        "observation": "明确不协商 Kitty keyboard 或 key-release。"
+      },
+      {
+        "path": "terminal/model.goml",
+        "line": 47,
+        "observation": "KeyEvent 为当前按键模型扩展入口。"
+      },
+      {
+        "path": "terminal/tests/decoder_test.goml",
+        "line": 317,
+        "observation": "kitty 文本仅作为未知控制串测试，不是键盘协议支持。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "显式启用/退出并保证 close 清理，非支持终端回退。",
+      "分片 CSI-u、修饰符、重复/释放和 malformed 参数有纯解码及 PTY 测试。"
+    ]
+  },
+  {
+    "package": "textproto",
+    "current_capability": "CRLF、头字段、dot-stuffing、SMTP 数字与增强回复读写",
+    "candidate": "显式 FTP 多行回复模式",
+    "status": "candidate",
+    "priority": "P3",
+    "effort": "M",
+    "rationale": "协议适配器可复用有界 framing，但不能放宽现有 SMTP 读回复的严格政策。",
+    "evidence": [
+      {
+        "path": "textproto/README.md",
+        "line": 44,
+        "observation": "明确拒绝 FTP 无代码中间行。"
+      },
+      {
+        "path": "textproto/reader.goml",
+        "line": 307,
+        "observation": "现有 read_response 是统一数字回复入口。"
+      },
+      {
+        "path": "textproto/tests/reply_test.goml",
+        "line": 1,
+        "observation": "存在独立 reply 测试文件，新增模式需与旧语义差分。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "独立 API/模式，仅同码+空格终止 FTP 回复。",
+      "中间任意字节行、截断、总行/字节限制及后续回复缓冲验证。"
+    ]
+  },
+  {
+    "package": "tracing",
+    "current_capability": "本地结构化 span、显式 task 上下文、过滤/采样、有界异步 sink",
+    "candidate": "独立分布式 trace-context 编解码和桥接",
+    "status": "candidate",
+    "priority": "P2",
+    "effort": "L",
+    "rationale": "HTTP 服务间关联日志需要 W3C traceparent；不能把当前递增 u64 ID 直接伪装成分布式 ID。",
+    "evidence": [
+      {
+        "path": "tracing/README.md",
+        "line": 71,
+        "observation": "现有 ID 为本地计数，明确非分布式 ID。"
+      },
+      {
+        "path": "tracing/span.goml",
+        "line": 12,
+        "observation": "TraceContext 持有 u64 ID 和本地 owner/state。"
+      },
+      {
+        "path": "tracing/tests/payload_limits_test.goml",
+        "line": 9,
+        "observation": "已有字段合并及 payload 配额，传播 metadata 也需有界。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "独立 128-bit trace ID/64-bit span ID 与严格编码验证。",
+      "显式 extract/inject，远端 parent 不能引用本地 owner；采样位和非法输入回退政策可测。"
+    ]
+  },
+  {
+    "package": "tui",
+    "current_capability": "缓冲差分渲染、组件、字素编辑器与 undo/redo",
+    "candidate": "可选软换行编辑模式",
+    "status": "candidate",
+    "priority": "P2",
+    "effort": "L",
+    "rationale": "在窄终端编辑多行说明/消息时不必横向滚动；必须把视觉行与逻辑文本位置分开。",
+    "evidence": [
+      {
+        "path": "tui/README.md",
+        "line": 89,
+        "observation": "明确不支持 soft-wrapped editing。"
+      },
+      {
+        "path": "tui/editor.goml",
+        "line": 13,
+        "observation": "Editor 维护 scroll_x/scroll_y 和 preferred_column。"
+      },
+      {
+        "path": "tui/tests/editor_test.goml",
+        "line": 16,
+        "observation": "已有字素删除与 undo/redo，新增换行不能回归。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "视觉行上下移动、Home/End、resize 和 selection 与文本字节位置一致。",
+      "宽字素、tab、超长簇、撤销/重做及视口边缘有快照测试。"
+    ]
+  },
+  {
+    "package": "tui_markdown",
+    "current_capability": "CommonMark 终端排版、可选表格、交互搜索/链接",
+    "candidate": "可选任务列表呈现",
+    "status": "candidate",
+    "priority": "P2",
+    "effort": "M",
+    "rationale": "README/工作清单中的 - [ ] 与 - [x] 可显示为清晰状态，不需要引入整个 GFM。",
+    "evidence": [
+      {
+        "path": "tui_markdown/README.md",
+        "line": 58,
+        "observation": "明确未添加 task lists。"
+      },
+      {
+        "path": "tui_markdown/model.goml",
+        "line": 76,
+        "observation": "Options 是显式扩展配置入口。"
+      },
+      {
+        "path": "tui_markdown/tests/viewer_test.goml",
+        "line": 13,
+        "observation": "已有 resize/search/link 交互测试，扩展需保持偏移和重排正确。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "opt-in，只识别合法列表首标记；代码块/转义保持原文。",
+      "嵌套列表、Unicode 宽度、搜索偏移及默认输出不变有快照。"
+    ]
+  },
+  {
+    "package": "unicode_text",
+    "current_capability": "Unicode 16 字素/词/行分段、宽度、换行和 GraphemeIndex",
+    "candidate": "UAX #29 默认句子分段",
+    "status": "candidate",
+    "priority": "P2",
+    "effort": "M",
+    "rationale": "文本预览和编辑器按句选择可复用同一 Unicode 数据基线；不承诺自然语言智能断句。",
+    "evidence": [
+      {
+        "path": "unicode_text/README.md",
+        "line": 41,
+        "observation": "明确无 sentence segmentation。"
+      },
+      {
+        "path": "unicode_text/word.goml",
+        "line": 156,
+        "observation": "现有 segment API 返回带字节位置的词段，可复用 API 风格。"
+      },
+      {
+        "path": "unicode_text/tests/segmentation_test.goml",
+        "line": 55,
+        "observation": "已有多语言词边界断言，不等于句子边界能力。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "固定 Unicode 16 SentenceBreakProperty 与官方 SentenceBreakTest 来源及哈希。",
+      "句段覆盖完整输入并返回 UTF-8 字节偏移，缩写/数字/CRLF/Extend 依 UAX 默认规则。"
+    ]
+  },
+  {
+    "package": "uuid",
+    "current_capability": "v4/v7、同步单调 v7、Serde 与 GUID 混合端序 本批新增：Uuid::v5 与四种标准命名空间。",
+    "candidate": "名称空间 UUID v5",
+    "status": "implemented",
+    "priority": "P2",
+    "effort": "S",
+    "rationale": "稳定资源标识可由 namespace+name 重现，不应依赖随机或时钟。",
+    "evidence": [
+      {
+        "path": "uuid/v5.goml",
+        "line": 1,
+        "observation": "Uuid::v5 与四种标准命名空间。"
+      },
+      {
+        "path": "uuid/tests/v5_test.goml",
+        "line": 1,
+        "observation": "17 库 + 4 示例测试，60 组 hashlib 向量含二进制与分块边界。"
+      },
+      {
+        "path": "uuid/README.md",
+        "line": 1,
+        "observation": "新增公开 API、使用方式和兼容边界已记录。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "RFC 标准 namespace 常量和 v5 固定向量。",
+      "名称字节语义明确，不做隐式 Unicode 规范化；版本/variant 和 nil namespace 验证。"
+    ],
+    "validation": [
+      "Rebase 前验证：17 库 + 4 示例测试，60 组 hashlib 向量含二进制与分块边界。",
+      "Rebase 前验证：GoML 0.1.64 独立验证 11 条检查全部通过；本地记录 verification/_artifact/batch24-uuid-report.json。",
+      "Rebase 后完整本地测试通过：ok. 17 passed; 0 failed; 0 ignored；ok. 4 passed; 0 failed; 0 ignored。"
+    ]
+  },
+  {
+    "package": "verification",
+    "current_capability": "旧独立验证器，拥有 runner/reference 和下游物化",
+    "candidate": "明确旧验证入口与 workflows/testkit 的迁移边界",
+    "status": "scope_boundary",
+    "priority": "P2",
+    "effort": "M",
+    "rationale": "两份运行器和不同模块清单容易让用户从不同入口得到不同验证范围；先核实消费者再决定兼容层，不立即删除。",
+    "evidence": [
+      {
+        "path": "verification/README.md",
+        "line": 28,
+        "observation": "自述 all 74 libraries，与 workflows 当前 README 75 有差异。"
+      },
+      {
+        "path": "verification/goml.toml",
+        "line": 2,
+        "observation": "仍声明 ecosystem::verification 独立模块。"
+      },
+      {
+        "path": "workflows/README.md",
+        "line": 7,
+        "observation": "workflows 声明 testkit 为唯一库依赖。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "枚举仍依赖 verification::reference 与旧 just 入口的仓库。",
+      "在保留用户命令的前提下给出唯一 runner 所属与迁移验证，禁止静默缩小检查。"
+    ]
+  },
+  {
+    "package": "walkdir",
+    "current_capability": "惰性 DFS、过滤/排序、取消、同文件系统、显式关闭",
+    "candidate": "显式目录描述符预算",
+    "status": "candidate",
+    "priority": "P2",
+    "effort": "M",
+    "rationale": "扫描深层目录时可预先限制 FD 而不是碰到全进程 EMFILE；不以静默关闭/重新路径打开破坏当前祖先身份保证。",
+    "evidence": [
+      {
+        "path": "walkdir/README.md",
+        "line": 90,
+        "observation": "每个活动祖先保留一个描述符，确保 rename 后仍安全定位。"
+      },
+      {
+        "path": "walkdir/README.md",
+        "line": 92,
+        "observation": "极深树可到达进程 descriptor limit。"
+      },
+      {
+        "path": "walkdir/walkdir.goml",
+        "line": 32,
+        "observation": "已有 cancellation，pub max_open 检索未发现；预算应与取消组合。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "独立 max_open_dirs 预算，超额返回明确资源错误并保留兄弟分支语义。",
+      "深树、提前 close、取消与目录重命名测试，确认不泄漏 FD。"
+    ]
+  },
+  {
+    "package": "wasm",
+    "current_capability": "Core 数字/控制、多值、引用、bulk 操作、受控 WASI",
+    "candidate": "可选保留 name 自定义节用于错误栈",
+    "status": "candidate",
+    "priority": "P2",
+    "effort": "M",
+    "rationale": "嵌入者排查 trap 时希望看到函数名，不必引入完整 DWARF 或 JIT。",
+    "evidence": [
+      {
+        "path": "wasm/README.md",
+        "line": 101,
+        "observation": "明确 name sections 和源码映射尚未暴露。"
+      },
+      {
+        "path": "wasm/binary.goml",
+        "line": 405,
+        "observation": "custom section 当前读取名称后跳过全部内容。"
+      },
+      {
+        "path": "wasm/tests/runtime_test.goml",
+        "line": 7,
+        "observation": "现有二进制 fixture 加载入口适合加入带 name 节的模块。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "模块/函数名与 index 关联，并独立限制 retained metadata 字节。",
+      "未知 subsection、重复索引、坏 UTF-8/LEB 与位置任意的 custom 节政策明确；执行语义不依赖 debug 名称。"
+    ]
+  },
+  {
+    "package": "web",
+    "current_capability": "HTTP 服务、流/SSE、路由、静态资源、会话/CSRF/限流、TLS/WebSocket",
+    "candidate": "静态文件 Last-Modified 与日期条件请求",
+    "status": "candidate",
+    "priority": "P2",
+    "effort": "M",
+    "rationale": "浏览器和代理缓存常发 If-Modified-Since；与已有 ETag 优先级结合可减少传输。",
+    "evidence": [
+      {
+        "path": "web/README.md",
+        "line": 99,
+        "observation": "明确不支持 date validators。"
+      },
+      {
+        "path": "web/README.md",
+        "line": 93,
+        "observation": "已有 If-Match/If-None-Match 优先级。"
+      },
+      {
+        "path": "web/tests/extras_test.goml",
+        "line": 27,
+        "observation": "extras 中已有 middleware/静态资源测试基础。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "基于同一已打开文件 metadata 生成 HTTP 日期，保持秒精度。",
+      "If-Unmodified-Since/If-Modified-Since 与 ETag 条件优先级、HEAD、无效日期和未来时间有协议测试。"
+    ]
+  },
+  {
+    "package": "websocket",
+    "current_capability": "RFC6455 完整帧/消息状态机、分片、并发读写及取消",
+    "candidate": "受控的流式消息发送",
+    "status": "candidate",
+    "priority": "P2",
+    "effort": "L",
+    "rationale": "大消息生产者可边生成边发，避免整个消息和所有帧一次入队；区别于现有 whole-message 分片。",
+    "evidence": [
+      {
+        "path": "websocket/session.goml",
+        "line": 145,
+        "observation": "send_fragmented 接收完整 Message。"
+      },
+      {
+        "path": "websocket/README.md",
+        "line": 113,
+        "observation": "现有分片按总队列预算原子入队，明确无无界 streaming writer。"
+      },
+      {
+        "path": "websocket/tests/frame_test.goml",
+        "line": 15,
+        "observation": "存在固定 masking fixture，可扩展流式分片准确字节断言。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "callback/reader API，固定缓冲背压、单消息发送锁与控制帧插入规则明确。",
+      "取消/中途错误终止消息并关闭连接，UTF-8 跨块验证及 close 竞态测试。"
+    ]
+  },
+  {
+    "package": "workflows",
+    "current_capability": "共享 CI、私有注册表、race/PTy/SIMD 检查和原子 JSON 报告 本批新增：--keep-going 继续验证后续模块，并记录 passed / failed / skipped 结果。",
+    "candidate": "失败后继续收集模块结果的 --keep-going",
+    "status": "implemented",
+    "priority": "P2",
+    "effort": "M",
+    "rationale": "全生态扫描遇到首个失败目前看不到其余包状态，增加显式选项可一次得到完整修复清单。",
+    "evidence": [
+      {
+        "path": "workflows/runner.goml",
+        "line": 1,
+        "observation": "--keep-going 继续验证后续模块，并记录 passed / failed / skipped 结果。"
+      },
+      {
+        "path": "workflows/tests/registry_test.goml",
+        "line": 1,
+        "observation": "33 库测试和构建；fake driver 集成覆盖失败后继续与默认停止。"
+      },
+      {
+        "path": "workflows/README.md",
+        "line": 1,
+        "observation": "新增公开 API、使用方式和兼容边界已记录。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "默认保持 fail-fast；显式 keep-going 逐模块记错误并最终返回非零。",
+      "共享 toolchain/registry 初始化失败仍立即停止；报告区分 failed/skipped/passed。"
+    ],
+    "validation": [
+      "Rebase 前验证：33 库测试和构建；fake driver 集成覆盖失败后继续与默认停止。",
+      "Rebase 前验证：使用专属 workspace 和 CI 固定 testkit 67a9a2d9fbe3e415d291d959cc3296167c52d82d；完整测试与构建日志位于 workflows/_artifact/keep-going-{test,build}.log。",
+      "Rebase 后完整本地 33 项测试通过。"
+    ]
+  },
+  {
+    "package": "x509",
+    "current_capability": "PKIX Name/Extension/AlgorithmIdentifier、BasicConstraints/KeyUsage/EKU 本批新增：DNS、邮箱、URI、IPv4/IPv6 的 SubjectAltName DER 和 Extension 编解码。",
+    "candidate": "SubjectAltName/GeneralName 类型化 DER",
+    "status": "implemented",
+    "priority": "P1",
+    "effort": "M",
+    "rationale": "证书工具需读取/构造 DNS、邮箱、URI、IP 名称扩展，无需跨越整证书信任链验证边界。",
+    "evidence": [
+      {
+        "path": "x509/pkix/subject_alt_name.goml",
+        "line": 1,
+        "observation": "DNS、邮箱、URI、IPv4/IPv6 的 SubjectAltName DER 和 Extension 编解码。"
+      },
+      {
+        "path": "x509/pkix/tests/san_test.goml",
+        "line": 1,
+        "observation": "17 库 + 4 示例测试，Go crypto/x509 独立 DER 向量。"
+      },
+      {
+        "path": "x509/README.md",
+        "line": 1,
+        "observation": "新增公开 API、使用方式和兼容边界已记录。"
+      }
+    ],
+    "references": [
+      {
+        "url": "https://pkg.go.dev/crypto/x509#Certificate",
+        "feature": "Go Certificate 暴露 DNSNames、EmailAddresses、IPAddresses、URIs；可作为 SAN 元数据用例和独立 DER 对照。"
+      }
+    ],
+    "acceptance": [
+      "DNS/rfc822Name/URI 的 IA5String 与 IPv4/IPv6 octets 编解码；其余 GeneralName 采用明确拒绝或有界原始值。",
+      "保留顺序、重复值和 ASN.1 配额；错误 tag/长度/非法 IA5/空序列测试。",
+      "以 Go x509 生成的 SAN DER 作独立向量，不引入名称匹配、信任链或 TLS 行为。",
+      "仅实现 DNS/email/URI/IP 的类型化 DER；不引入名称匹配或证书验证。"
+    ],
+    "validation": [
+      "Rebase 前验证：17 库 + 4 示例测试，Go crypto/x509 独立 DER 向量。",
+      "Rebase 前验证：GoML 0.1.64 独立验证 9 条检查全部通过；本地记录 verification/_artifact/batch24-x509-report.json。",
+      "Rebase 后完整本地测试通过：ok. 19 passed; 0 failed; 0 ignored；ok. 4 passed; 0 failed; 0 ignored。"
+    ]
+  },
+  {
+    "package": "xml",
+    "current_capability": "有界增量 XML token、命名空间、flat scalar Serde optional/repeated",
+    "candidate": "嵌套结构的显式 Serde schema",
+    "status": "candidate",
+    "priority": "P2",
+    "effort": "L",
+    "rationale": "常见 API/XML 配置包含子对象，用户目前需手写 token 循环；保持显式映射而非隐式猜测属性/元素。",
+    "evidence": [
+      {
+        "path": "xml/README.md",
+        "line": 43,
+        "observation": "当前 schema 明确 flat，排除 nested structs/mixed content。"
+      },
+      {
+        "path": "xml/serde.goml",
+        "line": 20,
+        "observation": "Field.kind 仅 ScalarKind。"
+      },
+      {
+        "path": "xml/tests/repeated_test.goml",
+        "line": 78,
+        "observation": "标量 repeated 元素已存在且保持成员顺序，不应重复实现。"
+      }
+    ],
+    "references": [],
+    "acceptance": [
+      "递归 schema 节点有独立深度上限；required/optional/repeated 与 expanded namespace 一致。",
+      "嵌套对象/向量、未知字段、字段路径和预算失败测试；mixed content 继续明确不支持。"
+    ]
+  },
+  {
+    "package": "yaml",
+    "current_capability": "有界 YAML 1.2 子集、alias、多文档、Serde 与语义错误坐标 本批新增：扫描和语法错误携带检测点行列坐标，支持 BOM、CRLF、Unicode 和 EOF。",
+    "candidate": "为目前返回 0/0 的扫描/语法阶段错误补源位置",
+    "status": "implemented",
+    "priority": "P1",
+    "effort": "M",
+    "rationale": "配置文件拼写/缩进错误目前常返回零坐标；准确位置能直接接入编辑器和配置诊断。",
+    "evidence": [
+      {
+        "path": "yaml/parser.goml",
+        "line": 1,
+        "observation": "扫描和语法错误携带检测点行列坐标，支持 BOM、CRLF、Unicode 和 EOF。"
+      },
+      {
+        "path": "yaml/tests/source_location_test.goml",
+        "line": 1,
+        "observation": "43 库测试和示例构建。"
+      },
+      {
+        "path": "yaml/README.md",
+        "line": 1,
+        "observation": "新增公开 API、使用方式和兼容边界已记录。"
+      }
+    ],
+    "references": [
+      {
+        "url": "https://pkg.go.dev/go.yaml.in/yaml/v3#Node",
+        "feature": "go-yaml Node 保留源 Line/Column；说明源位置是配置工具常用的解析能力。"
+      }
+    ],
+    "acceptance": [
+      "所有 grammar 错误记录检测点原始源坐标，EOF 使用一致哨兵位置，不用伪造 1:1。",
+      "覆盖 BOM、CRLF、非 ASCII scalar、引号/flow/缩进错误；已有语义错误坐标不回归。",
+      "保持错误 kind 和预算，不必暴露可编辑 presentation AST。"
+    ],
+    "validation": [
+      "Rebase 前验证：43 库测试和示例构建。",
+      "Rebase 前验证：本地分支已快进到远端 main 的 874d5fa；上游仅更新 CI，未创建新 commit。首次独立冷构建超过 600 秒，失败记录保留，最终复核使用临时验证器的 1800 秒单命令预算。",
+      "Rebase 前验证：验证器已移除 YAML 过时的 go test ./adapter 配置：当前仓库为纯 GoML，无 Go module/adapter；验证器自身 36 项测试通过。",
+      "Rebase 前验证：GoML 0.1.64 独立验证 18 条检查全部通过，包含独立 consumer、缓存构建、示例运行及库/下游 race 测试；本地记录 verification/_artifact/batch24-yaml-report.json。",
+      "Rebase 后完整本地测试通过：ok. 43 passed; 0 failed; 0 ignored；ok. 0 passed; 0 failed; 0 ignored。"
+    ]
+  }
+]

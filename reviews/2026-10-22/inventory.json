@@ -1,0 +1,695 @@
+{
+  "created_at": "2026-10-22T12:53:30.121839+00:00",
+  "scope": "The original 76-module ecosystem review. Implementations were integrated with fetched origin/main before committing. Runtime validation records distinguish original verification from post-rebase checks. Explicitly excluded sibling projects are listed separately.",
+  "packages": [
+    {
+      "package": "ansi",
+      "module": "ecosystem::ansi",
+      "head": "3e4e906513d5965af9a3edacb3cbd1fff2a42e4a",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "6827d403b2e5e51494272609fd83683a33cff7022e62e70c6e41365bbb344a9d",
+      "review_base_head": "3e4e906513d5965af9a3edacb3cbd1fff2a42e4a"
+    },
+    {
+      "package": "archive",
+      "module": "ecosystem::archive",
+      "head": "4c3b212c4ae7e3ccdac8fc447c93ad0596733bed",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "26d03814e480a2bab02eaa87d8a7353b2a34dc7bb6e58863913f3b446a3bd509",
+      "review_base_head": "e4a030fe9c9f49e7940c5370e3fff14cd5d1749f"
+    },
+    {
+      "package": "asn1",
+      "module": "ecosystem::asn1",
+      "head": "19634bb1ca1d6ff0cff740dd7a66a8e639b15c40",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "15f00633929eb8c700878a961691106becc96f0fd2129ab395fa33d7efe47c3b",
+      "review_base_head": "19634bb1ca1d6ff0cff740dd7a66a8e639b15c40"
+    },
+    {
+      "package": "bench",
+      "module": "ecosystem::bench",
+      "head": "cb642373fa022ddd6b90d888175c8b15ba63687d",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "0e8aba72a91c28d387012535e17e520df9173255d6cd95208acc53addcfc048e",
+      "review_base_head": "17d2b91cf142602a313c0cd82046bfeea65eaa5d"
+    },
+    {
+      "package": "bigint",
+      "module": "ecosystem::bigint",
+      "head": "baabea8257ca7606c3764bbeb940cfb22f3b3ec3",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "3ba14bf1062ef8aea81c68fc92b280c18ba90cf6c1a07f2f2a7292c0a2bd2c25",
+      "review_base_head": "baabea8257ca7606c3764bbeb940cfb22f3b3ec3"
+    },
+    {
+      "package": "bigmath",
+      "module": "ecosystem::bigmath",
+      "head": "ffb28e7c154b722421441aa35b4ffcca15d1d121",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "ef17b6af1a92f4133960f27f595123d3535c0124f887235fc60a103017243ca9",
+      "review_base_head": "ffb28e7c154b722421441aa35b4ffcca15d1d121"
+    },
+    {
+      "package": "bitflags",
+      "module": "ecosystem::bitflags",
+      "head": "e189d5af4704c2af8fb2b5adbc864884cf6dac7e",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "5b1c47d5b6e57ff14c61f59f6c000486e43d0b25e833ed96e92c1bc9602a2778",
+      "review_base_head": "e189d5af4704c2af8fb2b5adbc864884cf6dac7e"
+    },
+    {
+      "package": "cache",
+      "module": "ecosystem::cache",
+      "head": "d0a292c0bbaedc837fcd1a739e22c10b4aa6444c",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "d098664674357b147414e90ab1b03e1ecf26f4b3534c2652b73c2da3ef40816e",
+      "review_base_head": "a2f740e711012b0eda618216572938f692f034c2"
+    },
+    {
+      "package": "cli",
+      "module": "ecosystem::cli",
+      "head": "0477ea333cf2c881c053a5be3d519edf73eaab72",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "2c0477de1289bd358a4f180ca7b67d3a5ad0230f3af235fc8e989f114f45c40b",
+      "review_base_head": "46e36f58125fd26de1af08de2b9ede4f0d5aef73"
+    },
+    {
+      "package": "color",
+      "module": "ecosystem::color",
+      "head": "de0e76a6cd66c8fe9047d3931f90d859bca1a981",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "2dfaf3fdbea5748adec825296e519fb08b160a93325ababaa637d603b6d3e3b0",
+      "review_base_head": "bdcf7e6260f8a399a1101805e4a0a18d348a8427"
+    },
+    {
+      "package": "compress",
+      "module": "ecosystem::compress",
+      "head": "d339d5d4cb438ed6d90542a934539733c540c026",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "f0c90ec3fc7cc63c7e3079e319984298c7a4a42356a90d0271c7c5c518741bc7",
+      "review_base_head": "d339d5d4cb438ed6d90542a934539733c540c026"
+    },
+    {
+      "package": "config",
+      "module": "ecosystem::config",
+      "head": "2d113adda9276abcac542fa6fcb1e17fcbec5faf",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "2f9e5f20cbc16530bcdc9e4eb16e7659048cd46332e099347e919c7fc45b94c1",
+      "review_base_head": "a85bde198c69f5184f13f0ab51265304c5db8093"
+    },
+    {
+      "package": "csv",
+      "module": "ecosystem::csv",
+      "head": "d35647a062deaced05a755a883814cc3a493f8a9",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "a7f09e604b1eddfcb3869c313e746463e7bcc9e5c28c8f579af1066c5472c28f",
+      "review_base_head": "d35647a062deaced05a755a883814cc3a493f8a9"
+    },
+    {
+      "package": "datetime",
+      "module": "ecosystem::datetime",
+      "head": "5d57593fbbc6db968a6db05b944ed3411a1af604",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "22bae56de0b5bc7191eb6affaa88c9b73bd13caee8f74fee223dc27fbbe1e791",
+      "review_base_head": "5d57593fbbc6db968a6db05b944ed3411a1af604"
+    },
+    {
+      "package": "decimal",
+      "module": "ecosystem::decimal",
+      "head": "a89f10f2bb2b348675cac5c3c9a756e9f101a8fa",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "af54e52a2fed3b1197c6ec81c341df26c8a4d15ae51a5d9bcfe1817a1414afea",
+      "review_base_head": "b6629ac622b6e17541d0650516b454bee5c4771c"
+    },
+    {
+      "package": "diagnostics",
+      "module": "ecosystem::diagnostics",
+      "head": "393187ff01134f2d719a1ec5eddef6f154480f97",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "f7c54861da2016a846b492b30f5f4dc3f5b29f960557ecbce3fe28885965da6b",
+      "review_base_head": "704b69e78ecab3cb67ea6b66c8e940015e8a0594"
+    },
+    {
+      "package": "diff",
+      "module": "ecosystem::diff",
+      "head": "3c38c4ec6553a58feb17c5473be58bea9b4442cc",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "97d3f2c07a5310fea7ab664024e4f627ef4ca2b3caf4347683c7128bf50bd71a",
+      "review_base_head": "be79d436445937c91f68e52014dbf6caa15f331b"
+    },
+    {
+      "package": "dwarf",
+      "module": "ecosystem::dwarf",
+      "head": "1f2de1674eb12bedccac4d2a1bde1c3600f90f7e",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "0236dbb0a6a702127adb3ddcc2ff62a6f20c71adcb1bd10e5d5bcb56a162cc67",
+      "review_base_head": "d58cb41a5c910c156ee4f716803091c31c7b1036"
+    },
+    {
+      "package": "explorer",
+      "module": "example::explorer",
+      "head": "2b60c7cfb999700875b78949a484ff0d10b5dca2",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "14eb731a2d66de8285263553f7da40e88f02ad55f66603524ad06b3db75b6876",
+      "review_base_head": "2b60c7cfb999700875b78949a484ff0d10b5dca2"
+    },
+    {
+      "package": "fuzzy",
+      "module": "ecosystem::fuzzy",
+      "head": "49cff5f70920fa41e1af49fdab8a8e6520071fff",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "13e0a79f558cb8f2eb29866f915991a8ace4b016895a1c644448be1537b82674",
+      "review_base_head": "49cff5f70920fa41e1af49fdab8a8e6520071fff"
+    },
+    {
+      "package": "go_doc",
+      "module": "ecosystem::go_doc",
+      "head": "5f580932516c16fc71282059ce7d64a0b99a84ce",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "7d4ff5a7ec46eb011cb902ad92d1319ce1b43f8397188e3cb78c3ba6cc80cf26",
+      "review_base_head": "5f580932516c16fc71282059ce7d64a0b99a84ce"
+    },
+    {
+      "package": "goir",
+      "module": "ecosystem::goir",
+      "head": "130a59c0c4ea96e8671faee7113a768fecc41ec9",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "35a89f74efb3f6baf8575c4296000ffa1e756613becb1ada4d12b97ecf1f91c0",
+      "review_base_head": "57243e24064012a379510df6a142d9ba42800378"
+    },
+    {
+      "package": "goml_stats",
+      "module": "ecosystem::goml_stats",
+      "head": "7389257dfa55b23efe66410e51e51c0e0f1eebec",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "67a95e6b51befbfcaa0bb90594075919c081b1a731a04cc21c038410a8729d2e",
+      "review_base_head": "7389257dfa55b23efe66410e51e51c0e0f1eebec"
+    },
+    {
+      "package": "gomlgo",
+      "module": "gomlgo",
+      "head": "8427429b85684e0528e19c7ad6ce51ecd230526f",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "87848ff9a919901229e42a91bfda41e155025d47436e531c655c48af8b93e945",
+      "review_base_head": "87be6afbbd97a2976b6964943ba51d1a11a44fbd"
+    },
+    {
+      "package": "gomlquickjs",
+      "module": "gomlang::quickjs",
+      "head": "bc944d608f5dd07a7e4ca68ed5a5b554b47190e1",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "607c5212ce00438c36e8efa9f851f878f12a061c45611d9ff880618003910f1e",
+      "review_base_head": "bc944d608f5dd07a7e4ca68ed5a5b554b47190e1"
+    },
+    {
+      "package": "graph",
+      "module": "ecosystem::graph",
+      "head": "3e231f12ea542cc198080e43d0282b0a7b431735",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "8909b746de077147d270a34e781c22e1c3c3bdbd0e24fde06ce76f3b3ecc3fbd",
+      "review_base_head": "ffddfc3e6308dcc0e237ecd6d68a91083bdf65a1"
+    },
+    {
+      "package": "highlight",
+      "module": "ecosystem::highlight",
+      "head": "2c8940ab01c07b61c0a2b102a858b016ad07d413",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "b11b2d05f035b7c10805b9f2840cd25e97c1bbe49a7e11bd02a521fc0a8ac9fd",
+      "review_base_head": "d2b592ad9573ecf975317fedca2fceb50af2f37e"
+    },
+    {
+      "package": "html",
+      "module": "ecosystem::html",
+      "head": "e21faa0e5ed437d525089231fe9336fdf289ec62",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "5537e8490c5d252afad82b7b36c839dff404b86de724b6481129d8b9b81b0818",
+      "review_base_head": "bc1ac63bd30d10b511bdc9baa636dd79e5ad014a"
+    },
+    {
+      "package": "http",
+      "module": "ecosystem::http",
+      "head": "dc6d489f251bc0403049468e06fc51e6137d6942",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "fe693c418d0de032a9848e96fb27fa9dfb5c3f2e2f30778cca8ab435375f8733",
+      "review_base_head": "3213ea6642cf65030dad6acf6d3125a511d5657a"
+    },
+    {
+      "package": "ignore",
+      "module": "ecosystem::ignore",
+      "head": "2d29167fe820d18fb651a6980f63d1058b037ae0",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "4dc1a0bd71d25daa19111df1f6c02733714008507dbb818e59d5000f9819b2db",
+      "review_base_head": "2d29167fe820d18fb651a6980f63d1058b037ae0"
+    },
+    {
+      "package": "image",
+      "module": "ecosystem::image",
+      "head": "09b1eb31b66f05c058b2cbee8c7bb48378061c5f",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "fe1a3298f26a632b01d39c50856e272f8756dbb08e187d9a2a9e82213ef29b5d",
+      "review_base_head": "09b1eb31b66f05c058b2cbee8c7bb48378061c5f"
+    },
+    {
+      "package": "incremental",
+      "module": "ecosystem::incremental",
+      "head": "e47ff429204f495cb5995c5221a8048b96224449",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "1c9d220197189e240fa2cf745542bcf3649c3d484870613616810ceb94788652",
+      "review_base_head": "e47ff429204f495cb5995c5221a8048b96224449"
+    },
+    {
+      "package": "jwt",
+      "module": "ecosystem::jwt",
+      "head": "5a4d15a104efcd0beba4b508f28a3ea2c6e1f9e2",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "f6215a25041bec8b34caeaf0813bc852b36f835a44485945ce49bbf8cee4b038",
+      "review_base_head": "5a4d15a104efcd0beba4b508f28a3ea2c6e1f9e2"
+    },
+    {
+      "package": "lexer",
+      "module": "ecosystem::lexer",
+      "head": "c24a658e0d18416de3659a0a9ca91b9a79fc12f4",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "7905d718ca9908bd24f1679aa05c3fc9e750d2bbdecfb87efc86ec97c0a6a792",
+      "review_base_head": "c24a658e0d18416de3659a0a9ca91b9a79fc12f4"
+    },
+    {
+      "package": "llvm",
+      "module": "ecosystem::llvm",
+      "head": "e27e8d5260b4a4aa091db86a0d1c8ac280424265",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "3187c8bb78f9c4c33b425ffcb77e8d7abf795b4ebe38e7c0d2bb2ed8ffc2d067",
+      "review_base_head": "e27e8d5260b4a4aa091db86a0d1c8ac280424265"
+    },
+    {
+      "package": "lsp",
+      "module": "ecosystem::lsp",
+      "head": "084bed77ff0c4b667547d0fad7fc2bf0705cab7f",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "cd975415d9b0f7479a7d1a9f042ed923b751706f0838810a05f2e21b23963253",
+      "review_base_head": "084bed77ff0c4b667547d0fad7fc2bf0705cab7f"
+    },
+    {
+      "package": "mail",
+      "module": "ecosystem::mail",
+      "head": "de655e8de0e75b470ee94115c77979f698f6a328",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "f87f54776f9ac9dc52d85618bad788d132620ae609165056689d07f4ddb63673",
+      "review_base_head": "de655e8de0e75b470ee94115c77979f698f6a328"
+    },
+    {
+      "package": "markdown",
+      "module": "ecosystem::markdown",
+      "head": "aa21fb1f313b12bb25548f8fe5c348e8e2133509",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "008e5caeeeb6a5d6869a704eebf5f4ee641c14113cd943ea25be6deddc94b0e6",
+      "review_base_head": "aa21fb1f313b12bb25548f8fe5c348e8e2133509"
+    },
+    {
+      "package": "metrics",
+      "module": "ecosystem::metrics",
+      "head": "6e06cce4f75448f2ce23a1d16e9f103148188934",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "b4ef34722a2c892b79e25f95f5820d70f8f7b125fe9e898937f24d5bbf501b05",
+      "review_base_head": "6e06cce4f75448f2ce23a1d16e9f103148188934"
+    },
+    {
+      "package": "mime",
+      "module": "ecosystem::mime",
+      "head": "401c9afdda6425593e3ea01d64d3c4fb9b9811d5",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "b0c984142cb894a6121040b2869215614ee90aa9582042fb1a6712ec7cd7d673",
+      "review_base_head": "8ac07db6c04dd8742389f44a26c9b42a32b9978c"
+    },
+    {
+      "package": "msgpack",
+      "module": "ecosystem::msgpack",
+      "head": "b25b0b30913d576049db5d1f147b25e095cc11b4",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "49646d532e7bd1e11119d9b4ba2ebf22f31858d6649c9d948abbd92a8822afbc",
+      "review_base_head": "4dbe4d07d3556088dec67c3a41d0e3ea71332102"
+    },
+    {
+      "package": "ndarray",
+      "module": "ecosystem::ndarray",
+      "head": "b02e6bed8f3400238fcd8e2f3a74b0a5c164f3c1",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "63a94a0fded59e145f90fbe7b3a452b17bd7e091c8f883f9dde72b4de3d39d84",
+      "review_base_head": "8bba32de35706fbeda837fbcff663cb7ddab2dd3"
+    },
+    {
+      "package": "notify",
+      "module": "ecosystem::notify",
+      "head": "47756b338d50cff5dd897b7200edeb4a181ffc7d",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "247c98350591de05b013dcf4219f3e3fb3ddd09197b6d1eb679c61a568a115f3",
+      "review_base_head": "47756b338d50cff5dd897b7200edeb4a181ffc7d"
+    },
+    {
+      "package": "object",
+      "module": "ecosystem::object",
+      "head": "e105647a6c52382d8445834aa993db30998d3d2f",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "e8949aa8d1d383c886490eaca964b0540d42becd712deb2eda0bf7509f62053e",
+      "review_base_head": "919faf1b0bae34921bd0f84ad550d742fdaae680"
+    },
+    {
+      "package": "parser",
+      "module": "ecosystem::parser",
+      "head": "dada23a1e701a0492bbdb6d97b0f66f670e8b5e4",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "84781ce1f0bae329113dc6d0c9a92685f6a04c817143e4038041924d173fd406",
+      "review_base_head": "947f4c8a13f28defd194b2fdb2bbdc3eb046de08"
+    },
+    {
+      "package": "pipeline",
+      "module": "ecosystem::pipeline",
+      "head": "b0c68949bbdc841533dfb183330a667d10dd97bb",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "481837e95d0e707dff88301774b271883fa900ea398260ba90e5c1836a48904d",
+      "review_base_head": "05f8089d2f7e3bfc1437e952479197d91c144e2c"
+    },
+    {
+      "package": "progress",
+      "module": "ecosystem::progress",
+      "head": "0e882577d601fba7d648bdf3fab7cdd6e9f804c1",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "9387dafbb631c635b3273a30f17fae51b26b0eada5ba31101af870db6fb90c8d",
+      "review_base_head": "0e882577d601fba7d648bdf3fab7cdd6e9f804c1"
+    },
+    {
+      "package": "prompt",
+      "module": "ecosystem::prompt",
+      "head": "6b1730e18544467b47b87f5e0104be99aa3ec1fb",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "936d8880d975ca113f6f2fa7aaaee811abc1dba529f7c77a22807c404ff80b6b",
+      "review_base_head": "6b1730e18544467b47b87f5e0104be99aa3ec1fb"
+    },
+    {
+      "package": "proptest",
+      "module": "ecosystem::proptest",
+      "head": "c88f286a0abab7126e56311addf80c2e83d6b915",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "f4598258cf507046064a96f933a6483e30300229b40a2e39c448ea3a5a5b364c",
+      "review_base_head": "c88f286a0abab7126e56311addf80c2e83d6b915"
+    },
+    {
+      "package": "redis",
+      "module": "ecosystem::redis",
+      "head": "b0a7be14ea1582b4fd068652d8ee9c4565bfb717",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "20b487593089920745e09c33186876f75c47ea59cb38ecb2f553b7816992daeb",
+      "review_base_head": "8be97ed443407d1513b64c27899fe4893bf698ad"
+    },
+    {
+      "package": "regexp",
+      "module": "ecosystem::regexp",
+      "head": "2c6e5e179f0c757f504678242925989423e68af2",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "1b0c4287c829ae347762350169965c7ae4aa976a9b4bb63553332355537be656",
+      "review_base_head": "2c6e5e179f0c757f504678242925989423e68af2"
+    },
+    {
+      "package": "request",
+      "module": "ecosystem::request",
+      "head": "63d79315db3ec2fc7fa6bf6cc5646474edab846a",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "2ccb26ca09356e4acd25fe413314dc2c151d1fdb40d259643713a76fbe3f7f71",
+      "review_base_head": "47a86f9166f80acb8735f6f7474ad71d996f72d4"
+    },
+    {
+      "package": "rope",
+      "module": "ecosystem::rope",
+      "head": "19d05ac0e911702c4f2f3332f168a9d595661c03",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "883556c238005c7e81b5d9dc498f08c10c5e3e8550bcaae153fbabf7b8ef2310",
+      "review_base_head": "19d05ac0e911702c4f2f3332f168a9d595661c03"
+    },
+    {
+      "package": "s3",
+      "module": "ecosystem::s3",
+      "head": "9c26b036f3ff72ab1ba4cf33a80ea3000a7c7952",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "b6807a6dee61c6881d3d62d6fc255ea82ec1e74fd4c52c42b656038b6ec34c8d",
+      "review_base_head": "4e7e1684a77e0d2e8f26b7d20bce930e1911af38"
+    },
+    {
+      "package": "sql",
+      "module": "ecosystem::sql",
+      "head": "6fee8d9f453bd9f4a798c7b834e0f7bd84a88b5a",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "7ca7f54f636a2a191dce3c49ab6aa539d9291cfbc0ff4e5fa1a51ac7b69f5eba",
+      "review_base_head": "5e20d017a64a4893dd94cf0af1f8af1087524124"
+    },
+    {
+      "package": "sqlite",
+      "module": "ecosystem::sqlite",
+      "head": "02bd4be83756596d9536aed6b915eda671a2f7e5",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "13f5bf7f49c87d487bc42cede70ccb36cce9b0f82e74ed32c1830b21b898b544",
+      "review_base_head": "02bd4be83756596d9536aed6b915eda671a2f7e5"
+    },
+    {
+      "package": "syntax",
+      "module": "ecosystem::syntax",
+      "head": "9c5ba376d7b1db9c5d26353d4f94d3eb64e94a82",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "ec3b11fa92c8e9e2882c3d0fc21b686aadf59bd8b7aec90401e50b0c6237e44b",
+      "review_base_head": "9c5ba376d7b1db9c5d26353d4f94d3eb64e94a82"
+    },
+    {
+      "package": "tabwriter",
+      "module": "ecosystem::tabwriter",
+      "head": "a94e266bbcbb98c49452caad5d6720b16fc1ba71",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "d7ef718b06ecaacbf9de899525f3b4a1ed9e786c5607c5128053daa66d573fb9",
+      "review_base_head": "12ebef618a17372432eb85efd2979d9ccaaf2a1d"
+    },
+    {
+      "package": "tempfile",
+      "module": "ecosystem::tempfile",
+      "head": "931e4bad0c6867c7661f42da1daa336a4f98797f",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "a83940fdc4d52f4d37f49ae9937c374e200553a9e7dec0d02e92361d1778e52a",
+      "review_base_head": "931e4bad0c6867c7661f42da1daa336a4f98797f"
+    },
+    {
+      "package": "template",
+      "module": "ecosystem::template",
+      "head": "6ce2683a990093eaf54173d37dd761ae8f9b51a0",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "371aab0465db28ce681a88c3a5b386cf11ac56b0af61bc04d977689c1b923224",
+      "review_base_head": "6ce2683a990093eaf54173d37dd761ae8f9b51a0"
+    },
+    {
+      "package": "terminal",
+      "module": "ecosystem::terminal",
+      "head": "b35b075c27eb595d415107acfbb718d313fdf01b",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "f270bf34dcd59b1cc21ef58639144c6e0d8664c22dac2febcbf69546c2a1c090",
+      "review_base_head": "b35b075c27eb595d415107acfbb718d313fdf01b"
+    },
+    {
+      "package": "textproto",
+      "module": "ecosystem::textproto",
+      "head": "63739053d711c0a87a74f0bcba64521d7581f884",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "ae51a8300c516bae7c7ee82f2743a60f905ae7e09b78f28a6636fc6b6a28bda0",
+      "review_base_head": "63739053d711c0a87a74f0bcba64521d7581f884"
+    },
+    {
+      "package": "tracing",
+      "module": "ecosystem::tracing",
+      "head": "77e8a76c25cd823e105cf4323078fcef3964a21e",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "4913ed944a50c3f59d367d906a4ec49a0c17213be2c5c40decbf337bdc0af972",
+      "review_base_head": "77e8a76c25cd823e105cf4323078fcef3964a21e"
+    },
+    {
+      "package": "tui",
+      "module": "ecosystem::tui",
+      "head": "d7bb8027afe36fbd80f4da699d9254626f7fb9c5",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "dd21f57e0a56661950a057988c506a7baa9e20402b2ad8ff1db3eb0d83793a06",
+      "review_base_head": "d7bb8027afe36fbd80f4da699d9254626f7fb9c5"
+    },
+    {
+      "package": "tui_markdown",
+      "module": "ecosystem::tui_markdown",
+      "head": "b9f1b15585a955226c1e125b059f870f8fe858bf",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "3d66a199d9b38d563e4f31e19e4c256e7d412f140193ef96256df69bac85c78a",
+      "review_base_head": "b9f1b15585a955226c1e125b059f870f8fe858bf"
+    },
+    {
+      "package": "unicode_text",
+      "module": "ecosystem::unicode_text",
+      "head": "71e22e0d47284653ab1ef81a490ea565c4295c61",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "68b27e25ce96bfb5015fe2bab0929cd06ef1625c2b50e11d02e0db2029e9d84b",
+      "review_base_head": "71e22e0d47284653ab1ef81a490ea565c4295c61"
+    },
+    {
+      "package": "uuid",
+      "module": "ecosystem::uuid",
+      "head": "0634c2651e0497f02f7c467c8180195f0bc968ef",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "424689145bb54885352543d9340c244b2a67ce38778a2b41b40faa97acfd075f",
+      "review_base_head": "20682b00506ff871404bca74c9a2891c66739f70"
+    },
+    {
+      "package": "verification",
+      "module": "ecosystem::verification",
+      "head": "cb3f23e0b1c5a659beee5c3dd87fc28338252b83",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "4b0977645d97913df13b4e5ad3cb083743cb7302ffbad60fea68a6d36d395bed",
+      "review_base_head": "cd057a6a4b17411509a137382cca6f2cc7207144"
+    },
+    {
+      "package": "walkdir",
+      "module": "ecosystem::walkdir",
+      "head": "e0309bccf81d4d0304e217acc162894e5be938e9",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "fc82e3004d1e1a5befbec907f2a8795acb58d5fe9ee3e6f415fc89176ae65d13",
+      "review_base_head": "e0309bccf81d4d0304e217acc162894e5be938e9"
+    },
+    {
+      "package": "wasm",
+      "module": "ecosystem::wasm",
+      "head": "8da3dfcac2703f78863fdb32e7c99b87f7099230",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "9084d254b03049a4f2922cb44a279bdb67b462c952a0166d961a232d98a4e19f",
+      "review_base_head": "8da3dfcac2703f78863fdb32e7c99b87f7099230"
+    },
+    {
+      "package": "web",
+      "module": "ecosystem::web",
+      "head": "444711d3d4ca4e21676aa6c6e2a0a586654eaa8c",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "2eaa12853f1885fcf1308473742e661590fe306503560460cff4dd38bbe0f86d",
+      "review_base_head": "444711d3d4ca4e21676aa6c6e2a0a586654eaa8c"
+    },
+    {
+      "package": "websocket",
+      "module": "ecosystem::websocket",
+      "head": "1509f67cd786bc693a577e64d3db859be5043668",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "6332087cc220cb47cb85c7a39dc6cabe3da9e02afd75011a2fce979fd0fcdc00",
+      "review_base_head": "1509f67cd786bc693a577e64d3db859be5043668"
+    },
+    {
+      "package": "workflows",
+      "module": "ecosystem::workflows",
+      "head": "5d169a772e9bbc494117439b1b7392c786176d20",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "e635c7b7f07b2d3a0d6253d538ddcdb35211362558911aa8e5fdffe8d22057ee",
+      "review_base_head": "778e1a9a9b3d38a15902f75100cfd801b950b741"
+    },
+    {
+      "package": "x509",
+      "module": "ecosystem::x509",
+      "head": "2ff10b24fdd34d3cfce6bac81670e2195856af50",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "96ce9291f743df980f33aebca387de57320d066fc91ddfde442de465d4be952e",
+      "review_base_head": "f989d8e1eb43d162e136ba01d19d9cca597db832"
+    },
+    {
+      "package": "xml",
+      "module": "ecosystem::xml",
+      "head": "ba1195856cb4bbed1a486c23ab294ab129157044",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "9c9a2ae4516287f8b1c3333131e66e4cb8573798ec26600ca31762fdaaccc48c",
+      "review_base_head": "ba1195856cb4bbed1a486c23ab294ab129157044"
+    },
+    {
+      "package": "yaml",
+      "module": "ecosystem::yaml",
+      "head": "408f5d57150ba638532a14563e20a1bc89870a60",
+      "worktree_dirty": false,
+      "changed_paths": 0,
+      "readme_sha256": "fcfaba4f166f55094647c79ee0a71455fe540206909d16286f14e0ca504b39a8",
+      "baseline_update": "Fast-forward from f34ee862301e35542a9ec503b1cb47398085648a to origin/main; upstream change only updates CI GoML 0.1.62 to 0.1.63. Working-tree feature changes preserved; no new commit created.",
+      "review_base_head": "874d5fa13e305b2d6bc8ea3b71ef6babd49be251"
+    }
+  ],
+  "refreshed_at": "2026-10-22T13:29:05.529780+00:00",
+  "excluded_packages": {
+    "esp32emu": "独立模拟器工程，不在原有 76 模块审查及本轮授权的 24 仓库功能清单内；未修改或验证。"
+  }
+}
